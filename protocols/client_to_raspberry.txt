@@ -1,0 +1,77 @@
+potential Wrappings:
+	Json via HTTP for eventless, TCP for events enabled due to always-open-connect
+		Maps für die Parameternamen/return-parameter
+		Arrays für die Listen-rückgaben
+
+
+commandbases:
+set: sets given attribute to certain value. parameters until newline delimiter
+get: gets current value of property
+
+
+
+
+properties:
+
+//category: vlc_control
+
+volume
+	parameters: value from 0 to 255
+
+	
+playback_ctrl:
+	command:{play:pause:fastforward:skip:start}
+		on start: second parameter as title
+	doesnt return anything on get
+	
+playback_status
+	only get-able
+	values:
+	title
+	time
+	duration
+	
+playback_seek
+	set: sets position to seek
+	get: returns seekable flag
+	
+	
+webradio:
+	parameters: 
+		URL: URL of stream/playlist or ShortID
+
+webradioShortID
+	set: shortID URL
+	get: List of shortID-> url mappings
+	
+Playback_DLNA
+	TODO:
+	
+//category: video
+	
+vnc:
+	parameters: 
+		target_ip: destination ip/adress to connect
+		compress_level{0=none,..9=max}
+		
+		
+beamer_sourceselect:
+	get: available sources lists
+	set: one of available sources
+	
+miracast_start
+	TODO: define
+		
+		
+		
+		
+		
+		
+		
+Category: Meta
+	event:
+	parameter: 
+		propertyname: propertyname to watch for notification
+		mode: register:registers this listener to the sending computer unregister: removes selected listener for computer
+
+		
