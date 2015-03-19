@@ -17,7 +17,7 @@ properties:
 
 volume
 	parameters: value from 0 to 255
-
+	
 	
 playback_ctrl:
 	command:{play:pause:fastforward:skip:start}
@@ -26,7 +26,7 @@ playback_ctrl:
 	
 playback_status
 	only get-able
-	values:
+	values: Mapping mit
 	title
 	time
 	duration
@@ -45,30 +45,26 @@ webradioShortID
 	get: List of shortID-> url mappings
 	
 Playback_DLNA
-	TODO:
+	properties:{IP, path}
+	settable & gettable
 	
 //category: video
 	
 vnc:
-	parameters: 
+	set: parameters: 
 		target_ip: destination ip/adress to connect
 		compress_level{0=none,..9=max}
-		
-		
+	get: current VNC source IP
+
 beamer_sourceselect:
 	get: available sources lists
 	set: one of available sources
 	
 miracast_start
-	TODO: define
-		
-		
-		
-		
-		
-		
-		
-Category: Meta
+	set: IP of source
+	get: currently shown screen
+
+//Category: Meta
 	event:
 	parameter: 
 		propertyname: propertyname to watch for notification
