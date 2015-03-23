@@ -10,12 +10,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
-import org.cc86.MMC.API.Request;
+import org.cc86.MMC.API.Packet;
 import org.yaml.snakeyaml.Yaml;
 
 
@@ -24,8 +23,8 @@ import org.yaml.snakeyaml.Yaml;
  * @author tgoerner
  */
 public class TCPhandler implements Handler{
-    Socket sck;
-    String returnMsg;
+    private final Socket sck;
+    private String returnMsg;
     public TCPhandler(Socket s)
     {
         sck=s;
@@ -50,10 +49,10 @@ public class TCPhandler implements Handler{
                     } catch (IOException ex) {
                         Logger.getLogger(TCPhandler.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    Object packet = new Yaml();
-                    if(packet instanceof Request)
+                    Object packet = new Yaml().load(request);
+                    if(packet instanceof Packet)
                     {
-                        
+                        API.getDispatcher().handleEvent((Packet)packet,this);
                     }
                     else
                     {
@@ -65,13 +64,14 @@ public class TCPhandler implements Handler{
             Thread t2 = new Thread(()->{
                 while(sck.isConnected())
                 {
-                    synchronized(returnMsg)
+                    synchronized(sck)
                     {
                         try {
-                            returnMsg.wait();
+                            sck.wait();
                         } catch (InterruptedException ex) {
                         }
                         out.println(returnMsg);
+                        out.flush();
                         returnMsg="";
                     }
                 }
@@ -84,8 +84,12 @@ public class TCPhandler implements Handler{
     }    
 
     @Override
-    public void respondToLinkedClient(Request response) {
-         API.getDispatcher().handleEvent(response);
+    public void respondToLinkedClient(Packet response) {
+         synchronized(sck)
+         {
+             returnMsg=new Yaml().dump(response)+"\n---\n";
+             sck.notify();
+         }
     }
     
     

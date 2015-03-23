@@ -1,0 +1,17 @@
+apply plugin:'java'
+task distZip(dependsOn: 'jar') {
+	//NO-OPtask als redirect
+}
+
+
+
+
+
+compileJava.options.encoding = 'UTF-8'
+dependencies
+{
+	compile fileTree(dir: 'lib', include: '*.jar')
+	compile project(':Server')
+}
+
+

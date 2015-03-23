@@ -1,8 +1,9 @@
 apply plugin:'java'
 
+apply plugin:'application'
 
-
-
+version = '0.0.1.0'
+mainClassName = 'org.cc86.MMC.Main'
 
 compileJava.options.encoding = 'UTF-8'
 dependencies

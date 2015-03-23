@@ -11,5 +11,5 @@ package org.cc86.MMC.API;
  * @author tgoerner
  */
 public interface Handler {
-    public void respondToLinkedClient(Request response);
+    public void respondToLinkedClient(Packet response);
 }

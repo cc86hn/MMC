@@ -5,24 +5,38 @@
  */
 package org.cc86.MMC.server;
 
-import org.cc86.MMC.API.Request;
+import java.util.HashMap;
+import org.cc86.MMC.API.Processor;
+import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.API.Handler;
 
 /**
  *
  * @author tgoerner
  */
 public class Dispatcher {
-    
+    private HashMap<String,Processor> dispatcherLogic = new HashMap<>();
     PluginManager pm;
     public Dispatcher(PluginManager p)
     {
         pm=p;
     }
     
-    public void handleEvent(Request r)
+    public void handleEvent(Packet r,Handler h)
     {
-        
+        Processor p = dispatcherLogic.get(r.getData().get("command")); 
+        if(p!=null)
+        {
+            p.process(r,h);
+        }
+        else
+        {
+            //Errorhandling
+        }
     }
     
-    
+    public void registerOnRequestType(String requestType,Processor p)
+    {
+        dispatcherLogic.put(requestType, p);
+    }
 }

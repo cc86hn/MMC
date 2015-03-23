@@ -1,17 +1,19 @@
 potential Wrappings:
-	Json via HTTP for eventless, TCP for events enabled due to always-open-connect
-		Maps für die Parameternamen/return-parameter
-		Arrays für die Listen-rückgaben
+	Yaml via HTTP for eventless, TCP transporting for events enabled due to always-open-connect. maybe REST-based for other uses?
+		name von element = key in the data-map
 
 
 commandbases:
 set: sets given attribute to certain value. parameters until newline delimiter
 get: gets current value of property
-
+response: only used by server when sending a response
+(appears as type in the datamap)
 
 
 
 properties:
+those appear as command in the map. attributes by their name.
+
 
 //category: vlc_control
 
@@ -42,7 +44,7 @@ webradio:
 
 webradioShortID
 	set: shortID URL
-	get: List of shortID-> url mappings
+	get: List of shortID-> url mappings as a nested map
 	
 Playback_DLNA
 	properties:{IP, path}
@@ -70,4 +72,7 @@ miracast_start
 		propertyname: propertyname to watch for notification
 		mode: register:registers this listener to the sending computer unregister: removes selected listener for computer
 
+    test:
+        message: on set: sets message into memory and displays a message on console; on get: returns message wioth a "Saved:" prepended p:
+        //debugging command only
 		

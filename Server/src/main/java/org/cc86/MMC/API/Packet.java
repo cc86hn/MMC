@@ -11,7 +11,7 @@ import java.util.HashMap;
  *
  * @author tgoerner
  */
-public class Request {
+public class Packet {
     private HashMap<String,Object> data;
 
     public HashMap<String, Object> getData() {

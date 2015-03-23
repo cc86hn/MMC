@@ -11,9 +11,9 @@ package org.cc86.MMC.server;
  */
 public class Main {
     public static final Main m=new Main();
-    
+    private PluginManager mgr;
     private Dispatcher dispatcher;
-    
+    private ServerCore core;
     public static void main(String[] args) {
         m.bootstrap();
     }
@@ -30,7 +30,12 @@ public class Main {
     
     private void bootstrap()
     {
-        PluginManager m = new PluginManager();
-        dispatcher=new Dispatcher(m);
+        mgr = new PluginManager();
+        dispatcher=new Dispatcher(mgr);
+        core=new ServerCore(9264);
+        Thread t = new Thread(()->
+        core.bootUp());
+        t.setName("TCP listener");
+        t.start();
     }
 }

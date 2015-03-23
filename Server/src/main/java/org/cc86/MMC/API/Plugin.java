@@ -14,7 +14,10 @@ public interface Plugin {
      * gets triggered on pluginload so the plugin can register its available listeners for certain Messages
      */
     public void register();
-    public void handleRequest(Request r);
-    public void getName();
+    /**
+     * gets the name of the plugin for the Pluginlist
+     * @return Name of the plugin
+     */
+    public String getName();
     
 }
