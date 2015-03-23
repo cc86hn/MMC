@@ -6,6 +6,7 @@
 package org.cc86.MMC.client;
 
 import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.client.API.Connection;
 import org.cc86.MMC.client.API.Module;
 
 /**
@@ -14,10 +15,31 @@ import org.cc86.MMC.client.API.Module;
  */
 public class Dispatcher
 {
-    public Module[] modules={};
+    private final Module[] modules={new Mod_test()};
     
     public void sendPacketToModule(Packet p)
     {
+        String name = (String) p.getData().get("command");
+        for (Module module : modules) {
+            if(module.getCommands().contains(name))
+            {
+                System.out.println("Dispatched");
+                module.receiveMsgFromServer(p);
+                break;
+            }
+        }
         
     }
+    public Module[] getModules()
+    {
+        return modules;
+    }
+    public void connect(Connection c)
+    {
+        
+        for (Module module : modules) {
+            module.connect(c);
+        }
+    }
+    
 }

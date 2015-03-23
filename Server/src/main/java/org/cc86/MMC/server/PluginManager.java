@@ -6,7 +6,6 @@
 package org.cc86.MMC.server;
 
 import de.nplusc.izc.tools.IOtools.FileTK;
-import de.nplusc.izc.tools.baseTools.Detectors;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileReader;
 import java.io.File;
@@ -54,7 +53,7 @@ public class PluginManager {
                     boolean isplugin = false;
                     for (Class intf : interfaces)
                     {
-                        if (intf.getName().equals("org.cc86.MMC.API.plugin"))
+                        if (intf.getName().equals("org.cc86.MMC.API.Plugin"))
                         {
                             isplugin = true;
                             break;
@@ -64,6 +63,7 @@ public class PluginManager {
                     {
                         Plugin pluginInstance = (Plugin) clazz.newInstance();
                         detectedPlugs.add(pluginInstance);
+                        pluginInstance.register();
                     }
                     
                 }

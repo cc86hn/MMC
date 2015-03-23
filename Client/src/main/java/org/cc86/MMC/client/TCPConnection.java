@@ -46,6 +46,8 @@ public class TCPConnection implements Connection
                         while(!ln.equals("---"))
                         {
                             request+=ln+"\n";
+                            System.out.println(ln);
+                            ln=r.readLine();
                         }
                         
                     } catch (IOException ex) {
@@ -53,6 +55,7 @@ public class TCPConnection implements Connection
                     Object packet = new Yaml().load(request);
                     if(packet instanceof Packet)
                     {
+                        System.out.println("PACKET");
                         Main.getDispatcher().sendPacketToModule((Packet)packet);
                     }
                     else
@@ -62,7 +65,9 @@ public class TCPConnection implements Connection
                }
             });
             t.setName("InputCruncher");
+            t.start();
             Thread t2 = new Thread(()->{
+                //System.out.println("Gefangen!");
                 while(sck.isConnected())
                 {
                     synchronized(destination)
@@ -71,24 +76,29 @@ public class TCPConnection implements Connection
                             destination.wait();
                         } catch (InterruptedException ex) {
                         }
+                        System.out.println("MSG sent");
                         out.println(returnMsg);
                         out.flush();
                         returnMsg="";
                     }
                 }
+                //System.out.println("Flucht ist zwecklos");
             });
             t2.setName("OutputCruncher");
+            t2.start();
             
-        } catch (IOException ex) {
-        }
+        } 
+        catch (IOException ex) 
+        {}
     }
     
     
     @Override
-    public void sendRequest(Packet response) {
+    public void sendRequest(Packet request) {
          synchronized(destination)
          {
-             returnMsg=new Yaml().dump(response)+"\n---\n";
+             System.out.println("POKE");
+             returnMsg=new Yaml().dump(request)+"\n---\n";
              destination.notify();
          }
     }

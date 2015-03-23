@@ -26,15 +26,15 @@ public class TestProcessor implements Processor
         {
             msg="Saved:"+rqd.get("message");
         }
-        else
-        {
-            Packet rsp = new Packet();
-            HashMap<String,Object> rspns= new HashMap<>();
-            rspns.put("message",msg);
-            rspns.put("type","response");
-            rsp.setData(rspns);
-            h.respondToLinkedClient(rsp);
-        }
+        System.out.println("MSG stored");
+        Packet rsp = new Packet();
+        HashMap<String,Object> rspns= new HashMap<>();
+        rspns.put("message",msg);
+        rspns.put("command","Test");
+        rspns.put("type","response");
+        rsp.setData(rspns);
+        h.respondToLinkedClient(rsp);
+
     }
     
 }

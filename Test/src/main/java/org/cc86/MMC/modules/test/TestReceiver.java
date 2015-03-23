@@ -19,6 +19,7 @@ public class TestReceiver implements Plugin
     @Override
     public void register()
     {
+        System.out.println("REGISTERING");
         API.getDispatcher().registerOnRequestType("Test", new TestProcessor());
     }
 

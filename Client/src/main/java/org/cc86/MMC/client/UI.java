@@ -6,6 +6,9 @@
 
 package org.cc86.MMC.client;
 
+import java.awt.EventQueue;
+import org.cc86.MMC.client.API.Module;
+
 /**
  *
  * @author iZc <nplusc.de>
@@ -29,24 +32,66 @@ public class UI extends javax.swing.JFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    private void initComponents() {
+
+        lblOut = new javax.swing.JLabel();
+        btnFUuu = new javax.swing.JButton();
+        txfMsg = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        lblOut.setText("Message should appear here");
+
+        btnFUuu.setText("Ping");
+        btnFUuu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFUuuActionPerformed(evt);
+            }
+        });
+
+        txfMsg.setText("Enter Message here");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(47, 47, 47)
+                        .addComponent(lblOut, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(150, 150, 150)
+                        .addComponent(btnFUuu))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(57, 57, 57)
+                        .addComponent(txfMsg, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(94, 94, 94)
+                .addComponent(txfMsg, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
+                .addComponent(btnFUuu)
+                .addGap(35, 35, 35)
+                .addComponent(lblOut)
+                .addGap(70, 70, 70))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnFUuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFUuuActionPerformed
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_test)
+            {
+                ((Mod_test)m1).sendMessage(txfMsg.getText());
+            }
+        }
+    }//GEN-LAST:event_btnFUuuActionPerformed
 
     /**
      * @param args the command line arguments
@@ -96,7 +141,17 @@ public class UI extends javax.swing.JFrame
             }
         });
     }
-
+    
+    
+    public void updateMEssageLine(String msg)
+    {
+        EventQueue.invokeLater(()->lblOut.setText(msg));
+    }
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnFUuu;
+    private javax.swing.JLabel lblOut;
+    private javax.swing.JTextField txfMsg;
     // End of variables declaration//GEN-END:variables
 }

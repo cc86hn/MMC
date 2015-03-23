@@ -5,6 +5,7 @@
  */
 package org.cc86.MMC.client.API;
 
+import java.util.List;
 import org.cc86.MMC.API.Packet;
 
 /**
@@ -14,4 +15,6 @@ import org.cc86.MMC.API.Packet;
 public interface Module
 {
     public void receiveMsgFromServer(Packet msg);
+    public void connect(Connection c);
+    public List<String> getCommands();
 }

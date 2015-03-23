@@ -1,9 +1,43 @@
 apply plugin:'java'
 
 apply plugin:'application'
-
+apply from: "$rootDir/utils/IO.gradle"
 version = '0.0.1.0'
-mainClassName = 'org.cc86.MMC.Main'
+mainClassName = 'org.cc86.MMC.client.Main'
+
+
+
+startScripts << { 
+
+  def startScriptDir = outputDir.getAbsolutePath()
+  def winStartScript = startScriptDir + "/" + applicationName + ".bat"
+  def winStartScriptCopy = startScriptDir + "/" + applicationName + "c.bat"
+  def overwriteExistingFile = true
+  copyFile(winStartScript, winStartScriptCopy, overwriteExistingFile)
+
+  modifyFile(winStartScript) {
+    // javaw.exe doesn't have a console
+    if(it.contains("java.exe")){
+      return it.replace("java.exe", "javaw.exe")
+    }
+    // Command that launches the app
+    else if(it.startsWith("\"%JAVA_EXE%\" %DEFAULT_JVM_OPTS%")){
+      return "start \"\" /b " + it
+    }
+    // Leave the line unchanged
+    else{
+      return it
+    }
+  }
+}
+distZip {
+  // Include the additional start script
+  into(project.name+"-"+project.version+"/bin/"){
+    from(startScripts.outputDir)
+	include '*c.bat'
+  }
+}
+
 
 compileJava.options.encoding = 'UTF-8'
 dependencies

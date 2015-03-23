@@ -1,6 +1,6 @@
 /Server/.nb-gradle/profiles/private/
 /Server/.nb-gradle/private/
-/Server/build/
+/*/build/
 
 # Object files
 *.o
@@ -31,3 +31,4 @@
 *.dSYM/
 /.nb-gradle/private/
 /Test/build/
+/Client/build/

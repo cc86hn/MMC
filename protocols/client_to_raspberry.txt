@@ -72,7 +72,7 @@ miracast_start
 		propertyname: propertyname to watch for notification
 		mode: register:registers this listener to the sending computer unregister: removes selected listener for computer
 
-    test:
+    Test:
         message: on set: sets message into memory and displays a message on console; on get: returns message wioth a "Saved:" prepended p:
         //debugging command only
 		

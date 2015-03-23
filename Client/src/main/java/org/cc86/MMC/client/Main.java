@@ -6,23 +6,40 @@
 
 package org.cc86.MMC.client;
 
+import java.io.IOException;
+import org.cc86.MMC.client.API.Connection;
+
 /**
  *
  * @author iZc <nplusc.de>
  */
 public class Main
 {
-    
+    private static UI ui;
     private static final Dispatcher disp = new Dispatcher();
+    private static Connection c;
     public static void main(String[] args)
     {
-       
+        java.awt.EventQueue.invokeLater(()->
+        {
+             ui = new UI();
+            ui.setVisible(true);
+        });
+        c=new TCPConnection("localhost", 9264);
+        try {
+            c.connect();
+        } catch (IOException ex) {
+            //System.out.println(ex.m);
+            System.out.println("Ell-Emm-AhhX2");
+        }
+        disp.connect(c);
     }
-    
     public static Dispatcher getDispatcher()
     {
         return disp;
     }
-    
-    
+    public static UI getUi()
+    {
+        return ui;
+    }
 }

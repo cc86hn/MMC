@@ -18,6 +18,7 @@ public class API {
     public static final String APPDIR = new File(API.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParent();
     
     public static final String PLUGINPATH = APPDIR + File.separator + "plugins";
+    public static final String SETTINGSPATH = APPDIR + File.separator + "settings";
     
     
     

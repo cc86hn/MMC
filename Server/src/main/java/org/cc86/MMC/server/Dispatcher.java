@@ -24,9 +24,13 @@ public class Dispatcher {
     
     public void handleEvent(Packet r,Handler h)
     {
-        Processor p = dispatcherLogic.get(r.getData().get("command")); 
+        String lm = (String) r.getData().get("command");
+        System.out.println("cmd=="+lm);
+        Processor p = dispatcherLogic.get(lm); 
+        System.out.println(p);
         if(p!=null)
         {
+            System.out.println("Einsteigen bitte");
             p.process(r,h);
         }
         else
