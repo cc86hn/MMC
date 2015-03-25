@@ -1,6 +1,7 @@
-/Server/.nb-gradle/profiles/private/
-/Server/.nb-gradle/private/
-/*/build/
+build
+.nb-gradle
+
+
 
 # Object files
 *.o
