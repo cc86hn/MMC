@@ -22,7 +22,7 @@ public class TestProcessor implements Processor
     public void process(Packet r,Handler h)
     {
         HashMap<String,Object> rqd = r.getData();
-        if(rqd.get("type").equals("set"))
+        if(rqd.containsKey("type")&&rqd.get("type")!=null&&(rqd.get("type")).equals("set"))
         {
             msg="Saved:"+rqd.get("message");
         }

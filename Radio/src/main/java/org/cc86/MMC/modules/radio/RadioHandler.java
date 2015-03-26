@@ -24,6 +24,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class RadioHandler implements Processor{
 
+    @SuppressWarnings("FieldMayBeFinal")
     private HashMap<String,String> shortIdMappings;
     public RadioHandler()
     {
@@ -46,6 +47,45 @@ public class RadioHandler implements Processor{
     
     @Override
     public void process(Packet r, Handler h) {
+        
+        HashMap<String,Object> packetData = r.getData();
+        if(packetData.containsKey("command")&&packetData.get("command")!=null)
+        {
+            boolean isShortIDMapping=false;
+            if(packetData.containsKey("type")&&packetData.get("type")!=null&&(packetData.get("type")).equals("set"))
+            {
+
+            }
+            
+            String cmd = (String) packetData.get("command");
+            
+            if(cmd.equals("webradioShortID"))
+            {
+                
+            }
+            else
+            {
+                if(cmd.equals("webradio"))
+                {
+                    
+                }
+                else
+                {
+                    //ERROR
+                }
+            }
+            
+
+        }
+        else
+        {
+            //ERROR
+        }
+        
+        
+       
+
+            
         
     }
     
