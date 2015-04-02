@@ -14,7 +14,8 @@ response: only used by server when sending a response
 properties:
 those appear as command in the map. attributes by their name.
 
-
+@all: optional: 
+	targetnode: id of a subnode of the receiver, may be used if different devices are controlled by 1 module at server
 //category: vlc_control
 
 volume
@@ -43,7 +44,9 @@ webradio:
 		URL: URL of stream/playlist or ShortID
 
 webradioShortID
-	set: shortID URL
+	set: 
+		shortID
+		URL
 	get: List of shortID-> url mappings as a nested map
 	
 Playback_DLNA
