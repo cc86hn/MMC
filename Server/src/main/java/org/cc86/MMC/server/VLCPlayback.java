@@ -5,6 +5,8 @@
  */
 package org.cc86.MMC.server;
 
+import org.cc86.MMC.API.MediaPlayerControl;
+import org.cc86.MMC.API.StatusMode;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
@@ -14,15 +16,27 @@ import uk.co.caprica.vlcj.player.MediaPlayerFactory;
  *
  * @author tgoerner
  */
-public class VLCPlayback implements MediaPlayerEventListener{
+public class VLCPlayback implements MediaPlayerEventListener
+{
+
     private final MediaPlayer mpaccess;
     private final MediaPlayerFactory f;
+
     public VLCPlayback(String vlcpath)
     {
-        
-        f= new MediaPlayerFactory("--no-video-title-show");
+
+        f = new MediaPlayerFactory("--no-video-title-show");
         mpaccess = f.newHeadlessMediaPlayer();
-        mpaccess.addMediaPlayerEventListener(this );
+        mpaccess.addMediaPlayerEventListener(this);
+    }
+
+    public void newFilePlz()
+    {
+        String url = MediaPlayerControl.getTitleToPlay();
+        if(url!=null)
+        {
+            mpaccess.playMedia(url, "");
+        }
     }
 
     public void addTitle(String path)
@@ -30,34 +44,42 @@ public class VLCPlayback implements MediaPlayerEventListener{
         mpaccess.stop();
         mpaccess.playMedia(path);
     }
+
     public int getLengthInSeconds()
     {
-        return (int) (Math.ceil(mpaccess.getLength()/1000f));
+        return (int) (Math.ceil(mpaccess.getLength() / 1000f));
     }
+
     public int getPosition()
     {
-        return (int) (Math.ceil((mpaccess.getLength()/1000f)*mpaccess.getPosition()));
+        return (int) (Math.ceil((mpaccess.getLength() / 1000f) * mpaccess.getPosition()));
     }
-    
+
     public boolean isSeekable()
     {
         return mpaccess.isSeekable();
     }
-    
+
     public void seek(int sekunde)
     {
-        if(isSeekable())
-            mpaccess.setPosition(((float)sekunde)/((float)getLengthInSeconds()));
+        if (isSeekable())
+        {
+            mpaccess.setPosition(((float) sekunde) / ((float) getLengthInSeconds()));
+        }
     }
+
     public void skipTitle()
     {
-       
+        if (StatusMode.getAudioMode() == StatusMode.FILE)//feature nur bei DLNA-mode verfügbar
+        {
+            newFilePlz();
+        }
     }
+
     public void play()
     {
         mpaccess.play();
     }
-
 
     public void pause()
     {
@@ -65,167 +87,183 @@ public class VLCPlayback implements MediaPlayerEventListener{
     }
 
     @Override
-    public void mediaChanged(MediaPlayer mp, libvlc_media_t l, String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void mediaChanged(MediaPlayer mp, libvlc_media_t l, String string)
+    {
+
     }
 
     @Override
-    public void opening(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void opening(MediaPlayer mp)
+    {
+
     }
 
     @Override
-    public void buffering(MediaPlayer mp, float f) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void buffering(MediaPlayer mp, float f)
+    {
+
     }
 
     @Override
-    public void playing(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void playing(MediaPlayer mp)
+    {
+
     }
 
     @Override
-    public void paused(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void paused(MediaPlayer mp)
+    {
+
     }
 
     @Override
-    public void stopped(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void stopped(MediaPlayer mp)
+    {
+
     }
 
     @Override
-    public void forward(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void forward(MediaPlayer mp)
+    {
+
     }
 
     @Override
-    public void backward(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void backward(MediaPlayer mp)
+    {
+
     }
 
     @Override
-    public void finished(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void finished(MediaPlayer mp)
+    {
+        newFilePlz();
     }
 
     @Override
-    public void timeChanged(MediaPlayer mp, long l) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void timeChanged(MediaPlayer mp, long l)
+    {
+
     }
 
     @Override
-    public void positionChanged(MediaPlayer mp, float f) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void positionChanged(MediaPlayer mp, float f)
+    {
+
     }
 
     @Override
-    public void seekableChanged(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void seekableChanged(MediaPlayer mp, int i)
+    {
+
     }
 
     @Override
-    public void pausableChanged(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void pausableChanged(MediaPlayer mp, int i)
+    {
+
     }
 
     @Override
-    public void titleChanged(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void titleChanged(MediaPlayer mp, int i)
+    {
+
     }
 
     @Override
-    public void snapshotTaken(MediaPlayer mp, String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void snapshotTaken(MediaPlayer mp, String string)
+    {
+
     }
 
     @Override
-    public void lengthChanged(MediaPlayer mp, long l) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void lengthChanged(MediaPlayer mp, long l)
+    {
     }
 
     @Override
-    public void videoOutput(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void videoOutput(MediaPlayer mp, int i)
+    {
+
     }
 
     @Override
-    public void scrambledChanged(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void scrambledChanged(MediaPlayer mp, int i)
+    {
     }
 
     @Override
-    public void elementaryStreamAdded(MediaPlayer mp, int i, int i1) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void elementaryStreamAdded(MediaPlayer mp, int i, int i1)
+    {
     }
 
     @Override
-    public void elementaryStreamDeleted(MediaPlayer mp, int i, int i1) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void elementaryStreamDeleted(MediaPlayer mp, int i, int i1)
+    {
     }
 
     @Override
-    public void elementaryStreamSelected(MediaPlayer mp, int i, int i1) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void elementaryStreamSelected(MediaPlayer mp, int i, int i1)
+    {
     }
 
     @Override
-    public void error(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void error(MediaPlayer mp)
+    {
     }
 
     @Override
-    public void mediaMetaChanged(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void mediaMetaChanged(MediaPlayer mp, int i)
+    {
     }
 
     @Override
-    public void mediaSubItemAdded(MediaPlayer mp, libvlc_media_t l) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void mediaSubItemAdded(MediaPlayer mp, libvlc_media_t l)
+    {
     }
 
     @Override
-    public void mediaDurationChanged(MediaPlayer mp, long l) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void mediaDurationChanged(MediaPlayer mp, long l)
+    {
     }
 
     @Override
-    public void mediaParsedChanged(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void mediaParsedChanged(MediaPlayer mp, int i)
+    {
     }
 
     @Override
-    public void mediaFreed(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void mediaFreed(MediaPlayer mp)
+    {
     }
 
     @Override
-    public void mediaStateChanged(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void mediaStateChanged(MediaPlayer mp, int i)
+    {
     }
 
     @Override
-    public void mediaSubItemTreeAdded(MediaPlayer mp, libvlc_media_t l) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void mediaSubItemTreeAdded(MediaPlayer mp, libvlc_media_t l)
+    {
     }
 
     @Override
-    public void newMedia(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void newMedia(MediaPlayer mp)
+    {
     }
 
     @Override
-    public void subItemPlayed(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void subItemPlayed(MediaPlayer mp, int i)
+    {
     }
 
     @Override
-    public void subItemFinished(MediaPlayer mp, int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void subItemFinished(MediaPlayer mp, int i)
+    {
     }
 
     @Override
-    public void endOfSubItems(MediaPlayer mp) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void endOfSubItems(MediaPlayer mp)
+    {
     }
 }

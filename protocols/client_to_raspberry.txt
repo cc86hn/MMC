@@ -50,15 +50,16 @@ webradioShortID
 	get: List of shortID-> url mappings as a nested map
 	
 Playback_DLNA
-	properties:{IP, path}
-	settable & gettable
+	properties:{IP, path,scheduled}
+	settable & gettable, @gettable return playlist
+	scheduled sets that the file should be added to the playlist instead of played directly
 	
 //category: video
 	
 vnc:
 	set: parameters: 
-		target_ip: destination ip/adress to connect
-		compress_level{0=none,..9=max}
+		 target_ip: destination ip/adress to connect
+		 compress_level{0=none,..9=max}
 	get: current VNC source IP
 
 beamer_sourceselect:
