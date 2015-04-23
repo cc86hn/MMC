@@ -5,6 +5,11 @@
  */
 package org.cc86.MMC.server;
 
+import com.sun.jna.Native;
+import com.sun.jna.NativeLibrary;
+import uk.co.caprica.vlcj.binding.LibVlc;
+import uk.co.caprica.vlcj.runtime.RuntimeUtil;
+
 /**
  *
  * @author tgoerner
@@ -27,6 +32,15 @@ public class Main {
     public void setDispatcher(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
+    
+    private void setupLibraries()
+    {                                                   
+        NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "/home/pi/codestuff/vlc");//TODO LNX_PATH
+        Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
+    }
+    
+    
+    
     
     private void bootstrap()
     {

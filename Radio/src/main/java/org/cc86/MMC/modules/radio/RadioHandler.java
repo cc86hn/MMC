@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
+import org.cc86.MMC.API.MediaPlayerControl;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.API.Processor;
 import org.yaml.snakeyaml.Yaml;
@@ -26,6 +27,7 @@ public class RadioHandler implements Processor{
 
     @SuppressWarnings("FieldMayBeFinal")
     private HashMap<String,String> shortIdMappings;
+    private String currentURL="";
     public RadioHandler()
     {
         new TFile(API.SETTINGSPATH).mkdir();
@@ -49,25 +51,57 @@ public class RadioHandler implements Processor{
     public void process(Packet r, Handler h) {
         
         HashMap<String,Object> packetData = r.getData();
+        boolean set=false;
         if(packetData.containsKey("command")&&packetData.get("command")!=null)
         {
-            boolean isShortIDMapping=false;
             if(packetData.containsKey("type")&&packetData.get("type")!=null&&(packetData.get("type")).equals("set"))
             {
-
+                set=true;
             }
             
             String cmd = (String) packetData.get("command");
-            
+            //		shortID
+            //		URL
             if(cmd.equals("webradioShortID"))
             {
-                
+                if(set&&packetData.containsKey("URL")&&packetData.get("URL")!=null&&packetData.containsKey("shortID")&&packetData.get("shortID")!=null)
+                {
+                    String url=(String) packetData.get("URL");
+                    String shortID = (String) packetData.get("shortID");
+                    if(!shortIdMappings.values().contains(shortID))//schutz gegen url-zinkung von vorhandenen URLs
+                    {
+                        shortIdMappings.put(url, shortID);
+                    }
+                }
+                else
+                {
+                    HashMap<String,Object> response=new HashMap<>();
+                    response.put("mappings",shortIdMappings);
+                    response.put("command","webradio");
+                    response.put("type","response");
+                }
             }
             else
             {
                 if(cmd.equals("webradio"))
                 {
-                    
+                    if(set&&packetData.containsKey("URL")&&packetData.get("URL")!=null)
+                    {
+                        String url=(String) packetData.get("URL");
+                        if(shortIdMappings.containsKey(url))
+                        {
+                            url=shortIdMappings.get(url);
+                        }
+                        MediaPlayerControl.playURL(url, false);
+                        currentURL=url;
+                    }
+                    else
+                    {
+                        HashMap<String,Object> response=new HashMap<>();
+                        response.put("URL",currentURL);
+                        response.put("command","webradio");
+                        response.put("type","response");
+                    }
                 }
                 else
                 {

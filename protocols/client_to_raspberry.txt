@@ -47,7 +47,7 @@ webradioShortID
 	set: 
 		shortID
 		URL
-	get: List of shortID-> url mappings as a nested map
+	get: List of shortID-> url mappings as a nested map as mappings
 	
 Playback_DLNA
 	properties:{IP, path,scheduled}

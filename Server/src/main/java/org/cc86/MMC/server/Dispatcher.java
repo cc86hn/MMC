@@ -22,7 +22,7 @@ public class Dispatcher {
         pm=p;
     }
     
-    public void handleEvent(Packet r,Handler h)
+    public synchronized void handleEvent(Packet r,Handler h)
     {
         String lm = (String) r.getData().get("command");
         System.out.println("cmd=="+lm);
