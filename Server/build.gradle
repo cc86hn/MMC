@@ -47,7 +47,7 @@ distZip {
   }
   into(project.name+"-"+project.version+"/plugins/"){
         from project(':Test').jar
-        //from project(':Radio').jar
+        from project(':Radio').jar
         //from project(':Audio').jar
 		//from project(':Beamer').jar
 		//from project(':Stream').jar

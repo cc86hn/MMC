@@ -44,6 +44,8 @@ public class RadioHandler implements Processor{
         else
         {
             shortIdMappings=new HashMap<>();
+            shortIdMappings.put("SWR1", "http://mp3-live.swr.de/swr1bw_m.m3u");
+            shortIdMappings.put("Antenne 1", "http://stream.antenne1.de/stream1/livestream.mp3");
         }
     }
     

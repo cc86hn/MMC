@@ -16,15 +16,12 @@ import org.cc86.MMC.client.API.Connection;
 public class Main
 {
     private static UI ui;
+    private static RadioUI radio;
     private static final Dispatcher disp = new Dispatcher();
     private static Connection c;
     public static void main(String[] args)
     {
-        java.awt.EventQueue.invokeLater(()->
-        {
-             ui = new UI();
-            ui.setVisible(true);
-        });
+        
         c=new TCPConnection("localhost", 9264);
         try {
             c.connect();
@@ -33,6 +30,16 @@ public class Main
             System.out.println("Ell-Emm-AhhX2");
         }
         disp.connect(c);
+        
+        java.awt.EventQueue.invokeLater(()->
+        {
+             ui = new UI();
+            //ui.setVisible(true);
+            radio=new RadioUI();
+            radio.setVisible(true);
+        });
+        
+        
     }
     public static Dispatcher getDispatcher()
     {
@@ -42,4 +49,10 @@ public class Main
     {
         return ui;
     }
+
+    public static RadioUI getRadio()
+    {
+        return radio;
+    }
+    
 }
