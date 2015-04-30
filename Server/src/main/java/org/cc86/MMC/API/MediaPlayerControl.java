@@ -19,7 +19,7 @@ public class MediaPlayerControl
     private static String nowPlaying = "";
 
     //TODO logik!
-    private static final VLCPlayback backend = new VLCPlayback("");
+    private static final VLCPlayback backend = new VLCPlayback();
 
     public static void playURL(String url, boolean enqueue)
     {

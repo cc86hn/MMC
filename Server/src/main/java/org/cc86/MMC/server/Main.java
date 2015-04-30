@@ -7,6 +7,8 @@ package org.cc86.MMC.server;
 
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
+import java.io.File;
+import org.cc86.MMC.API.API;
 import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
@@ -33,9 +35,14 @@ public class Main {
         this.dispatcher = dispatcher;
     }
     
-    private void setupLibraries()
-    {                                                   
-        NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), "/home/pi/codestuff/vlc");//TODO LNX_PATH
+    private  void setupLibraries()
+    {                    
+        String vlcpath="/home/pi/codestuff/vlc";
+        if(API.APPDIR.charAt(1)==':')
+        {
+            vlcpath=API.WINVLC;
+        }
+         NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcpath);//TODO LNX_PATH
         Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
     }
     
@@ -44,6 +51,7 @@ public class Main {
     
     private void bootstrap()
     {
+        setupLibraries();
         mgr = new PluginManager();
         dispatcher=new Dispatcher(mgr);
         core=new ServerCore(9264);
@@ -52,5 +60,13 @@ public class Main {
         core.bootUp());
         t.setName("TCP listener");
         t.start();
+    }
+    
+    
+    
+    /*packageprotected*/ void shitdownHandler()
+    {
+        mgr.shitdown();
+        System.exit(0);
     }
 }

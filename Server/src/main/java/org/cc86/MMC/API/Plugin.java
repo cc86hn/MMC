@@ -20,4 +20,11 @@ public interface Plugin {
      */
     public String getName();
     
+    
+    
+    /**
+     * event that runs before the program shutdowns
+     */
+    public void shutdown();
+      
 }

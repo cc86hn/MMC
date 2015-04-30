@@ -13,17 +13,22 @@ import org.cc86.MMC.API.Plugin;
  * @author tgoerner
  */
 public class RadioControl implements Plugin{
-
+    
+    RadioHandler h;
+    
     @Override
     public void register() {
-        RadioHandler h = new RadioHandler();
+        h = new RadioHandler();
         API.getDispatcher().registerOnRequestType("webradio", h); 
         API.getDispatcher().registerOnRequestType("webradioShortID", h); 
     }
-
     @Override
     public String getName() {
         return "Radio";
     }
-    
+    @Override
+    public void shutdown()
+    {
+        h.shitdown();
+    }
 }

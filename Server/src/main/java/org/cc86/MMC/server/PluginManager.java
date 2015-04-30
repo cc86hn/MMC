@@ -79,4 +79,11 @@ public class PluginManager {
             }
         }
     }
+
+    public void shitdown()
+    {
+        detectedPlugs.forEach((a)->a.shutdown());
+    }
+
 }
+

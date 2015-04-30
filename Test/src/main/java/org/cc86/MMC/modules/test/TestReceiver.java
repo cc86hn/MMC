@@ -28,5 +28,10 @@ public class TestReceiver implements Plugin
     {
         return "Test";
     }
+
+    @Override
+    public void shutdown()
+    {
+    }
     
 }

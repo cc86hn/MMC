@@ -9,6 +9,8 @@ import de.schlichtherle.truezip.file.TFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,10 +30,11 @@ public class RadioHandler implements Processor{
     @SuppressWarnings("FieldMayBeFinal")
     private HashMap<String,String> shortIdMappings;
     private String currentURL="";
+    private String mappingspath = API.SETTINGSPATH+File.separator+"radiolist.yml";
     public RadioHandler()
     {
         new TFile(API.SETTINGSPATH).mkdir();
-        TFile radiodata = new TFile(API.SETTINGSPATH+File.separator+"radiolist.yml");
+        TFile radiodata = new TFile(mappingspath);
         if(radiodata.exists())
         {
             try {
@@ -79,8 +82,11 @@ public class RadioHandler implements Processor{
                 {
                     HashMap<String,Object> response=new HashMap<>();
                     response.put("mappings",shortIdMappings);
-                    response.put("command","webradio");
+                    response.put("command","webradioShortID");
                     response.put("type","response");
+                    Packet rsp = new Packet();
+                    rsp.setData(response);
+                    h.respondToLinkedClient(rsp);
                 }
             }
             else
@@ -103,6 +109,9 @@ public class RadioHandler implements Processor{
                         response.put("URL",currentURL);
                         response.put("command","webradio");
                         response.put("type","response");
+                        Packet rsp = new Packet();
+                        rsp.setData(response);
+                        h.respondToLinkedClient(rsp);
                     }
                 }
                 else
@@ -124,5 +133,14 @@ public class RadioHandler implements Processor{
             
         
     }
-    
+    /*packageprotected*/ void shitdown()
+    {
+        try
+        {
+            new Yaml().dump(shortIdMappings, new FileWriter(new TFile(mappingspath)));
+        } catch (IOException ex)
+        {
+            Logger.getLogger(RadioHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

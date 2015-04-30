@@ -68,6 +68,7 @@ public class RadioUI extends javax.swing.JFrame
         jLabel2 = new javax.swing.JLabel();
         btnSelSender = new javax.swing.JButton();
         btnF5 = new javax.swing.JButton();
+        btnDebugIXx = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -103,6 +104,15 @@ public class RadioUI extends javax.swing.JFrame
             }
         });
 
+        btnDebugIXx.setText("Server Ixxen");
+        btnDebugIXx.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnDebugIXxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -113,7 +123,9 @@ public class RadioUI extends javax.swing.JFrame
                     .addGroup(layout.createSequentialGroup()
                         .addGap(132, 132, 132)
                         .addComponent(btnCancelPlayback)
-                        .addGap(111, 111, 111))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnDebugIXx)
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txfURL)
@@ -137,7 +149,7 @@ public class RadioUI extends javax.swing.JFrame
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnF5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -155,7 +167,9 @@ public class RadioUI extends javax.swing.JFrame
                     .addComponent(txfShortID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnShortIDSave))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCancelPlayback)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCancelPlayback)
+                    .addComponent(btnDebugIXx))
                 .addContainerGap())
         );
 
@@ -177,6 +191,11 @@ public class RadioUI extends javax.swing.JFrame
     {//GEN-HEADEREND:event_btnF5ActionPerformed
         poke();
     }//GEN-LAST:event_btnF5ActionPerformed
+
+    private void btnDebugIXxActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnDebugIXxActionPerformed
+    {//GEN-HEADEREND:event_btnDebugIXxActionPerformed
+       Main.serverKillen();
+    }//GEN-LAST:event_btnDebugIXxActionPerformed
     
     public void updateList(HashMap<String,String> mappings)
     {
@@ -233,6 +252,7 @@ public class RadioUI extends javax.swing.JFrame
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelPlayback;
+    private javax.swing.JButton btnDebugIXx;
     private javax.swing.JButton btnF5;
     private javax.swing.JButton btnPlayURL;
     private javax.swing.JButton btnSelSender;

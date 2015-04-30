@@ -20,6 +20,7 @@ public class Dispatcher {
     public Dispatcher(PluginManager p)
     {
         pm=p;
+        dispatcherLogic.put("exit", new Exitter());
     }
     
     public synchronized void handleEvent(Packet r,Handler h)

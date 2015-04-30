@@ -54,5 +54,10 @@ public class Main
     {
         return radio;
     }
-    
+    /*packahgeprotected*/ static void serverKillen()
+    {
+        Mod_Exit x = new Mod_Exit();
+        x.connect(c);
+        x.exxit();
+    }
 }

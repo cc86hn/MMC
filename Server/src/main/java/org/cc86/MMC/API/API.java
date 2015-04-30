@@ -19,7 +19,7 @@ public class API {
     
     public static final String PLUGINPATH = APPDIR + File.separator + "plugins";
     public static final String SETTINGSPATH = APPDIR + File.separator + "settings";
-    
+    public static final String WINVLC = APPDIR + File.separator + "vlc";
     
     
     

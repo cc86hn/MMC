@@ -25,5 +25,10 @@ public class AudioPlugin implements Plugin{
     public String getName() {
         return "Radio";
     }
+
+    @Override
+    public void shutdown()
+    {
+    }
     
 }
