@@ -12,4 +12,5 @@ package org.cc86.MMC.API;
  */
 public interface Handler {
     public void respondToLinkedClient(Packet response);
+    public String getClientIP();
 }

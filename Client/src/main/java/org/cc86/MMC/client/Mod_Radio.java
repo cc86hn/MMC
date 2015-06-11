@@ -60,7 +60,7 @@ public class Mod_Radio implements Module
     
     public void requestMappings()
     {
-                Packet p = new Packet();
+        Packet p = new Packet();
         HashMap<String,Object> data = new HashMap<>();
         data.put("type","get");
         data.put("command","webradioShortID");

@@ -63,6 +63,7 @@ public class PluginManager {
                     {
                         Plugin pluginInstance = (Plugin) clazz.newInstance();
                         detectedPlugs.add(pluginInstance);
+                       System.out.println(pluginInstance);
                         pluginInstance.register();
                     }
                     

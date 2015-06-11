@@ -33,3 +33,5 @@ build
 /.nb-gradle/private/
 /Test/build/
 /Client/build/
+
+/private

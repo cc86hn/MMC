@@ -98,6 +98,12 @@ public class TCPhandler implements Handler{
              sck.notify();
          }
     }
+
+    @Override
+    public String getClientIP()
+    {
+        return sck.getRemoteSocketAddress().toString();
+    }
     
     
 }

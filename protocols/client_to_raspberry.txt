@@ -58,18 +58,29 @@ Playback_DLNA
 	
 vnc:
 	set: parameters: 
-		 target_ip: destination ip/adress to connect
-		 compress_level{0=none,..9=max}
+		//client IP is determined from the Socket the command is from
 	get: current VNC source IP
+	
+mp4:
+	set: parameters: 
+		 target_port: port on which the stream is piped to the PI
+		 mode: fast or slow //(slow with synced audio)
+		 // compress_level{0=none,..9=max}
+	get: current VNC source IP
+	
 
 beamer_sourceselect:
 	get: available sources lists
 	set: one of available sources
 	
-miracast_start
+miracast   //reserved for widi compatible devices
 	set: IP of source
 	get: currently shown screen
 
+	
+streamaudio
+	set: enabled: true when enabled other audiostreams get overriden and streamaudio is used, false for no audio of stream
+	get: status
 //Category: Meta
 	event:
 	parameter: 

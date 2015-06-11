@@ -37,13 +37,13 @@ public class Main {
     
     private  void setupLibraries()
     {                    
-        String vlcpath="/home/pi/codestuff/vlc";
+        /*String vlcpath="/home/pi/codestuff/vlc";
         if(API.APPDIR.charAt(1)==':')
         {
             vlcpath=API.WINVLC;
         }
          NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcpath);//TODO LNX_PATH
-        Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
+        Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);*/
     }
     
     

@@ -1,1 +1,1 @@
-pluginbaseclass: path.to.class
+pluginbaseclass: org.cc86.MMC.modules.stream.StreamPlugin

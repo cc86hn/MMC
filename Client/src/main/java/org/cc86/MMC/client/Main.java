@@ -17,12 +17,13 @@ public class Main
 {
     private static UI ui;
     private static RadioUI radio;
+    private static StreamUI stream;
     private static final Dispatcher disp = new Dispatcher();
     private static Connection c;
     public static void main(String[] args)
     {
-        
-        c=new TCPConnection("localhost", 9264);
+        //TODO PI-DETECTION
+        c=new TCPConnection("192.168.10.228", 9264);
         try {
             c.connect();
         } catch (IOException ex) {
@@ -36,7 +37,10 @@ public class Main
              ui = new UI();
             //ui.setVisible(true);
             radio=new RadioUI();
-            radio.setVisible(true);
+            //radio.setVisible(true);
+            stream=new StreamUI();
+            stream.setVisible(true);
+            
         });
         
         

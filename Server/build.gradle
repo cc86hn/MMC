@@ -50,7 +50,7 @@ distZip {
         from project(':Radio').jar
         //from project(':Audio').jar
 		//from project(':Beamer').jar
-		//from project(':Stream').jar
+		from project(':Stream').jar
   }
 }
 

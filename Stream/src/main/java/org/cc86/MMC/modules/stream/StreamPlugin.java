@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.cc86.MMC.modules.audio;
+package org.cc86.MMC.modules.stream;
 
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Plugin;
@@ -12,23 +12,24 @@ import org.cc86.MMC.API.Plugin;
  *
  * @author tgoerner
  */
-public class AudioPlugin implements Plugin{
-
+public class StreamPlugin implements Plugin{
+    
+    StreamProcessor h;
+    
     @Override
     public void register() {
-        AudioProcessor h = new AudioProcessor();
-        //API.getDispatcher().registerOnRequestType("webradio", h); 
-        //API.getDispatcher().registerOnRequestType("webradioShortID", h); 
+        h = new StreamProcessor();
+        API.getDispatcher().registerOnRequestType("vnc", h); 
+        API.getDispatcher().registerOnRequestType("mp4", h); 
+        API.getDispatcher().registerOnRequestType("miracast", h); 
     }
-
     @Override
     public String getName() {
         return "Radio";
     }
-
     @Override
     public void shutdown()
     {
+        //h.shitdown();
     }
-    
 }
