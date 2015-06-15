@@ -5,16 +5,12 @@
  */
 package org.cc86.MMC.server;
 
-import com.sun.jna.Native;
-import com.sun.jna.NativeLibrary;
 import org.cc86.MMC.API.MediaPlayerControl;
 import org.cc86.MMC.API.StatusMode;
-import uk.co.caprica.vlcj.binding.LibVlc;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
 import uk.co.caprica.vlcj.player.MediaPlayer;
 import uk.co.caprica.vlcj.player.MediaPlayerEventListener;
 import uk.co.caprica.vlcj.player.MediaPlayerFactory;
-import uk.co.caprica.vlcj.runtime.RuntimeUtil;
 
 /**
  *

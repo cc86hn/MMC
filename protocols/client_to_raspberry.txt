@@ -9,7 +9,7 @@ get: gets current value of property
 response: only used by server when sending a response
 (appears as type in the datamap)
 
-
+Discovery via UDP on port 52358
 
 properties:
 those appear as command in the map. attributes by their name.
@@ -68,7 +68,11 @@ mp4:
 		 // compress_level{0=none,..9=max}
 	get: current VNC source IP
 	
-
+stream:  //server to client
+	response:
+		//one of those fields
+		disconnect: tells client to close running streams
+		message: Statusmessage
 beamer_sourceselect:
 	get: available sources lists
 	set: one of available sources

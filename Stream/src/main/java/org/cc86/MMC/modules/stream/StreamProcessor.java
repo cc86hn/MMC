@@ -7,6 +7,8 @@ package org.cc86.MMC.modules.stream;
 
 import de.nplusc.izc.tools.baseTools.Tools;
 import java.util.HashMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Packet;
@@ -18,10 +20,12 @@ import org.cc86.MMC.API.Processor;
  */
 public class StreamProcessor implements Processor
 {
+    private static final Logger l = LogManager.getLogger();
     public static final String MODE_MIRACAST="miracast";
     public static final String MODE_VNC="vnc";
     public static final String MODE_MP4="mp4";
     public static final String MODE_NONE="nop";
+    private Handler lastConnected;
     private String modeSelected=MODE_NONE;
     private String target="";
     @Override
@@ -38,8 +42,17 @@ public class StreamProcessor implements Processor
             {
                 set=true;
             }
+            
+            HashMap<String,Object> disconnectPKG=new HashMap<>();
+            disconnectPKG.put("disconnect","disconnect");
+            disconnectPKG.put("command","stream");
+            disconnectPKG.put("type","response");
+            Packet disconnector = new Packet();
+            disconnector.setData(disconnectPKG);
+            h.respondToLinkedClient(disconnector);
             HashMap<String,Object> response=new HashMap<>();
             Packet rsp = new Packet();
+            response.put("type","response");
             switch(packetData.get("command").toString().toLowerCase())
             {
                 case MODE_MIRACAST:
@@ -47,16 +60,26 @@ public class StreamProcessor implements Processor
                     
                     response.put("message","Not yet implemented, don't waste your time");
                     response.put("command","miracast");
-                    response.put("type","response");
                     
                     break;
                 case MODE_VNC:
                     if(set)
                     {
-                        target=(String) packetData.get("target_ip");
+                        String nTarget = h.getClientIP();
+                        if(modeSelected.equals(MODE_VNC))
+                        {
+                            if(target.equals(nTarget))
+                            {
+                                break; //NOTHING TO DO
+                            }
+                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "killall","xtightvncviewer");
+                        }
+                        target=h.getClientIP();
+                        modeSelected=MODE_VNC;
+                        l.info("target="+target);
                         
                         new Thread(()->{
-                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "kill","-9","omxplayer");
+                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "killall","omxplayer.bin");
                             //Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "kill","-9","TODO:MIRACAST");
                             Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "xtightvncviewer",target);
                             
@@ -67,23 +90,25 @@ public class StreamProcessor implements Processor
                         
                         if(modeSelected.equals(MODE_VNC))
                         {
-                            response.put("target_ip",target);
-                            response.put("command","vnc");
-                            response.put("type","response");
+                        response.put("command","stream");
+                        response.put("message","connected");
                         }
                         
                     }     
                     break;
                 case MODE_MP4:
-                    if(set&&packetData.containsKey("target_ip")&&packetData.get("target_ip")!=null)
+                    if(set&&packetData.containsKey("target_port")&&packetData.get("target_port")!=null)
                     {
-                        target=(String) packetData.get("target_ip");
+                        target=(String) packetData.get("target_port");
                         new Thread(()->{
-                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "kill","-9","xtightvncviewer");
+                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "killall","xtightvncviewer");
+                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "killall","omxplayer.bin");
                             //Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "kill","-9","TODO:MIRACAST");
-                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "omxplayer","udp://:"+target);
+                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "omxplayer","udp://:"+target);
                             
                         }).start();
+                        response.put("command","stream");
+                        response.put("message","connected");
                     }
                     else
                     {   //works cause the mode only gets values from literals
@@ -91,8 +116,7 @@ public class StreamProcessor implements Processor
                         if(modeSelected.equals(MODE_VNC))
                         {
                             response.put("target_port",target);
-                            response.put("command","vnc");
-                            response.put("type","response");
+                            response.put("command","mp4");
                         }
                         
                     }     
@@ -100,6 +124,7 @@ public class StreamProcessor implements Processor
             }
             rsp.setData(response);
             h.respondToLinkedClient(rsp);
+            lastConnected=h;
         }
     }
     

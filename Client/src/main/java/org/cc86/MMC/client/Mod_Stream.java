@@ -8,6 +8,8 @@ package org.cc86.MMC.client;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.client.API.Connection;
 import org.cc86.MMC.client.API.Module;
@@ -18,28 +20,47 @@ import org.cc86.MMC.client.API.Module;
  */
 public class Mod_Stream implements Module
 {
+    private static final Logger l = LogManager.getLogger();
     Connection c;
+    private boolean ignoreAbort=true;
     @Override
     public void receiveMsgFromServer(Packet msg)
     {
-       
+
+        if(msg.getData().containsKey("disconnect"))
+        {
+            if(ignoreAbort)
+            {
+                ignoreAbort=false;
+                return;
+            }
+            l.info("disconnect");
+            mp4Thread.stopStreaming();
+        }
     }
-    
+    MP4Thread mp4Thread=null;
     public void streamMP4()
     {
+        if(mp4Thread!=null)
+        {
+            mp4Thread.stopStreaming();
+            ignoreAbort=true;
+        }
         Packet p = new Packet();
         HashMap<String,Object> data = new HashMap<>();
+        int tport = ((int)(0xCC87+Math.random()*100));//52359-52459 als port
         data.put("type","set");
         data.put("command","mp4");
-        data.put("target_port",""+((int)(9264+Math.random()*100)));//9264-9264 als port
+        data.put("target_port",""+tport);
+        mp4Thread = new MP4Thread(tport, true);
+        new Thread(mp4Thread).start();
         p.setData(data);
         c.sendRequest(p);
     }
         
     
     public void streamVNC()
-    {
-        
+    {       
         //TODO check for VNC and launch if needed
         Packet p = new Packet();
         HashMap<String,Object> data = new HashMap<>();
@@ -58,7 +79,7 @@ public class Mod_Stream implements Module
     @Override
     public List<String> getCommands()
     {
-        return Arrays.asList(new String[]{"vnc","mp4","miracast"});
+        return Arrays.asList(new String[]{"vnc","mp4","miracast","stream"});
     }
     
 }

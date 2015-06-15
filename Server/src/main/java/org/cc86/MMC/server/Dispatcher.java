@@ -6,6 +6,8 @@
 package org.cc86.MMC.server;
 
 import java.util.HashMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.Processor;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.API.Handler;
@@ -15,6 +17,8 @@ import org.cc86.MMC.API.Handler;
  * @author tgoerner
  */
 public class Dispatcher {
+    
+    private static final Logger l = LogManager.getLogger();
     private HashMap<String,Processor> dispatcherLogic = new HashMap<>();
     PluginManager pm;
     public Dispatcher(PluginManager p)
@@ -25,13 +29,14 @@ public class Dispatcher {
     
     public synchronized void handleEvent(Packet r,Handler h)
     {
+        l.info("Handling event");
         String lm = (String) r.getData().get("command");
-        System.out.println("cmd=="+lm);
+        l.info("Command:"+lm);
         Processor p = dispatcherLogic.get(lm); 
-        System.out.println(p);
+        l.trace(p);
         if(p!=null)
         {
-            System.out.println("Einsteigen bitte");
+            l.trace("Einsteigen bitte");
             p.process(r,h);
         }
         else

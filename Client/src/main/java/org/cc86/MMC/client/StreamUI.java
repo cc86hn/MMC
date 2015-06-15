@@ -48,6 +48,13 @@ public class StreamUI extends javax.swing.JFrame
         });
 
         mp4.setText("MP4");
+        mp4.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                mp4ActionPerformed(evt);
+            }
+        });
 
         srvrIXX.setText("Server Ixxen");
         srvrIXX.addActionListener(new java.awt.event.ActionListener()
@@ -100,6 +107,17 @@ public class StreamUI extends javax.swing.JFrame
             }
         }
     }//GEN-LAST:event_vncActionPerformed
+
+    private void mp4ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_mp4ActionPerformed
+    {//GEN-HEADEREND:event_mp4ActionPerformed
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Stream)
+            {
+                ((Mod_Stream)m1).streamMP4();
+            }
+        }
+    }//GEN-LAST:event_mp4ActionPerformed
 
     /**
      * @param args the command line arguments

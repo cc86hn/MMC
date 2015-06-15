@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Packet;
@@ -23,6 +24,7 @@ import org.yaml.snakeyaml.Yaml;
  * @author tgoerner
  */
 public class TCPhandler implements Handler{
+    private static final org.apache.logging.log4j.Logger l = LogManager.getLogger();
     private final Socket sck;
     private String returnMsg;
     public TCPhandler(Socket s)
@@ -44,18 +46,18 @@ public class TCPhandler implements Handler{
                         while(!ln.equals("---"))
                         {
                             request+=ln+"\n";
-                            System.out.println(ln);
+                            l.trace(ln);
                             ln=r.readLine();
                         }
                         
                     } catch (IOException ex) {
-                        System.out.println("Lost connection");
+                        l.warn("Lost connection");
                         break;
                     }
                     Object packet = new Yaml().load(request);
                     if(packet instanceof Packet)
                     {
-                        System.out.println("PACKET");
+                        l.info("PACKET received");
                         API.getDispatcher().handleEvent((Packet)packet,this);
                     }
                     else
@@ -78,7 +80,7 @@ public class TCPhandler implements Handler{
                         out.println(returnMsg);
                         out.flush();
                         returnMsg="";
-                        System.out.println("MSG sent back");
+                        l.info("MSG sent back");
                     }
                 }
             });
@@ -93,7 +95,7 @@ public class TCPhandler implements Handler{
     public void respondToLinkedClient(Packet response) {
          synchronized(sck)
          {
-             System.out.println("ANTWORT");
+             l.info("ANTWORT");
              returnMsg=new Yaml().dump(response)+"\n---\n";
              sck.notify();
          }
@@ -102,7 +104,9 @@ public class TCPhandler implements Handler{
     @Override
     public String getClientIP()
     {
-        return sck.getRemoteSocketAddress().toString();
+        String internalAddr=sck.getRemoteSocketAddress().toString().substring(1);
+        int lastCol=internalAddr.lastIndexOf(":");
+        return internalAddr.substring(0,lastCol);  //HACK!
     }
     
     
