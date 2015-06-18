@@ -17,4 +17,6 @@ public interface Module
     public void receiveMsgFromServer(Packet msg);
     public void connect(Connection c);
     public List<String> getCommands();
+    public default void loadUI(){};
+    public default void quit(){};
 }

@@ -20,6 +20,7 @@ import org.cc86.MMC.client.API.Module;
  */
 public class Mod_Stream implements Module
 {
+    StreamUI ui;
     private static final Logger l = LogManager.getLogger();
     Connection c;
     private boolean ignoreAbort=true;
@@ -39,7 +40,17 @@ public class Mod_Stream implements Module
         }
     }
     MP4Thread mp4Thread=null;
-    public void streamMP4()
+    
+    @Override
+    public void loadUI() 
+    {
+        l.info("figgdi");
+        ui= new StreamUI();
+        Menu.getMenu().registerTab("ScreenStream", ui);
+    }
+    
+    
+    public void streamMP4(boolean fastmode)
     {
         if(mp4Thread!=null)
         {
@@ -52,7 +63,7 @@ public class Mod_Stream implements Module
         data.put("type","set");
         data.put("command","mp4");
         data.put("target_port",""+tport);
-        mp4Thread = new MP4Thread(tport, true);
+        mp4Thread = new MP4Thread(tport, fastmode);
         new Thread(mp4Thread).start();
         p.setData(data);
         c.sendRequest(p);
@@ -69,7 +80,16 @@ public class Mod_Stream implements Module
         p.setData(data);
         c.sendRequest(p);
     }
-    
+    public void stopAllStreams()
+    {       
+        //TODO check for VNC and launch if needed
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","stopall");
+        p.setData(data);
+        c.sendRequest(p);
+    }
     
     @Override
     public void connect(Connection c) {
@@ -81,5 +101,10 @@ public class Mod_Stream implements Module
     {
         return Arrays.asList(new String[]{"vnc","mp4","miracast","stream"});
     }
-    
+        
+    @Override
+    public void quit() 
+    {
+        mp4Thread.stopStreaming();
+    }
 }

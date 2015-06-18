@@ -6,6 +6,8 @@
 
 package org.cc86.MMC.client;
 
+import de.nplusc.izc.tools.baseTools.Messagers;
+import de.nplusc.izc.tools.baseTools.TimeoutManager;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -24,9 +26,8 @@ import org.cc86.MMC.client.API.Connection;
 public class Main
 {
     private static final Logger l = LogManager.getLogger();
-    private static UI ui;
-    private static RadioUI radio;
-    private static StreamUI stream;
+    //private static TestsUI ui;
+    //private static RadioUI radio;
     private static final Dispatcher disp = new Dispatcher();
     private static Connection c;
     
@@ -34,7 +35,8 @@ public class Main
     
     public static void main(String[] args)
     {
-        //TODO PI-DETECTION
+        TimeoutManager m = new TimeoutManager(3, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
+        m.start();
         String srvr =serverDiscovery();
         l.info(srvr);
         if(srvr.equals("0.0.0.0"))
@@ -44,9 +46,12 @@ public class Main
                     
         }
         c=new TCPConnection(srvr, 0xCC86);
-        try {
+        try 
+        {
             c.connect();
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) 
+        {
             //System.out.println(ex.m);
             System.out.println("Ell-Emm-AhhX2");
             l.error("FAILED TO CONNECT");
@@ -54,16 +59,53 @@ public class Main
         }
         piIP=srvr;
         disp.connect(c);
+        Runtime.getRuntime().addShutdownHook(new Thread(disp::quit));
+        m.disarm();
+        
+                /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try
+        {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+            {
+                if ("Nimbus".equals(info.getName()))
+                {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        }
+        catch (ClassNotFoundException ex)
+        {
+            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        catch (InstantiationException ex)
+        {
+            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        catch (IllegalAccessException ex)
+        {
+            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException ex)
+        {
+            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        
+        
         
         java.awt.EventQueue.invokeLater(()->
         {
-             ui = new UI();
+             //ui = new TestsUI();
             //ui.setVisible(true);
-            radio=new RadioUI();
-            //radio.setVisible(true);
-            stream=new StreamUI();
-            stream.setVisible(true);
-            
+            Menu.bootUI();
         });
         
         
@@ -72,7 +114,8 @@ public class Main
     {
         return disp;
     }
-    public static UI getUi()
+    /*
+    public static TestsUI getUi()
     {
         return ui;
     }
@@ -80,7 +123,7 @@ public class Main
     public static RadioUI getRadio()
     {
         return radio;
-    }
+    }*/
     /*packahgeprotected*/ static void serverKillen()
     {
         Mod_Exit x = new Mod_Exit();

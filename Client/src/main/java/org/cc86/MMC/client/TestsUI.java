@@ -13,13 +13,13 @@ import org.cc86.MMC.client.API.Module;
  *
  * @author iZc <nplusc.de>
  */
-public class UI extends javax.swing.JFrame
+public class TestsUI extends javax.swing.JFrame
 {
 
     /**
      * Creates new form UI
      */
-    public UI()
+    public TestsUI()
     {
         initComponents();
     }
@@ -32,7 +32,8 @@ public class UI extends javax.swing.JFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         lblOut = new javax.swing.JLabel();
         btnFUuu = new javax.swing.JButton();
@@ -43,8 +44,10 @@ public class UI extends javax.swing.JFrame
         lblOut.setText("Message should appear here");
 
         btnFUuu.setText("Ping");
-        btnFUuu.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnFUuu.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnFUuuActionPerformed(evt);
             }
         });
@@ -116,20 +119,21 @@ public class UI extends javax.swing.JFrame
         }
         catch (ClassNotFoundException ex)
         {
-            java.util.logging.Logger.getLogger(UI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         catch (InstantiationException ex)
         {
-            java.util.logging.Logger.getLogger(UI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         catch (IllegalAccessException ex)
         {
-            java.util.logging.Logger.getLogger(UI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         catch (javax.swing.UnsupportedLookAndFeelException ex)
         {
-            java.util.logging.Logger.getLogger(UI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
@@ -137,7 +141,7 @@ public class UI extends javax.swing.JFrame
         {
             public void run()
             {
-                new UI().setVisible(true);
+                new TestsUI().setVisible(true);
             }
         });
     }

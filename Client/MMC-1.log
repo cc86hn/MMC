@@ -1,65 +1,38 @@
-18:56:48.508 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:116) - Request packet sent to: 255.255.255.255 (DEFAULT)
-18:56:48.553 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:149) - Request packet sent to: 192.168.10.255; Interface: Realtek PCIe GBE Family Controller
-18:56:48.557 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:149) - Request packet sent to: 169.254.255.255; Interface: TAP-Windows Adapter V9
-18:56:48.570 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:153) - Done looping over all network interfaces. Now waiting for a reply!
-18:56:48.571 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:161) - Broadcast response from server: 192.168.10.228
-18:56:48.572 [main] INFO  org.cc86.MMC.client.Main.main(Main.java:39) - 192.168.10.228
-18:56:50.249 [[External.VNC]] INFO  - ffmpeg version N-69672-g078be09 Copyright (c) 2000-2015 the FFmpeg developers
-18:56:50.250 [[External.VNC]] INFO  -   built with gcc 4.9.2 (GCC)
-18:56:50.253 [[External.VNC]] INFO  -   configuration: --enable-gpl --enable-version3 --disable-w32threads --enable-avisynth --enable-bzlib --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-lzma --enable-decklink --enable-zlib
-18:56:50.256 [[External.VNC]] INFO  -   libavutil      54. 18.100 / 54. 18.100
-18:56:50.257 [[External.VNC]] INFO  -   libavcodec     56. 21.102 / 56. 21.102
-18:56:50.257 [[External.VNC]] INFO  -   libavformat    56. 19.100 / 56. 19.100
-18:56:50.258 [[External.VNC]] INFO  -   libavdevice    56.  4.100 / 56.  4.100
-18:56:50.258 [[External.VNC]] INFO  -   libavfilter     5.  9.104 /  5.  9.104
-18:56:50.259 [[External.VNC]] INFO  -   libswscale      3.  1.101 /  3.  1.101
-18:56:50.259 [[External.VNC]] INFO  -   libswresample   1.  1.100 /  1.  1.100
-18:56:50.260 [[External.VNC]] INFO  -   libpostproc    53.  3.100 / 53.  3.100
-18:56:50.372 [[External.VNC]] INFO  - Input #0, dshow, from 'video=screen-capture-recorder':
-18:56:50.374 [[External.VNC]] INFO  -   Duration: N/A, start: 11040.254000, bitrate: N/A
-18:56:50.375 [[External.VNC]] INFO  -     Stream #0:0: Video: rawvideo, bgr0, 1920x1200, 24 tbr, 10000k tbn, 24 tbc
-18:56:50.382 [[External.VNC]] INFO  - Output #0, mpegts, to 'udp://192.168.10.228:52369?pkt_size=400?buffer_size=65535':
-18:56:50.383 [[External.VNC]] INFO  -   Metadata:
-18:56:50.384 [[External.VNC]] INFO  -     encoder         : Lavf56.19.100
-18:56:50.385 [[External.VNC]] INFO  -     Stream #0:0: Video: mpeg4, yuv420p, 1920x1200, q=2-31, 200 kb/s, 24 fps, 90k tbn, 24 tbc
-18:56:50.385 [[External.VNC]] INFO  -     Metadata:
-18:56:50.386 [[External.VNC]] INFO  -       encoder         : Lavc56.21.102 mpeg4
-18:56:50.386 [[External.VNC]] INFO  - Stream mapping:
-18:56:50.386 [[External.VNC]] INFO  -   Stream #0:0 -> #0:0 (rawvideo (native) -> mpeg4 (native))
-18:56:50.387 [[External.VNC]] INFO  - Press [q] to stop, [?] for help
-18:56:50.907 [[External.VNC]] INFO  - frame=   13 fps=0.0 q=20.0 size=    1444kB time=00:00:00.54 bitrate=21843.6kbits/s dup=2 drop=0    
-18:56:51.405 [[External.VNC]] INFO  - frame=   25 fps= 24 q=20.0 size=    2768kB time=00:00:01.04 bitrate=21768.8kbits/s dup=4 drop=0    
-18:56:51.908 [[External.VNC]] INFO  - frame=   37 fps= 24 q=20.0 size=    4102kB time=00:00:01.54 bitrate=21799.1kbits/s dup=6 drop=0    
-18:56:52.409 [[External.VNC]] INFO  - frame=   49 fps= 24 q=20.0 size=    5445kB time=00:00:02.04 bitrate=21846.2kbits/s dup=8 drop=0    
-18:56:52.911 [[External.VNC]] INFO  - frame=   61 fps= 24 q=20.0 size=    6792kB time=00:00:02.54 bitrate=21891.3kbits/s dup=10 drop=0    
-18:56:53.410 [[External.VNC]] INFO  - frame=   73 fps= 24 q=20.0 size=    8152kB time=00:00:03.04 bitrate=21955.3kbits/s dup=12 drop=0    
-18:56:53.912 [[External.VNC]] INFO  - frame=   85 fps= 24 q=20.0 size=    9521kB time=00:00:03.54 bitrate=22022.4kbits/s dup=14 drop=0    
-18:56:54.426 [[External.VNC]] INFO  - frame=   98 fps= 24 q=20.0 size=   11016kB time=00:00:04.08 bitrate=22101.1kbits/s dup=17 drop=0    
-18:56:54.928 [[External.VNC]] INFO  - frame=  110 fps= 24 q=20.0 size=   12406kB time=00:00:04.58 bitrate=22173.4kbits/s dup=19 drop=0    
-18:56:55.445 [[External.VNC]] INFO  - frame=  122 fps= 24 q=20.0 size=   13808kB time=00:00:05.08 bitrate=22252.9kbits/s dup=21 drop=0    
-18:56:55.946 [[External.VNC]] INFO  - frame=  134 fps= 24 q=20.0 size=   15228kB time=00:00:05.58 bitrate=22342.6kbits/s dup=23 drop=0    
-18:56:56.450 [[External.VNC]] INFO  - frame=  146 fps= 24 q=20.0 size=   16664kB time=00:00:06.08 bitrate=22439.8kbits/s dup=25 drop=0    
-18:56:56.952 [[External.VNC]] INFO  - frame=  156 fps= 24 q=20.0 size=   17840kB time=00:00:06.50 bitrate=22484.1kbits/s dup=27 drop=0    
-18:56:57.259 [[External.VNC]] INFO  - [dshow @ 04558da0] real-time buffer [screen-capture-recorder] [video input] too full or near too full (606% of size: 3041280 [rtbufsize parameter])! frame dropped!
-18:56:57.355 [[External.VNC]] INFO  -     Last message repeated 6 times
-18:56:57.357 [[External.VNC]] INFO  - Past duration 0.911995 too large
-18:56:57.387 [[External.VNC]] INFO  - Past duration 0.903999 too large
-18:56:57.458 [[External.VNC]] INFO  - frame=  172 fps= 24 q=20.0 size=   19028kB time=00:00:07.16 bitrate=21749.9kbits/s dup=36 drop=1    
-18:56:57.744 [[External.VNC]] INFO  - [dshow @ 04558da0] real-time buffer [screen-capture-recorder] [video input] too full or near too full (606% of size: 3041280 [rtbufsize parameter])! frame dropped!
-18:56:57.984 [[External.VNC]] INFO  -     Last message repeated 7 times
-18:56:57.985 [[External.VNC]] INFO  - frame=  185 fps= 24 q=20.0 size=   20111kB time=00:00:07.70 bitrate=21372.7kbits/s dup=36 drop=16    
-18:56:58.018 [[External.VNC]] INFO  - [dshow @ 04558da0] real-time buffer [screen-capture-recorder] [video input] too full or near too full (606% of size: 3041280 [rtbufsize parameter])! frame dropped!
-18:56:58.466 [[External.VNC]] INFO  -     Last message repeated 1 times
-18:56:58.466 [[External.VNC]] INFO  - frame=  196 fps= 24 q=20.0 size=   21385kB time=00:00:08.16 bitrate=21451.7kbits/s dup=36 drop=19    
-18:56:58.966 [[External.VNC]] INFO  - frame=  208 fps= 24 q=20.0 size=   22803kB time=00:00:08.66 bitrate=21554.3kbits/s dup=36 drop=19    
-18:56:59.465 [[External.VNC]] INFO  - frame=  220 fps= 24 q=20.0 size=   24242kB time=00:00:09.16 bitrate=21664.7kbits/s dup=36 drop=19    
-18:56:59.977 [[External.VNC]] INFO  - frame=  232 fps= 24 q=20.0 size=   26439kB time=00:00:09.66 bitrate=22405.7kbits/s dup=36 drop=19    
-18:57:00.477 [[External.VNC]] INFO  - frame=  244 fps= 24 q=20.0 size=   29184kB time=00:00:10.16 bitrate=23515.8kbits/s dup=36 drop=19    
-18:57:01.020 [[External.VNC]] INFO  - frame=  257 fps= 24 q=20.0 size=   32177kB time=00:00:10.70 bitrate=24615.6kbits/s dup=36 drop=19    
-18:57:01.519 [[External.VNC]] INFO  - frame=  269 fps= 24 q=20.0 size=   34947kB time=00:00:11.20 bitrate=25542.4kbits/s dup=36 drop=19    
-18:57:02.022 [[External.VNC]] INFO  - frame=  281 fps= 24 q=20.0 size=   37710kB time=00:00:11.70 bitrate=26384.5kbits/s dup=36 drop=19    
-18:57:02.520 [[External.VNC]] INFO  - frame=  293 fps= 24 q=20.0 size=   40477kB time=00:00:12.20 bitrate=27160.5kbits/s dup=36 drop=19    
-18:57:03.020 [[External.VNC]] INFO  - frame=  305 fps= 24 q=20.0 size=   43250kB time=00:00:12.70 bitrate=27879.7kbits/s dup=36 drop=19    
-18:57:03.561 [[External.VNC]] INFO  - frame=  318 fps= 24 q=20.0 size=   46257kB time=00:00:13.25 bitrate=28598.8kbits/s dup=36 drop=19    
-18:57:04.063 [[External.VNC]] INFO  - frame=  330 fps= 24 q=20.0 size=   49026kB time=00:00:13.75 bitrate=29208.7kbits/s dup=36 drop=19    
-18:57:04.560 [[External.VNC]] INFO  - frame=  342 fps= 24 q=20.0 size=   51732kB time=00:00:14.25 bitrate=29739.8kbits/s dup=36 drop=19    
+19:03:04.112 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:158) - Request packet sent to: 255.255.255.255 (DEFAULT)
+19:03:04.154 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:191) - Request packet sent to: 192.168.10.255; Interface: Realtek PCIe GBE Family Controller
+19:03:04.158 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:191) - Request packet sent to: 169.254.255.255; Interface: TAP-Windows Adapter V9
+19:03:04.170 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:195) - Done looping over all network interfaces. Now waiting for a reply!
+19:03:04.171 [main] INFO  org.cc86.MMC.client.Main.serverDiscovery(Main.java:203) - Broadcast response from server: 192.168.10.41
+19:03:04.172 [main] INFO  org.cc86.MMC.client.Main.main(Main.java:41) - 192.168.10.41
+19:03:04.326 [AWT-EventQueue-0] ERROR org.cc86.MMC.client.Menu.bootUI(Menu.java:117) - Ach LEgg mi doch am arsch
+19:03:04.422 [AWT-EventQueue-0] INFO  org.cc86.MMC.client.Mod_Stream.loadUI(Mod_Stream.java:47) - figgdi
+19:03:07.715 [[External.FFMPEG]] INFO  - ffmpeg version N-69672-g078be09 Copyright (c) 2000-2015 the FFmpeg developers
+19:03:07.717 [[External.FFMPEG]] INFO  -   built with gcc 4.9.2 (GCC)
+19:03:07.719 [[External.FFMPEG]] INFO  -   configuration: --enable-gpl --enable-version3 --disable-w32threads --enable-avisynth --enable-bzlib --enable-fontconfig --enable-frei0r --enable-gnutls --enable-iconv --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libfreetype --enable-libgme --enable-libgsm --enable-libilbc --enable-libmodplug --enable-libmp3lame --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenjpeg --enable-libopus --enable-librtmp --enable-libschroedinger --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvo-aacenc --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxvid --enable-lzma --enable-decklink --enable-zlib
+19:03:07.720 [[External.FFMPEG]] INFO  -   libavutil      54. 18.100 / 54. 18.100
+19:03:07.720 [[External.FFMPEG]] INFO  -   libavcodec     56. 21.102 / 56. 21.102
+19:03:07.721 [[External.FFMPEG]] INFO  -   libavformat    56. 19.100 / 56. 19.100
+19:03:07.721 [[External.FFMPEG]] INFO  -   libavdevice    56.  4.100 / 56.  4.100
+19:03:07.721 [[External.FFMPEG]] INFO  -   libavfilter     5.  9.104 /  5.  9.104
+19:03:07.722 [[External.FFMPEG]] INFO  -   libswscale      3.  1.101 /  3.  1.101
+19:03:07.722 [[External.FFMPEG]] INFO  -   libswresample   1.  1.100 /  1.  1.100
+19:03:07.722 [[External.FFMPEG]] INFO  -   libpostproc    53.  3.100 / 53.  3.100
+19:03:07.826 [[External.FFMPEG]] INFO  - Input #0, dshow, from 'video=screen-capture-recorder':
+19:03:07.827 [[External.FFMPEG]] INFO  -   Duration: N/A, start: 10612.644000, bitrate: N/A
+19:03:07.827 [[External.FFMPEG]] INFO  -     Stream #0:0: Video: rawvideo, bgr0, 1920x1200, 24 tbr, 10000k tbn, 24 tbc
+19:03:07.834 [[External.FFMPEG]] INFO  - Output #0, mpegts, to 'udp://192.168.10.41:52380?pkt_size=400?buffer_size=65535':
+19:03:07.835 [[External.FFMPEG]] INFO  -   Metadata:
+19:03:07.836 [[External.FFMPEG]] INFO  -     encoder         : Lavf56.19.100
+19:03:07.837 [[External.FFMPEG]] INFO  -     Stream #0:0: Video: mpeg4, yuv420p, 1920x1200, q=2-31, 200 kb/s, 24 fps, 90k tbn, 24 tbc
+19:03:07.838 [[External.FFMPEG]] INFO  -     Metadata:
+19:03:07.839 [[External.FFMPEG]] INFO  -       encoder         : Lavc56.21.102 mpeg4
+19:03:07.840 [[External.FFMPEG]] INFO  - Stream mapping:
+19:03:07.841 [[External.FFMPEG]] INFO  -   Stream #0:0 -> #0:0 (rawvideo (native) -> mpeg4 (native))
+19:03:07.842 [[External.FFMPEG]] INFO  - Press [q] to stop, [?] for help
+19:03:08.350 [[External.FFMPEG]] INFO  - frame=   13 fps=0.0 q=20.0 size=    1388kB time=00:00:00.54 bitrate=20996.8kbits/s dup=2 drop=0    
+19:03:08.852 [[External.FFMPEG]] INFO  - frame=   25 fps= 25 q=20.0 size=    2653kB time=00:00:01.04 bitrate=20860.6kbits/s dup=4 drop=0    
+19:03:09.357 [[External.FFMPEG]] INFO  - frame=   37 fps= 24 q=20.0 size=    3923kB time=00:00:01.54 bitrate=20847.9kbits/s dup=6 drop=0    
+19:03:09.861 [[External.FFMPEG]] INFO  - frame=   49 fps= 24 q=20.0 size=    5203kB time=00:00:02.04 bitrate=20877.5kbits/s dup=8 drop=0    
+19:03:10.370 [[External.FFMPEG]] INFO  - frame=   61 fps= 24 q=20.0 size=    6486kB time=00:00:02.54 bitrate=20905.5kbits/s dup=10 drop=0    
+19:03:10.877 [[External.FFMPEG]] INFO  - frame=   73 fps= 24 q=20.0 size=    7777kB time=00:00:03.04 bitrate=20946.6kbits/s dup=12 drop=0    
+19:03:11.399 [InputCruncher] INFO  org.cc86.MMC.client.Mod_Stream.receiveMsgFromServer(Mod_Stream.java:38) - disconnect

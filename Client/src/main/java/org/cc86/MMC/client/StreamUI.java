@@ -5,13 +5,14 @@
  */
 package org.cc86.MMC.client;
 
+import javax.swing.JPanel;
 import org.cc86.MMC.client.API.Module;
 
 /**
  *
  * @author tgoerner
  */
-public class StreamUI extends javax.swing.JFrame
+public class StreamUI extends JPanel
 {
 
     /**
@@ -34,9 +35,10 @@ public class StreamUI extends javax.swing.JFrame
 
         vnc = new javax.swing.JButton();
         mp4 = new javax.swing.JButton();
-        srvrIXX = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        btnMP4WithSound = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         vnc.setText("VNC");
         vnc.addActionListener(new java.awt.event.ActionListener()
@@ -56,46 +58,73 @@ public class StreamUI extends javax.swing.JFrame
             }
         });
 
-        srvrIXX.setText("Server Ixxen");
-        srvrIXX.addActionListener(new java.awt.event.ActionListener()
+        jLabel1.setText("Nur Video");
+
+        jLabel2.setText("Video + Audio");
+
+        btnMP4WithSound.setText("MP4(Hohe Latenz)");
+        btnMP4WithSound.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
-                srvrIXXActionPerformed(evt);
+                btnMP4WithSoundActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        jButton1.setText("Alle Streams stoppen");
+        jButton1.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(273, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(srvrIXX)
-                    .addComponent(mp4)
-                    .addComponent(vnc))
-                .addGap(32, 32, 32))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(vnc, javax.swing.GroupLayout.DEFAULT_SIZE, 91, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGap(19, 19, 19)
+                        .addComponent(jLabel1))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(mp4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(36, 36, 36)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnMP4WithSound)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(vnc)
+                .addContainerGap(186, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(mp4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 118, Short.MAX_VALUE)
-                .addComponent(srvrIXX)
-                .addGap(96, 96, 96))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(mp4)
+                            .addComponent(btnMP4WithSound))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(vnc)
+                        .addGap(37, 37, 37))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addGap(50, 50, 50))))
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void srvrIXXActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_srvrIXXActionPerformed
-    {//GEN-HEADEREND:event_srvrIXXActionPerformed
-        Main.serverKillen();
-    }//GEN-LAST:event_srvrIXXActionPerformed
 
     private void vncActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_vncActionPerformed
     {//GEN-HEADEREND:event_vncActionPerformed
@@ -114,59 +143,40 @@ public class StreamUI extends javax.swing.JFrame
         for (Object m1 : m) {
             if(m1 instanceof Mod_Stream)
             {
-                ((Mod_Stream)m1).streamMP4();
+                ((Mod_Stream)m1).streamMP4(true);
             }
         }
     }//GEN-LAST:event_mp4ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[])
-    {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try
-        {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+    private void btnMP4WithSoundActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnMP4WithSoundActionPerformed
+    {//GEN-HEADEREND:event_btnMP4WithSoundActionPerformed
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Stream)
             {
-                if ("Nimbus".equals(info.getName()))
-                {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+                ((Mod_Stream)m1).streamMP4(false);
             }
-        } catch (ClassNotFoundException ex)
-        {
-            java.util.logging.Logger.getLogger(StreamUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex)
-        {
-            java.util.logging.Logger.getLogger(StreamUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex)
-        {
-            java.util.logging.Logger.getLogger(StreamUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(StreamUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+    }//GEN-LAST:event_btnMP4WithSoundActionPerformed
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable()
-        {
-            public void run()
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
+    {//GEN-HEADEREND:event_jButton1ActionPerformed
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Stream)
             {
-                new StreamUI().setVisible(true);
+                ((Mod_Stream)m1).stopAllStreams();
             }
-        });
-    }
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnMP4WithSound;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JButton mp4;
-    private javax.swing.JButton srvrIXX;
     private javax.swing.JButton vnc;
     // End of variables declaration//GEN-END:variables
 }

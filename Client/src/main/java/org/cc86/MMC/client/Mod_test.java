@@ -24,7 +24,7 @@ public class Mod_test implements Module
         HashMap<String,Object> data = msg.getData();
         if(data.get("type").equals("response")&&data.get("command").equals("Test"))
         {
-            Main.getUi().updateMEssageLine((String) data.get("message"));
+            //Main.getUi().updateMEssageLine((String) data.get("message"));
         }
     }
     

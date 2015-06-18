@@ -24,6 +24,7 @@ public class StreamPlugin implements Plugin{
         API.getDispatcher().registerOnRequestType("vnc", h); 
         API.getDispatcher().registerOnRequestType("mp4", h); 
         API.getDispatcher().registerOnRequestType("miracast", h); 
+        API.getDispatcher().registerOnRequestType("stopall", h);
     }
     @Override
     public String getName() {

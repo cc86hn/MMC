@@ -7,6 +7,7 @@ package org.cc86.MMC.client;
 
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
+import javax.swing.JPanel;
 import javax.swing.ListModel;
 import org.cc86.MMC.client.API.Module;
 
@@ -14,7 +15,7 @@ import org.cc86.MMC.client.API.Module;
  *
  * @author tgoerner
  */
-public class RadioUI extends javax.swing.JFrame
+public class RadioUI extends JPanel
 {
 
     /**
@@ -68,13 +69,10 @@ public class RadioUI extends javax.swing.JFrame
         jLabel2 = new javax.swing.JLabel();
         btnSelSender = new javax.swing.JButton();
         btnF5 = new javax.swing.JButton();
-        btnDebugIXx = new javax.swing.JButton();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         btnPlayURL.setText("URL abspielen");
 
-        btnCancelPlayback.setText("Stop");
+        btnCancelPlayback.setText("Stream Stop");
 
         lstFavoriten.setModel(new DefaultListModel<String>());
         lstFavoriten.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -95,7 +93,7 @@ public class RadioUI extends javax.swing.JFrame
             }
         });
 
-        btnF5.setText("F5");
+        btnF5.setText("Aktualisieren");
         btnF5.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -104,45 +102,29 @@ public class RadioUI extends javax.swing.JFrame
             }
         });
 
-        btnDebugIXx.setText("Server Ixxen");
-        btnDebugIXx.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                btnDebugIXxActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txfURL)
+                    .addComponent(txfShortID)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnPlayURL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnSelSender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(132, 132, 132)
-                        .addComponent(btnCancelPlayback)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnDebugIXx)
+                        .addComponent(btnF5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txfURL)
-                            .addComponent(txfShortID)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnPlayURL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnSelSender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnShortIDSave)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnF5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addContainerGap())))))
+                        .addComponent(btnShortIDSave)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(btnCancelPlayback, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -167,13 +149,9 @@ public class RadioUI extends javax.swing.JFrame
                     .addComponent(txfShortID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnShortIDSave))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnCancelPlayback)
-                    .addComponent(btnDebugIXx))
+                .addComponent(btnCancelPlayback)
                 .addContainerGap())
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSelSenderActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSelSenderActionPerformed
@@ -191,11 +169,6 @@ public class RadioUI extends javax.swing.JFrame
     {//GEN-HEADEREND:event_btnF5ActionPerformed
         poke();
     }//GEN-LAST:event_btnF5ActionPerformed
-
-    private void btnDebugIXxActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnDebugIXxActionPerformed
-    {//GEN-HEADEREND:event_btnDebugIXxActionPerformed
-       Main.serverKillen();
-    }//GEN-LAST:event_btnDebugIXxActionPerformed
     
     public void updateList(HashMap<String,String> mappings)
     {
@@ -203,56 +176,10 @@ public class RadioUI extends javax.swing.JFrame
         mdl.clear();
         mappings.keySet().forEach(mdl::addElement);
     }
-    
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[])
-    {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try
-        {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
-            {
-                if ("Nimbus".equals(info.getName()))
-                {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex)
-        {
-            java.util.logging.Logger.getLogger(RadioUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex)
-        {
-            java.util.logging.Logger.getLogger(RadioUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex)
-        {
-            java.util.logging.Logger.getLogger(RadioUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(RadioUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable()
-        {
-            public void run()
-            {
-                new RadioUI().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelPlayback;
-    private javax.swing.JButton btnDebugIXx;
     private javax.swing.JButton btnF5;
     private javax.swing.JButton btnPlayURL;
     private javax.swing.JButton btnSelSender;

@@ -19,6 +19,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class Mod_Radio implements Module
 {
+    private RadioUI ui;
     private Connection c;
     @Override
     public void receiveMsgFromServer(Packet msg)
@@ -29,12 +30,19 @@ public class Mod_Radio implements Module
             //Handling der Mapping-Liste
             new Yaml().dump(data);
             System.out.println("WRSID");
-            Main.getRadio().updateList((HashMap<String, String>) data.get("mappings"));
+            ui.updateList((HashMap<String, String>) data.get("mappings"));
             
             
         }
     }
     
+    @Override
+    public void loadUI() 
+    {
+        ui= new RadioUI();
+        Menu.getMenu().registerTab("Radio", ui);
+    }
+
     public void switchToStation(String url)
     {
         Packet p = new Packet();

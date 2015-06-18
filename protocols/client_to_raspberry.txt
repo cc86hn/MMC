@@ -80,6 +80,9 @@ beamer_sourceselect:
 miracast   //reserved for widi compatible devices
 	set: IP of source
 	get: currently shown screen
+stopall  //reserved for widi compatible devices
+	set: Stops all connected Screenstreams
+	get: nothing
 
 	
 streamaudio

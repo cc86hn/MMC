@@ -15,7 +15,7 @@ import org.cc86.MMC.client.API.Module;
  */
 public class Dispatcher
 {
-    private final Module[] modules={new Mod_test(),new Mod_Radio(),new Mod_Stream()};
+    private final Module[] modules={new Mod_Radio(),new Mod_Stream()};
     
     public void sendPacketToModule(Packet p)
     {
@@ -30,6 +30,15 @@ public class Dispatcher
         }
         
     }
+    
+    public void startUIs()
+    {
+        for (Module module : modules) {
+            module.loadUI();
+        }
+    }
+    
+    
     public Module[] getModules()
     {
         return modules;
@@ -39,6 +48,12 @@ public class Dispatcher
         
         for (Module module : modules) {
             module.connect(c);
+        }
+    }
+    public void quit()
+    {
+        for (Module module : modules) {
+            module.quit();
         }
     }
     

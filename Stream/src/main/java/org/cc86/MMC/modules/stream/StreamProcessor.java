@@ -24,6 +24,7 @@ public class StreamProcessor implements Processor
     public static final String MODE_MIRACAST="miracast";
     public static final String MODE_VNC="vnc";
     public static final String MODE_MP4="mp4";
+    public static final String MODE_STOPALL="stopstream";
     public static final String MODE_NONE="nop";
     private Handler lastConnected;
     private String modeSelected=MODE_NONE;
@@ -55,6 +56,10 @@ public class StreamProcessor implements Processor
             response.put("type","response");
             switch(packetData.get("command").toString().toLowerCase())
             {
+                case MODE_STOPALL:
+                        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "killall","xtightvncviewer");
+                        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "killall","omxplayer.bin");
+                    break;
                 case MODE_MIRACAST:
                     //NOP yet
                     
