@@ -7,6 +7,7 @@ package org.cc86.MMC.modules.radio;
 
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Plugin;
+import org.cc86.MMC.API.Resources;
 
 /**
  *
@@ -30,5 +31,11 @@ public class RadioControl implements Plugin{
     public void shutdown()
     {
         h.shitdown();
+    }
+
+    @Override
+    public void freeUpResources(Resources... res)
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

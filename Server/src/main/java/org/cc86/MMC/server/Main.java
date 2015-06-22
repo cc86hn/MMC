@@ -27,7 +27,13 @@ public class Main {
         setupLogging(true);//TODO CMDLINE
         m.bootstrap();
     }
-
+    
+    public PluginManager getPluginmgr()
+    {
+        return mgr;
+    }
+    
+    
     public Dispatcher getDispatcher() {
         return dispatcher;
     }

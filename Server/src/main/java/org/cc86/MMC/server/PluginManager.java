@@ -21,6 +21,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Plugin;
+import org.cc86.MMC.API.Resources;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -87,6 +88,12 @@ public class PluginManager {
     {
         detectedPlugs.forEach((a)->a.shutdown());
     }
-
+    
+    public void freeRessources(Resources... r)
+    {
+        detectedPlugs.forEach((Plugin p)->p.freeUpResources(r));
+    }
+    
+    
 }
 

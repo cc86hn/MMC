@@ -71,6 +71,13 @@ public class RadioUI extends JPanel
         btnF5 = new javax.swing.JButton();
 
         btnPlayURL.setText("URL abspielen");
+        btnPlayURL.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnPlayURLActionPerformed(evt);
+            }
+        });
 
         btnCancelPlayback.setText("Stream Stop");
 
@@ -79,6 +86,13 @@ public class RadioUI extends JPanel
         jScrollPane1.setViewportView(lstFavoriten);
 
         btnShortIDSave.setText("Kurzname speichern");
+        btnShortIDSave.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnShortIDSaveActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("URL");
 
@@ -169,6 +183,16 @@ public class RadioUI extends JPanel
     {//GEN-HEADEREND:event_btnF5ActionPerformed
         poke();
     }//GEN-LAST:event_btnF5ActionPerformed
+
+    private void btnShortIDSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnShortIDSaveActionPerformed
+    {//GEN-HEADEREND:event_btnShortIDSaveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnShortIDSaveActionPerformed
+
+    private void btnPlayURLActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnPlayURLActionPerformed
+    {//GEN-HEADEREND:event_btnPlayURLActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnPlayURLActionPerformed
     
     public void updateList(HashMap<String,String> mappings)
     {

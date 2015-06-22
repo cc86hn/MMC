@@ -28,5 +28,8 @@ public class API {
         return Main.m.getDispatcher();
     }        
     
-    
+    public static void requestResourcesFree(Resources... r)
+    {
+        Main.m.getPluginmgr().freeRessources(r);
+    }
 }

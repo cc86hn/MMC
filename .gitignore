@@ -36,3 +36,4 @@ build
 /Client/build/
 
 /private
+*.log

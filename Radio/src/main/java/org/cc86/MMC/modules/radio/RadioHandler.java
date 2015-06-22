@@ -18,7 +18,9 @@ import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.MediaPlayerControl;
 import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.API.PlaybackMode;
 import org.cc86.MMC.API.Processor;
+import org.cc86.MMC.API.Resources;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -143,4 +145,16 @@ public class RadioHandler implements Processor{
             Logger.getLogger(RadioHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    /*packageprotected*/void freeRsrcs(Resources... r)
+    {
+        for (Resources r1 : r)
+        {
+            if(r1==Resources.AUDIODATA)
+            {
+                MediaPlayerControl.control(PlaybackMode.STOP);
+            }
+        }
+    }
+    
+    
 }

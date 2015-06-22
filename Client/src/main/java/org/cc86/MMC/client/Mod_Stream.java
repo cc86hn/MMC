@@ -63,6 +63,7 @@ public class Mod_Stream implements Module
         data.put("type","set");
         data.put("command","mp4");
         data.put("target_port",""+tport);
+        data.put("mode",fastmode?"fast":"slow");
         mp4Thread = new MP4Thread(tport, fastmode);
         new Thread(mp4Thread).start();
         p.setData(data);

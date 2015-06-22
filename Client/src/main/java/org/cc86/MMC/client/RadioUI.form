@@ -80,6 +80,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="URL abspielen"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPlayURLActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnCancelPlayback">
       <Properties>
@@ -111,6 +114,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Kurzname speichern"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnShortIDSaveActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>

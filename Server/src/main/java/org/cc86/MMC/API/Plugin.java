@@ -23,6 +23,14 @@ public interface Plugin {
     
     
     /**
+     * Requests the plugins to unblock the given resources if taken
+     * @param res 
+     */
+    public void freeUpResources(Resources... res);
+    
+    
+    
+    /**
      * event that runs before the program shutdowns
      */
     public void shutdown();
