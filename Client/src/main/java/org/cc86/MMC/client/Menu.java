@@ -114,7 +114,7 @@ public class Menu extends javax.swing.JFrame
     public static void bootUI()
     {
         m.setVisible(true);
-        l.error("Ach LEgg mi doch am arsch");
+        //l.trace("Ach LEgg mi doch am arsch");
         Main.getDispatcher().startUIs();
         //m.pGeneral.add()
     }

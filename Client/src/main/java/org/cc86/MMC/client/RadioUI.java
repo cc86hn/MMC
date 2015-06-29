@@ -186,12 +186,24 @@ public class RadioUI extends JPanel
 
     private void btnShortIDSaveActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnShortIDSaveActionPerformed
     {//GEN-HEADEREND:event_btnShortIDSaveActionPerformed
-        // TODO add your handling code here:
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Radio)
+            {
+                ((Mod_Radio)m1).addMappingForID(txfShortID.getText(), txfURL.getText());
+            }
+        }
     }//GEN-LAST:event_btnShortIDSaveActionPerformed
 
     private void btnPlayURLActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnPlayURLActionPerformed
     {//GEN-HEADEREND:event_btnPlayURLActionPerformed
-        // TODO add your handling code here:
+       Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Radio)
+            {
+                ((Mod_Radio)m1).switchToStation((String) txfURL.getText());
+            }
+        }
     }//GEN-LAST:event_btnPlayURLActionPerformed
     
     public void updateList(HashMap<String,String> mappings)

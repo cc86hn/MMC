@@ -188,27 +188,22 @@ public class VLCPlayback implements MediaPlayerEventListener
 
     }
 
-    @Override
     public void scrambledChanged(MediaPlayer mp, int i)
     {
     }
 
-    @Override
     public void elementaryStreamAdded(MediaPlayer mp, int i, int i1)
     {
     }
 
-    @Override
     public void elementaryStreamDeleted(MediaPlayer mp, int i, int i1)
     {
     }
 
-    @Override
     public void elementaryStreamSelected(MediaPlayer mp, int i, int i1)
     {
     }
 
-    @Override
     public void error(MediaPlayer mp)
     {
     }
@@ -243,12 +238,10 @@ public class VLCPlayback implements MediaPlayerEventListener
     {
     }
 
-    @Override
     public void mediaSubItemTreeAdded(MediaPlayer mp, libvlc_media_t l)
     {
     }
 
-    @Override
     public void newMedia(MediaPlayer mp)
     {
     }
