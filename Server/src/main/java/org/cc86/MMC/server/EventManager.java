@@ -76,4 +76,9 @@ public class EventManager implements Processor
             }
         }
     }
+    
+    public void unregisterAllListenesForHandler(Handler h)
+    {
+        listenerPool.forEach((String nope,List<Handler>l)->l.remove(h));
+    }
 }

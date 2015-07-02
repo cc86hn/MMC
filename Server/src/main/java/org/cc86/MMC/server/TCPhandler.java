@@ -52,6 +52,7 @@ public class TCPhandler implements Handler{
                         
                     } catch (IOException ex) {
                         l.warn("Lost connection"); //TODO cleanup
+                        Main.m.getEvtmgr().unregisterAllListenesForHandler(this);
                         break;
                     }
                     Object packet = new Yaml().load(request);
