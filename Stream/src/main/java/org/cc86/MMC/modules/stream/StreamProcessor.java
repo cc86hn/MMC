@@ -81,6 +81,7 @@ public class StreamProcessor implements Processor
                     response.put("command","miracast");
                     
                     break;
+                    
                 case MODE_VNC:
                     if (packetData.get("mode").equals("slow"))
                     {

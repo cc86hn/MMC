@@ -20,6 +20,7 @@ public class Main {
     public static final Main m=new Main();
     private PluginManager mgr;
     private Dispatcher dispatcher;
+    private EventManager evtmgr;
     private ServerCore core;
     
     
@@ -51,6 +52,16 @@ public class Main {
         }
          NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), vlcpath);//TODO LNX_PATH
         Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);*/
+    }
+
+    public EventManager getEvtmgr()
+    {
+        return evtmgr;
+    }
+
+    void setEvtmgr(EventManager evtmgr)
+    {
+        this.evtmgr = evtmgr;
     }
     
     

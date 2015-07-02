@@ -32,4 +32,9 @@ public class API {
     {
         Main.m.getPluginmgr().freeRessources(r);
     }
+    
+    public static void dispatchEvent(Packet p)
+    {
+        Main.m.getEvtmgr().sendEventToRegisteredClients(p);
+    }
 }

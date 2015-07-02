@@ -65,8 +65,8 @@ public class MediaPlayerControl
                 backend.skipTitle();
                 break;
             case STOP:
-                
-            break;
+                backend.pause();
+                break;
         }
     }
 

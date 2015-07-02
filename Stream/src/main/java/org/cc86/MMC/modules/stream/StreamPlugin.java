@@ -31,6 +31,7 @@ public class StreamPlugin implements Plugin{
     public String getName() {
         return "Radio";
     }
+    
     @Override
     public void shutdown()
     {

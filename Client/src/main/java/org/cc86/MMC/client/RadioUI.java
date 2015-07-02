@@ -5,10 +5,10 @@
  */
 package org.cc86.MMC.client;
 
+import java.awt.EventQueue;
 import java.util.HashMap;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
-import javax.swing.ListModel;
 import org.cc86.MMC.client.API.Module;
 
 /**
@@ -69,6 +69,7 @@ public class RadioUI extends JPanel
         jLabel2 = new javax.swing.JLabel();
         btnSelSender = new javax.swing.JButton();
         btnF5 = new javax.swing.JButton();
+        lblStation = new javax.swing.JLabel();
 
         btnPlayURL.setText("URL abspielen");
         btnPlayURL.addActionListener(new java.awt.event.ActionListener()
@@ -80,6 +81,13 @@ public class RadioUI extends JPanel
         });
 
         btnCancelPlayback.setText("Stream Stop");
+        btnCancelPlayback.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnCancelPlaybackActionPerformed(evt);
+            }
+        });
 
         lstFavoriten.setModel(new DefaultListModel<String>());
         lstFavoriten.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -116,36 +124,45 @@ public class RadioUI extends JPanel
             }
         });
 
+        lblStation.setText("Aktuelle Station: ");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txfURL)
-                    .addComponent(txfShortID)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnPlayURL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnSelSender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnF5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblStation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnShortIDSave)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(btnCancelPlayback, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txfURL)
+                            .addComponent(txfShortID)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnPlayURL, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnSelSender, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnF5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnShortIDSave)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(btnCancelPlayback, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(lblStation)
+                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnF5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -163,7 +180,7 @@ public class RadioUI extends JPanel
                     .addComponent(txfShortID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnShortIDSave))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCancelPlayback)
+                .addComponent(btnCancelPlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -205,6 +222,17 @@ public class RadioUI extends JPanel
             }
         }
     }//GEN-LAST:event_btnPlayURLActionPerformed
+
+    private void btnCancelPlaybackActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnCancelPlaybackActionPerformed
+    {//GEN-HEADEREND:event_btnCancelPlaybackActionPerformed
+         Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Radio)
+            {
+                ((Mod_Radio)m1).stopCurrentRadioStream();
+            }
+        }
+    }//GEN-LAST:event_btnCancelPlaybackActionPerformed
     
     public void updateList(HashMap<String,String> mappings)
     {
@@ -213,7 +241,10 @@ public class RadioUI extends JPanel
         mappings.keySet().forEach(mdl::addElement);
     }
 
-
+    public void updateStation(final String station)
+    {
+        EventQueue.invokeLater(()->lblStation.setText((!station.isEmpty())?"Aktuelle Station: "+station:"Kein Sender aktiv"));
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelPlayback;
     private javax.swing.JButton btnF5;
@@ -223,6 +254,7 @@ public class RadioUI extends JPanel
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblStation;
     private javax.swing.JList lstFavoriten;
     private javax.swing.JTextField txfShortID;
     private javax.swing.JTextField txfURL;

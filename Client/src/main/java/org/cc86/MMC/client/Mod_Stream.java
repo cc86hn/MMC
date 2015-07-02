@@ -106,6 +106,9 @@ public class Mod_Stream implements Module
     @Override
     public void quit() 
     {
-        mp4Thread.stopStreaming();
+        if(mp4Thread!=null)
+        {
+            mp4Thread.stopStreaming();
+        }
     }
 }

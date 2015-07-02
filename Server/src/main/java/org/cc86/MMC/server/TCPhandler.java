@@ -51,13 +51,14 @@ public class TCPhandler implements Handler{
                         }
                         
                     } catch (IOException ex) {
-                        l.warn("Lost connection");
+                        l.warn("Lost connection"); //TODO cleanup
                         break;
                     }
                     Object packet = new Yaml().load(request);
                     if(packet instanceof Packet)
                     {
                         l.info("PACKET received");
+                        l.trace(request);
                         API.getDispatcher().handleEvent((Packet)packet,this);
                     }
                     else

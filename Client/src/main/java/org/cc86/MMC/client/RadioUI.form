@@ -18,26 +18,34 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="txfURL" alignment="0" max="32767" attributes="0"/>
-                  <Component id="txfShortID" alignment="0" max="32767" attributes="0"/>
-                  <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="jScrollPane1" alignment="0" pref="277" max="32767" attributes="0"/>
-              </Group>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="btnPlayURL" max="32767" attributes="0"/>
-                  <Component id="btnSelSender" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
-                      <Component id="btnF5" max="32767" attributes="0"/>
+                      <Component id="lblStation" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
-                      <Component id="btnShortIDSave" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="txfURL" alignment="0" max="32767" attributes="0"/>
+                          <Component id="txfShortID" alignment="0" max="32767" attributes="0"/>
+                          <Component id="jLabel1" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jScrollPane1" alignment="0" pref="277" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="btnPlayURL" max="32767" attributes="0"/>
+                          <Component id="btnSelSender" max="32767" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="btnF5" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="btnShortIDSave" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="btnCancelPlayback" max="32767" attributes="0"/>
+                      </Group>
                   </Group>
-                  <Component id="btnCancelPlayback" max="32767" attributes="0"/>
               </Group>
           </Group>
       </Group>
@@ -46,8 +54,10 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="lblStation" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jScrollPane1" pref="370" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="337" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="btnF5" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
@@ -69,7 +79,7 @@
                   <Component id="btnShortIDSave" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnCancelPlayback" min="-2" max="-2" attributes="0"/>
+              <Component id="btnCancelPlayback" min="-2" pref="23" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -88,6 +98,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Stream Stop"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelPlaybackActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="txfURL">
     </Component>
@@ -143,6 +156,11 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnF5ActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblStation">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Aktuelle Station: "/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

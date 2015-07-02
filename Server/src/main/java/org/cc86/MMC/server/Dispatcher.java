@@ -25,6 +25,7 @@ public class Dispatcher {
     {
         pm=p;
         dispatcherLogic.put("exit", new Exitter());
+        dispatcherLogic.put("event", new EventManager());
     }
     
     public synchronized void handleEvent(Packet r,Handler h)

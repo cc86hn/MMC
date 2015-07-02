@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.MediaPlayerControl;
@@ -31,8 +32,10 @@ public class RadioHandler implements Processor{
 
     @SuppressWarnings("FieldMayBeFinal")
     private HashMap<String,String> shortIdMappings;
+    private static final org.apache.logging.log4j.Logger l = LogManager.getLogger();
     private String currentURL="";
     private String mappingspath = API.SETTINGSPATH+File.separator+"radiolist.yml";
+    private boolean streamIsPlaying=false;
     public RadioHandler()
     {
         new TFile(API.SETTINGSPATH).mkdir();
@@ -104,8 +107,35 @@ public class RadioHandler implements Processor{
                         }
                         MediaPlayerControl.playURL(url, false);
                         currentURL=url;
+                        streamIsPlaying=true;
+                        
+                        
                     }
                     else
+                    {
+                        if(set&&packetData.containsKey("STOP")&&packetData.get("STOP")!=null)
+                        {
+                            if(streamIsPlaying)
+                            {
+                                MediaPlayerControl.control(PlaybackMode.STOP);
+                                l.info("BEEP");
+                                currentURL="";
+                                streamIsPlaying=false;
+                            }
+                        }
+                        else
+                        {
+                            HashMap<String,Object> response=new HashMap<>();
+                            response.put("URL",currentURL);
+                            response.put("command","webradio");
+                            response.put("type","response");
+                            Packet rsp = new Packet();
+                            rsp.setData(response);
+                            h.respondToLinkedClient(rsp);
+                        }
+                        
+                    }
+                    if(set)
                     {
                         HashMap<String,Object> response=new HashMap<>();
                         response.put("URL",currentURL);
@@ -113,7 +143,7 @@ public class RadioHandler implements Processor{
                         response.put("type","response");
                         Packet rsp = new Packet();
                         rsp.setData(response);
-                        h.respondToLinkedClient(rsp);
+                        API.dispatchEvent(rsp);
                     }
                 }
                 else

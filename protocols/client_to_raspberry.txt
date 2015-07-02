@@ -40,8 +40,9 @@ playback_seek
 	
 	
 webradio:
-	parameters: 
+	parameters (each one is exclusively used):
 		URL: URL of stream/playlist or ShortID
+		STOP: stops the current radio stream
 
 webradioShortID
 	set: 
@@ -91,7 +92,7 @@ streamaudio
 //Category: Meta
 	event:
 	parameter: 
-		propertyname: propertyname to watch for notification
+		eventID: packet type to watch for notification
 		mode: register:registers this listener to the sending computer unregister: removes selected listener for computer
 
     Test:
