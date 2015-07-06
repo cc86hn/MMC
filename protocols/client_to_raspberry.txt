@@ -60,28 +60,31 @@ Playback_DLNA
 vnc:
 	set: parameters: 
 		//client IP is determined from the Socket the command is from
-	get: current VNC source IP
-	
+	get: none, all attributes are managed on the stream node
 mp4:
 	set: parameters: 
 		 target_port: port on which the stream is piped to the PI
 		 mode: fast or slow //(slow with synced audio)
 		 // compress_level{0=none,..9=max}
-	get: current VNC source IP
-	
-stream:  //server to client
+	get: none, all attributes are managed on the stream node
+stream:  //control commands independent of medium
 	response:
 		//one of those fields
-		disconnect: tells client to close running streams
+		disconnect: 
+			from server to client: tells the client to pause his streams
+			from client to server: tells server that stream is ending
 		message: Statusmessage
+		streamsource: Array of IP, port and type
+		reconnect: only from server to client; tells the client to reestablish the connection
+	get: triggers a response with the streamsource data
 beamer_sourceselect:
 	get: available sources lists
 	set: one of available sources
 	
 miracast   //reserved for widi compatible devices
 	set: IP of source
-	get: currently shown screen
-stopall  //reserved for widi compatible devices
+	get: none, all attributes are managed on the stream node
+stopall  
 	set: Stops all connected Screenstreams
 	get: nothing
 
@@ -92,7 +95,7 @@ streamaudio
 //Category: Meta
 	event:
 	parameter: 
-		eventID: packet type to watch for notification
+		eventID: packet type to watch for notification, only attributes that have a get can be watched
 		mode: register:registers this listener to the sending computer unregister: removes selected listener for computer
 
     Test:

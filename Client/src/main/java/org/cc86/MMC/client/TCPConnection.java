@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.client.API.Connection;
 import org.yaml.snakeyaml.Yaml;
@@ -21,6 +23,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class TCPConnection implements Connection
 {
+    private static final Logger l = LogManager.getLogger();
     private final int port;
     private final String destination;
     private Socket sck;
@@ -46,16 +49,18 @@ public class TCPConnection implements Connection
                         while(!ln.equals("---"))
                         {
                             request+=ln+"\n";
-                            System.out.println(ln);
+                            l.trace("packet line = "+ln);
                             ln=r.readLine();
                         }
                         
                     } catch (IOException ex) {
                     }
+                    l.trace(request);
                     Object packet = new Yaml().load(request);
                     if(packet instanceof Packet)
                     {
-                        System.out.println("PACKET");
+                        
+                        l.trace("PACKET");
                         Main.getDispatcher().sendPacketToModule((Packet)packet);
                     }
                     else

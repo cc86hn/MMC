@@ -9,6 +9,8 @@ import de.nplusc.izc.tools.baseTools.Tools;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.client.API.Connection;
@@ -21,6 +23,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class Mod_Radio implements Module
 {
+    private static final Logger l = LogManager.getLogger();
     private RadioUI ui;
     private Connection c;
     private HashMap<String,String> mappings;
@@ -35,8 +38,8 @@ public class Mod_Radio implements Module
         if(data.get("type").equals("response")&&data.get("command").equals("webradioShortID"))
         {
             //Handling der Mapping-Liste
-            new Yaml().dump(data);
-            System.out.println("WRSID");
+            l.trace(new Yaml().dump(data));
+            l.trace("WRSID");
             mappings=(HashMap<String, String>) data.get("mappings");
             ui.updateList(mappings);
         }

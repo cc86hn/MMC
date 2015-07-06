@@ -9,9 +9,12 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.API.Processor;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  *
@@ -19,6 +22,7 @@ import org.cc86.MMC.API.Processor;
  */
 public class EventManager implements Processor
 {
+    private static final Logger l = LogManager.getLogger();
     private HashMap<String,List<Handler>> listenerPool = new HashMap<>();
     
     
@@ -30,13 +34,17 @@ public class EventManager implements Processor
     public void sendEventToRegisteredClients(final Packet p)
     {
         String eventID = (String) p.getData().get("command");
+        l.trace("Event Dump:+\n"+ new Yaml().dump(p)+"\n End Event dump");
+        l.trace("Listeners dump:+\n"+ new Yaml().dump(listenerPool)+"\n End Listener dump");
         if(eventID==null)
         {
             throw new InvalidParameterException("Don't be stupid, the command field cannot be Null");
         }
         else
         {
+            
             List<Handler> listeners = listenerPool.get(eventID);
+            l.trace("Listeners for event ID "+eventID+ " are existing:"+(listeners!=null?"yes":"no"));
             if(listeners!=null) //null wenn keine Listener registriert wurden auf dieses Event
             {
                 listeners.forEach((Handler h)->h.respondToLinkedClient(p));
@@ -79,6 +87,6 @@ public class EventManager implements Processor
     
     public void unregisterAllListenesForHandler(Handler h)
     {
-        listenerPool.forEach((String nope,List<Handler>l)->l.remove(h));
+        listenerPool.forEach((String nope,List<Handler>ll)->ll.remove(h));
     }
 }

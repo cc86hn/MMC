@@ -5,6 +5,7 @@
  */
 package org.cc86.MMC.client;
 
+import java.awt.EventQueue;
 import javax.swing.JPanel;
 import org.cc86.MMC.client.API.Module;
 
@@ -38,7 +39,10 @@ public class StreamUI extends JPanel
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         btnMP4WithSound = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        btnStopAll = new javax.swing.JButton();
+        lblSource = new javax.swing.JLabel();
+        lblStatus = new javax.swing.JLabel();
+        btnDisconnect = new javax.swing.JButton();
 
         vnc.setText("VNC");
         vnc.addActionListener(new java.awt.event.ActionListener()
@@ -71,12 +75,25 @@ public class StreamUI extends JPanel
             }
         });
 
-        jButton1.setText("Alle Streams stoppen");
-        jButton1.addActionListener(new java.awt.event.ActionListener()
+        btnStopAll.setText("Alle Streams stoppen");
+        btnStopAll.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
-                jButton1ActionPerformed(evt);
+                btnStopAllActionPerformed(evt);
+            }
+        });
+
+        lblSource.setText("Aktuelle Quelle:");
+
+        lblStatus.setText("Status");
+
+        btnDisconnect.setText("Stream beenden");
+        btnDisconnect.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnDisconnectActionPerformed(evt);
             }
         });
 
@@ -98,31 +115,40 @@ public class StreamUI extends JPanel
                 .addGap(36, 36, 36)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnMP4WithSound)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(btnMP4WithSound)
+                    .addComponent(btnDisconnect, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 151, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblSource, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnStopAll, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(186, Short.MAX_VALUE)
+                .addContainerGap(171, Short.MAX_VALUE)
+                .addComponent(lblSource)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(mp4)
-                            .addComponent(btnMP4WithSound))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(vnc)
-                        .addGap(37, 37, 37))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jButton1)
-                        .addGap(50, 50, 50))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(mp4)
+                    .addComponent(btnMP4WithSound))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(vnc)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnStopAll)
+                    .addComponent(btnDisconnect))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -159,8 +185,8 @@ public class StreamUI extends JPanel
         }
     }//GEN-LAST:event_btnMP4WithSoundActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_jButton1ActionPerformed
-    {//GEN-HEADEREND:event_jButton1ActionPerformed
+    private void btnStopAllActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnStopAllActionPerformed
+    {//GEN-HEADEREND:event_btnStopAllActionPerformed
         Module[] m = Main.getDispatcher().getModules();
         for (Object m1 : m) {
             if(m1 instanceof Mod_Stream)
@@ -168,14 +194,38 @@ public class StreamUI extends JPanel
                 ((Mod_Stream)m1).stopAllStreams();
             }
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnStopAllActionPerformed
 
+    private void btnDisconnectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnDisconnectActionPerformed
+    {//GEN-HEADEREND:event_btnDisconnectActionPerformed
+         Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Stream)
+            {
+                ((Mod_Stream)m1).stopThisStream();
+            }
+        }
+    }//GEN-LAST:event_btnDisconnectActionPerformed
 
+    public void updateStatus(final String msg)
+    {
+        EventQueue.invokeLater(()->lblStatus.setText("Status: "+msg));
+    }
+            
+    public void updateSource(final String msg)
+    {
+        EventQueue.invokeLater(()->lblStatus.setText("Aktuelle Quelle: "+msg));
+    }
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDisconnect;
     private javax.swing.JButton btnMP4WithSound;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnStopAll;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel lblSource;
+    private javax.swing.JLabel lblStatus;
     private javax.swing.JButton mp4;
     private javax.swing.JButton vnc;
     // End of variables declaration//GEN-END:variables

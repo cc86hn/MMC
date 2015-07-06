@@ -6,7 +6,9 @@
 package org.cc86.MMC.modules.stream;
 
 import de.nplusc.izc.tools.baseTools.Tools;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
@@ -27,9 +29,13 @@ public class StreamProcessor implements Processor
     public static final String MODE_VNC="vnc";
     public static final String MODE_MP4="mp4";
     public static final String MODE_STOPALL="stopstream";
+    public static final String MODE_STREAM="stream";
     public static final String MODE_NONE="nop";
     private boolean audioOn=false;
-    private Handler lastConnected;
+    private List<Handler> streamSources = new ArrayList<>();
+    private boolean autoSwitch=false;
+    
+    //private Handler lastConnected;
     private String modeSelected=MODE_NONE;
     private String target="";
     
@@ -41,9 +47,13 @@ public class StreamProcessor implements Processor
             {
                 Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "killall","xtightvncviewer");
                 Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "killall","omxplayer.bin");
+                autoSwitch=false;
             }
         }
     }
+    
+    
+    
     
     @Override
     public void process(Packet r, final Handler h)
@@ -56,23 +66,64 @@ public class StreamProcessor implements Processor
             {
                 set=true;
             }
+            String command = packetData.get("command").toString().toLowerCase();
+            if(packetData.containsKey("disconnect"))
+            {
+                if(!streamSources.isEmpty())
+                {
+                    Handler last = streamSources.get(streamSources.size()-1);
+                    if(h.equals(last))
+                    {
+                        stopStream();
+                    }
+                    if(streamSources.contains(h))
+                    {
+                        streamSources.remove(h);
+                    }
+                    if(autoSwitch)
+                    {
+                        HashMap<String,Object> reconnectPKG=new HashMap<>();
+                        reconnectPKG.put("reconnect","reconnect");
+                        reconnectPKG.put("command","stream");
+                        reconnectPKG.put("type","response");
+                        Packet disconnector = new Packet();
+                        disconnector.setData(reconnectPKG);
+                        last.respondToLinkedClient(disconnector);
+                    }
+                }
+                return;
+            }
             
-            HashMap<String,Object> disconnectPKG=new HashMap<>();
-            disconnectPKG.put("disconnect","disconnect");
-            disconnectPKG.put("command","stream");
-            disconnectPKG.put("type","response");
-            Packet disconnector = new Packet();
-            disconnector.setData(disconnectPKG);
-            h.respondToLinkedClient(disconnector);
+            if(!streamSources.isEmpty())
+            {
+                Handler hdl = streamSources.get(streamSources.size()-1);
+                if(!hdl.equals(h))
+                {
+                    HashMap<String,Object> disconnectPKG=new HashMap<>();
+                    disconnectPKG.put("disconnect","disconnect");
+                    disconnectPKG.put("command","stream");
+                    disconnectPKG.put("type","response");
+                    Packet disconnector = new Packet();
+                    disconnector.setData(disconnectPKG);
+                    hdl.respondToLinkedClient(disconnector);
+                }
+            }
             HashMap<String,Object> response=new HashMap<>();
             Packet rsp = new Packet();
             response.put("type","response");
+            
+            autoSwitch=true;
+            if(streamSources.contains(h))
+            {
+                streamSources.remove(h);
+            }
+            streamSources.add(h);
             audioOn=false;
-            switch(packetData.get("command").toString().toLowerCase())
+            switch(command)
             {
                 case MODE_STOPALL:
-                        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "killall","xtightvncviewer");
-                        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "killall","omxplayer.bin");
+                        stopStream();
+                        streamSources.clear();
                     break;
                 case MODE_MIRACAST:
                     //NOP yet
@@ -83,16 +134,16 @@ public class StreamProcessor implements Processor
                     break;
                     
                 case MODE_VNC:
-                    if (packetData.get("mode").equals("slow"))
+                    if (packetData.containsKey("mode")&&packetData.get("mode").equals("slow"))
                     {
                         API.requestResourcesFree(Resources.AUDIODATA);
                     }
                     if (set)
                     {
-                        String nTarget = h.getClientIP();
+                        //String nTarget = h.getClientIP();
                         if(modeSelected.equals(MODE_VNC))
                         {
-                            if(target.equals(nTarget))
+                            if(!streamSources.isEmpty()&&streamSources.get(streamSources.size()-1).equals(h))
                             {
                                 break; //NOTHING TO DO
                             }
@@ -104,23 +155,16 @@ public class StreamProcessor implements Processor
                         
                         new Thread(()->{
                             Resources.setResourceStatus(Resources.VIDEODATA, true);
-                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "killall","omxplayer.bin");
+                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.IXX").buildPrintStream(), "killall","omxplayer.bin");
                             //Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "kill","-9","TODO:MIRACAST");
                             Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "xtightvncviewer",target);
                             
                         }).start();
-                        
-                        //Resources.setResourceStatus(Resources.VIDEODATA, true);
-                    }
-                    else
-                    {   //works cause the mode only gets values from literals
-                        
-                        if(modeSelected.equals(MODE_VNC))
-                        {
                         response.put("command","stream");
                         response.put("message","connected");
-                        }
-                        
+                    }
+                    else
+                    {  
                     }     
                     break;
                 case MODE_MP4:
@@ -134,11 +178,8 @@ public class StreamProcessor implements Processor
                                 Resources.setResourceStatus(Resources.AUDIODATA, true);
                                 audioOn=true;
                             }
-                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "killall","xtightvncviewer");
-                            Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "killall","omxplayer.bin");
-                            //Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "kill","-9","TODO:MIRACAST");
+                            stopStream();
                             Tools.runCmdWithPassthru(IoBuilder.forLogger("External.OMX").buildPrintStream(), "omxplayer","udp://:"+target);
-                            
                         }).start();
                         
                         response.put("command","stream");
@@ -146,19 +187,57 @@ public class StreamProcessor implements Processor
                     }
                     else
                     {   //works cause the mode only gets values from literals
-                        
-                        if(modeSelected.equals(MODE_VNC))
-                        {
-                            response.put("target_port",target);
-                            response.put("command","mp4");
-                        }
                     }     
                     break;
+                default:
+                    return;
+            }
+            if(set)
+            {
+                Packet evt = new Packet();
+                HashMap<String,Object> evtdata = new HashMap<>();
+                String tport = ""+(command.equals(MODE_MP4)?target:0);
+                evtdata.put("command","stream");
+                evtdata.put("type","response");
+                if(streamSources.isEmpty())
+                {
+                    evtdata.put("streamsource",new String[]{"","",""});
+                }
+                else
+                {
+                    evtdata.put("streamsource",new String[]{h.getClientIP(),tport,command});
+                }
+                evt.setData(evtdata);
+                API.dispatchEvent(evt);
+            }
+            if(!set)
+            {
+                String tport = ""+(command.equals(MODE_MP4)?target:0);
+                response.put("command","stream");
+                if(streamSources.isEmpty())
+                {
+                    response.put("streamsource",new String[]{"","",""});
+                }
+                else
+                {
+                    response.put("streamsource",new String[]{h.getClientIP(),tport,command});
+                }
+                response.put("streamsource",new String[]{h.getClientIP(),tport,command});
+            }
+            else
+            {
             }
             rsp.setData(response);
             h.respondToLinkedClient(rsp);
-            lastConnected=h;
         }
+    }
+    
+    
+    void stopStream()
+    {
+        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.IXX").buildPrintStream(), "killall","xtightvncviewer");
+        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.IXX").buildPrintStream(), "killall","omxplayer.bin");
+        //Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "kill","-9","TODO:MIRACAST")
     }
     
 }

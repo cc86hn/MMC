@@ -23,20 +23,47 @@ public class Mod_Stream implements Module
     StreamUI ui;
     private static final Logger l = LogManager.getLogger();
     Connection c;
-    private boolean ignoreAbort=true;
+    private Packet streampkt;
+    //private int streamPort;
+    private enum StreamMode{MP4,VNC,MIRACAST};
+    private StreamMode lastMode;
+    
+    
     @Override
     public void receiveMsgFromServer(Packet msg)
     {
 
         if(msg.getData().containsKey("disconnect"))
         {
-            if(ignoreAbort)
+            l.info("disconnect");
+            if(mp4Thread!=null)
             {
-                ignoreAbort=false;
+                mp4Thread.stopStreaming();
+            }
+            return;
+        }
+        if(msg.getData().containsKey("reconnect"))
+        {
+            reconnectStream();
+            return;
+        }
+        if(msg.getData().containsKey("message"))
+        {
+            ui.updateStatus((String) msg.getData().get("message"));
+            return;
+        }
+        if(msg.getData().containsKey("streamsource"))
+        {
+            List<String> source = (List<String>) msg.getData().get("streamsource");
+            if(source.get(0).equals(""))
+            {
+                ui.updateSource("None connected");
                 return;
             }
-            l.info("disconnect");
-            mp4Thread.stopStreaming();
+            boolean noport=source.get(1).equals("0");
+            
+            String src = source.get(0)+(noport?":"+source.get(1):"")+" als"+source.get(2);
+            ui.updateSource(src);
         }
     }
     MP4Thread mp4Thread=null;
@@ -49,13 +76,24 @@ public class Mod_Stream implements Module
         Menu.getMenu().registerTab("ScreenStream", ui);
     }
     
-    
+    private void reconnectStream()
+    {
+        if(streampkt==null)
+        {
+            return;
+        }
+        c.sendRequest(streampkt);
+        if(lastMode==StreamMode.MP4)
+        {
+            new Thread(mp4Thread).start();
+        }
+    }
     public void streamMP4(boolean fastmode)
     {
+        lastMode=StreamMode.MP4;
         if(mp4Thread!=null)
         {
             mp4Thread.stopStreaming();
-            ignoreAbort=true;
         }
         Packet p = new Packet();
         HashMap<String,Object> data = new HashMap<>();
@@ -68,11 +106,13 @@ public class Mod_Stream implements Module
         new Thread(mp4Thread).start();
         p.setData(data);
         c.sendRequest(p);
+        streampkt=p;
     }
         
     
     public void streamVNC()
-    {       
+    {   
+        lastMode=StreamMode.VNC;
         //TODO check for VNC and launch if needed
         Packet p = new Packet();
         HashMap<String,Object> data = new HashMap<>();
@@ -80,6 +120,24 @@ public class Mod_Stream implements Module
         data.put("command","vnc");
         p.setData(data);
         c.sendRequest(p);
+        streampkt=p;
+    }
+    
+    public void stopThisStream()
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","stream");
+        data.put("disconnect","disconnect");
+        p.setData(data);
+        c.sendRequest(p);
+        
+        if(mp4Thread!=null)
+        {
+            mp4Thread.stopStreaming();
+        }
+        streampkt=null;
     }
     public void stopAllStreams()
     {       
@@ -90,11 +148,20 @@ public class Mod_Stream implements Module
         data.put("command","stopall");
         p.setData(data);
         c.sendRequest(p);
+        streampkt=null;
     }
     
     @Override
     public void connect(Connection c) {
         this.c=c;
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","event");
+        data.put("mode","register");
+        data.put("eventID","stream");
+        p.setData(data);
+        c.sendRequest(p);
     }
 
     @Override
@@ -106,9 +173,6 @@ public class Mod_Stream implements Module
     @Override
     public void quit() 
     {
-        if(mp4Thread!=null)
-        {
-            mp4Thread.stopStreaming();
-        }
+        stopThisStream();
     }
 }

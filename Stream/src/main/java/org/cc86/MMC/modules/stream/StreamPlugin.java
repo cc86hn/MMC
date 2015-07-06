@@ -23,7 +23,8 @@ public class StreamPlugin implements Plugin{
     public void register() {
         h = new StreamProcessor();
         API.getDispatcher().registerOnRequestType("vnc", h); 
-        API.getDispatcher().registerOnRequestType("mp4", h); 
+        API.getDispatcher().registerOnRequestType("mp4", h);
+        API.getDispatcher().registerOnRequestType("stream", h); 
         API.getDispatcher().registerOnRequestType("miracast", h); 
         API.getDispatcher().registerOnRequestType("stopall", h);
     }
@@ -35,8 +36,7 @@ public class StreamPlugin implements Plugin{
     @Override
     public void shutdown()
     {
-        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "killall","xtightvncviewer");
-        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "killall","omxplayer.bin");
+        h.stopStream();
     }
 
     @Override
