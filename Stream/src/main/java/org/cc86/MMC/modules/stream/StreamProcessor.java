@@ -29,7 +29,7 @@ public class StreamProcessor implements Processor
     public static final String MODE_MIRACAST="miracast";
     public static final String MODE_VNC="vnc";
     public static final String MODE_MP4="mp4";
-    public static final String MODE_STOPALL="stopstream";
+    public static final String MODE_STOPALL="stopall";
     public static final String MODE_STREAM="stream";
     public static final String MODE_NONE="nop";
     private boolean audioOn=false;
@@ -127,6 +127,19 @@ public class StreamProcessor implements Processor
             switch(command)
             {
                 case MODE_STOPALL:
+                    
+                       
+                        if(!streamSources.isEmpty())
+                        {
+                            Handler hdl = streamSources.get(streamSources.size()-1);
+                            HashMap<String,Object> disconnectPKG=new HashMap<>();
+                            disconnectPKG.put("disconnect","disconnect");
+                            disconnectPKG.put("command","stream");
+                            disconnectPKG.put("type","response");
+                            Packet disconnector = new Packet();
+                            disconnector.setData(disconnectPKG);
+                            hdl.respondToLinkedClient(disconnector);
+                        }
                         stopStream();
                         streamSources.clear();
                     break;
