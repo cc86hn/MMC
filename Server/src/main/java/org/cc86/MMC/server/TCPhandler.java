@@ -111,5 +111,9 @@ public class TCPhandler implements Handler{
         return internalAddr.substring(0,lastCol);  //HACK!
     }
     
-    
+    @Override
+    public String toString()
+    {
+        return "TCPHandler @"+getClientIP()+":"+sck.getPort();
+    }
 }

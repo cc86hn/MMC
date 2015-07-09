@@ -62,7 +62,7 @@ public class Mod_Stream implements Module
             }
             boolean noport=source.get(1).equals("0");
             
-            String src = source.get(0)+(noport?":"+source.get(1):"")+" als"+source.get(2);
+            String src = source.get(0)+(noport?":"+source.get(1):"")+" als "+source.get(2);
             ui.updateSource(src);
         }
     }

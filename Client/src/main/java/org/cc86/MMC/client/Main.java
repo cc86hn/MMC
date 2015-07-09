@@ -15,8 +15,11 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.cc86.MMC.client.API.Connection;
 
 /**
@@ -35,6 +38,7 @@ public class Main
     
     public static void main(String[] args)
     {
+        setupLogging(true);
         TimeoutManager m = new TimeoutManager(3, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
         m.start();
         String srvr =serverDiscovery();
@@ -219,4 +223,33 @@ public class Main
         }
         return res;
     }
+    
+        private static void setupLogging(boolean verbose)
+    {
+        
+        
+        //if(!cl.hasOption("verbose")&&!(System.getProperty("log4j.configurationFile")==null))
+        //{
+        //    System.setProperty("log4j.configurationFile", "file:///"+jarschiv+"!log4j2NonVerbose.xml");
+        //}
+        LoggerContext cx = (LoggerContext) LogManager.getContext(false);
+        org.apache.logging.log4j.core.config.Configuration config = cx.getConfiguration();
+        LoggerConfig loggerConfig = config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME); 
+        LoggerConfig externalloggerConfig = config.getLoggerConfig("External"); 
+
+        if (verbose)
+        {
+            
+            loggerConfig.setLevel(Level.TRACE);
+            externalloggerConfig.setLevel(Level.TRACE);
+        }
+        else
+        {
+            loggerConfig.setLevel(Level.INFO);
+            externalloggerConfig.setLevel(Level.INFO);
+        }
+        cx.updateLoggers();
+    }
+    
+    
 }

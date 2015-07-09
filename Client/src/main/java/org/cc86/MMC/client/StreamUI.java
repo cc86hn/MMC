@@ -214,7 +214,7 @@ public class StreamUI extends JPanel
             
     public void updateSource(final String msg)
     {
-        EventQueue.invokeLater(()->lblStatus.setText("Aktuelle Quelle: "+msg));
+        EventQueue.invokeLater(()->lblSource.setText("Aktuelle Quelle: "+msg));
     }
     
     

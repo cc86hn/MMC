@@ -46,14 +46,17 @@ public class TCPConnection implements Connection
                     String request = "";
                     try {
                         String ln = r.readLine();
+                        l.trace("packet line = "+ln);
                         while(!ln.equals("---"))
                         {
                             request+=ln+"\n";
-                            l.trace("packet line = "+ln);
+                            
                             ln=r.readLine();
                         }
                         
                     } catch (IOException ex) {
+                        l.warn("NETZAP");
+                        break;
                     }
                     l.trace(request);
                     Object packet = new Yaml().load(request);

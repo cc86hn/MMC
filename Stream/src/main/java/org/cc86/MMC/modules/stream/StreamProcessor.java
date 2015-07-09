@@ -17,6 +17,7 @@ import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.API.Processor;
 import org.cc86.MMC.API.Resources;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  *
@@ -72,6 +73,7 @@ public class StreamProcessor implements Processor
                 if(!streamSources.isEmpty())
                 {
                     Handler last = streamSources.get(streamSources.size()-1);
+                    
                     if(h.equals(last))
                     {
                         stopStream();
@@ -79,16 +81,19 @@ public class StreamProcessor implements Processor
                     if(streamSources.contains(h))
                     {
                         streamSources.remove(h);
+                        l.info("removed stream from "+h.getClientIP()+";\n reconnect = "+(autoSwitch?"true":"false"));
+                        l.trace(new Yaml().dump(streamSources));
                     }
-                    if(autoSwitch)
+                    if(!streamSources.isEmpty()&&autoSwitch)
                     {
+                        Handler resumer = streamSources.get(streamSources.size()-1);
                         HashMap<String,Object> reconnectPKG=new HashMap<>();
                         reconnectPKG.put("reconnect","reconnect");
                         reconnectPKG.put("command","stream");
                         reconnectPKG.put("type","response");
-                        Packet disconnector = new Packet();
-                        disconnector.setData(reconnectPKG);
-                        last.respondToLinkedClient(disconnector);
+                        Packet reconnector = new Packet();
+                        reconnector.setData(reconnectPKG);
+                        resumer.respondToLinkedClient(reconnector);
                     }
                 }
                 return;
@@ -117,7 +122,7 @@ public class StreamProcessor implements Processor
             {
                 streamSources.remove(h);
             }
-            streamSources.add(h);
+            
             audioOn=false;
             switch(command)
             {
@@ -145,6 +150,7 @@ public class StreamProcessor implements Processor
                         {
                             if(!streamSources.isEmpty()&&streamSources.get(streamSources.size()-1).equals(h))
                             {
+                                l.info("Useless Reconnect!");
                                 break; //NOTHING TO DO
                             }
                             Tools.runCmdWithPassthru(IoBuilder.forLogger("External.VNC").buildPrintStream(), "killall","xtightvncviewer");
@@ -227,6 +233,7 @@ public class StreamProcessor implements Processor
             else
             {
             }
+            streamSources.add(h);
             rsp.setData(response);
             h.respondToLinkedClient(rsp);
         }
