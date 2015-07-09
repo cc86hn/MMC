@@ -26,10 +26,12 @@ volume:
 
 	
 ==Music related==
+//not yet implemented
 playback_control:
 	No get supported.
 	action: {play:pause:fastforward:skip}
-	
+
+//not yet implemented
 playback_status:
 	Readonly property;
 	title: title of current track
@@ -37,6 +39,7 @@ playback_status:
 	duration: length of current track.
 	seekable: boolean denoting if track is seekable
 		
+//not yet implemented
 playback_seek
 	set only
 	position: time in seconds for seeking.
