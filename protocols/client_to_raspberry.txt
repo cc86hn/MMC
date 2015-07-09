@@ -1,104 +1,129 @@
-potential Wrappings:
-	Yaml via HTTP for eventless, TCP transporting for events enabled due to always-open-connect. maybe REST-based for other uses?
-		name von element = key in the data-map
-
-
-commandbases:
-set: sets given attribute to certain value. parameters until newline delimiter
-get: gets current value of property
-response: only used by server when sending a response
-(appears as type in the datamap)
-
 Discovery via UDP on port 52358
 
-properties:
-those appear as command in the map. attributes by their name.
+TCP communication also going via port 52358
 
-@all: optional: 
-	targetnode: id of a subnode of the receiver, may be used if different devices are controlled by 1 module at server
-//category: vlc_control
+potential Wrappings:
+	Yaml via HTTP for eventless, TCP transporting for events enabled due to always-open-connect. maybe REST-based for other uses?
 
-volume
-	parameters: value from 0 to 255
+
+Each packet is from type !!org.cc86.MMC.API.Packet
+payload: Single Mapping of String to any data called data.
+
+Common keys: 
+	type: 
+		set: sets given attribute to certain value. parameters until newline delimiter
+		get: gets current value of property
+		response: only used by server when sending a response
+
+	command: one of the commands listed under the following section.
+
+================================================================
+Commands available
+================================================================
+==Audio general==
+volume:
+	value: integer from 0 to 255 denoting the volume
+
 	
+==Music related==
+playback_control:
+	No get supported.
+	action: {play:pause:fastforward:skip}
 	
-playback_ctrl:
-	command:{play:pause:fastforward:skip:start}
-		on start: second parameter as title
-	doesnt return anything on get
-	
-playback_status
-	only get-able
-	values: Mapping mit
-	title
-	time
-	duration
-	
+playback_status:
+	Readonly property;
+	title: title of current track
+	time: current position on track
+	duration: length of current track.
+	seekable: boolean denoting if track is seekable
+		
 playback_seek
-	set: sets position to seek
-	get: returns seekable flag
-	
-	
-webradio:
-	parameters (each one is exclusively used):
-		URL: URL of stream/playlist or ShortID
-		STOP: stops the current radio stream
+	set only
+	position: time in seconds for seeking.
 
-webradioShortID
-	set: 
-		shortID
-		URL
-	get: List of shortID-> url mappings as a nested map as mappings
-	
+//not yet implemented
 Playback_DLNA
 	properties:{IP, path,scheduled}
 	settable & gettable, @gettable return playlist
 	scheduled sets that the file should be added to the playlist instead of played directly
+==Webradio==
+webradio:
+	only one of the following subcommands used. get only returns URL
+	URL: URL of stream/playlist or ShortID
+	STOP: stops the current radio stream
 	
-//category: video
+webradioShortID
+	on set: 
+		shortID: Short name to be used for the station
+		URL: url of the station
+	on get: Mapping containing all ShortIDS and their URLs
+
+==Streaming control==
 	
 vnc:
-	set: parameters: 
-		//client IP is determined from the Socket the command is from
-	get: none, all attributes are managed on the stream node
+	only set-able
+		No parameters added.
 mp4:
-	set: parameters: 
-		 target_port: port on which the stream is piped to the PI
-		 mode: fast or slow //(slow with synced audio)
-		 // compress_level{0=none,..9=max}
-	get: none, all attributes are managed on the stream node
+	only set-able
+	target_port: Port on which the stream flows to the Server
+	mode: {fast,slow} Fast: no audio, slow: with aduio but more delay
+	
 stream:  //control commands independent of medium
-	response:
-		//one of those fields
-		disconnect: 
-			from server to client: tells the client to pause his streams
-			from client to server: tells server that stream is ending
-		message: Statusmessage
-		streamsource: Array of IP, port and type
-		reconnect: only from server to client; tells the client to reestablish the connection
-	get: triggers a response with the streamsource data
+	response fields:
+		disconnect: tells client to disconnect stream while allowing to reconnect later
+		reconnect: tells client to restart stream with parameters used before disconnect.
+		message: contains a MEssage to be shown on the statusbar.
+		streamsource: contains a List with IP, port and mode of the current stream.
+
+stopall:
+	set-able only
+	tells all streams to disconnect
+	
+	
+	//Not yet implemented
+miracast   //reserved for widi compatible devices
+	set: IP of source
+	get: none, all attributes are managed on the stream node
+==beamer control==
+	
+//not yet implemented
 beamer_sourceselect:
 	get: available sources lists
 	set: one of available sources
 	
-miracast   //reserved for widi compatible devices
-	set: IP of source
-	get: none, all attributes are managed on the stream node
-stopall  
-	set: Stops all connected Screenstreams
-	get: nothing
+==Meta==
+event:
+	settable only
+	eventID: packet type to watch for notification, only attributes that have a get can be watched
+	mode: register:registers this listener to the sending computer unregister: removes selected listener for computer
+	
+	
+
+//category: vlc_control
+
 
 	
-streamaudio
-	set: enabled: true when enabled other audiostreams get overriden and streamaudio is used, false for no audio of stream
-	get: status
+//category: video
+	
+
+
+
 //Category: Meta
 	event:
 	parameter: 
 		eventID: packet type to watch for notification, only attributes that have a get can be watched
 		mode: register:registers this listener to the sending computer unregister: removes selected listener for computer
-
+================================================================
+Commands for internal use
+================================================================
     Test:
         message: on set: sets message into memory and displays a message on console; on get: returns message wioth a "Saved:" prepended p:
         //debugging command only
+	exit:
+        no data fields. tells the server to shutdown clean immediately.
 		
+================================================================
+Ideas for later
+================================================================
+@all: optional: 
+	targetnode: id of a subnode of the receiver, may be used if different devices are controlled by 1 module at server
