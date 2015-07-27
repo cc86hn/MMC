@@ -48,7 +48,7 @@ distZip {
   into(project.name+"-"+project.version+"/plugins/"){
         from project(':Test').jar
         from project(':Radio').jar
-        //from project(':Audio').jar
+        from project(':Audio').jar
 		//from project(':Beamer').jar
 		from project(':Stream').jar
   }
@@ -79,7 +79,8 @@ dependencies
         compile ('uk.co.caprica:vlcj:3.0.0' ){
             exclude group: 'net.java.dev.jna'
         }
-        
+        compile "org.fourthline.cling:cling-core:2.0.1"
+        compile "org.fourthline.cling:cling-support:2.0.1"
         compile 'net.java.dev.jna:jna-platform:4.1.0'
         compile 'net.java.dev.jna:jna:4.1.0'
 

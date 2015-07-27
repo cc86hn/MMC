@@ -22,4 +22,8 @@ public class AudioProcessor implements Processor
         
     }
     
+    void shutdown()
+    {
+        
+    }
 }

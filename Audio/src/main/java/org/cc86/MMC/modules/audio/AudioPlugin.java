@@ -15,21 +15,27 @@ import org.cc86.MMC.API.Resources;
  */
 public class AudioPlugin implements Plugin{
 
+    private AudioProcessor h;
+    
     @Override
     public void register() {
-        AudioProcessor h = new AudioProcessor();
-        //API.getDispatcher().registerOnRequestType("webradio", h); 
-        //API.getDispatcher().registerOnRequestType("webradioShortID", h); 
+        h = new AudioProcessor();
+        API.getDispatcher().registerOnRequestType("Playback_DLNA", h); 
+        API.getDispatcher().registerOnRequestType("playback_seek", h); 
+        API.getDispatcher().registerOnRequestType("playback_status", h); 
+        API.getDispatcher().registerOnRequestType("playback_control", h); 
+        API.getDispatcher().registerOnRequestType("volume", h);
     }
 
     @Override
     public String getName() {
-        return "MusicStream";
+        return "AudioControl";
     }
 
     @Override
     public void shutdown()
     {
+        h.shutdown();
     }
 
     @Override

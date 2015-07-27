@@ -45,11 +45,19 @@ playback_seek
 	position: time in seconds for seeking.
 
 //not yet implemented
-Playback_DLNA
-	properties:{IP, path,scheduled}
-	settable & gettable, @gettable return playlist
+playback_DLNA
+	properties:{path,scheduled}
+	set-able & get-able, @get-able return playlist
 	scheduled sets that the file should be added to the playlist instead of played directly
+	
+	path is in the form: ip/filename.extension
+	
+playback_pool
+	set: allows to update your part of the pool, get: returns the complete pool as index
+	properties: pool;
+	mapping from path to User-friendly name
 ==Webradio==
+
 webradio:
 	only one of the following subcommands used. get only returns URL
 	URL: URL of stream/playlist or ShortID

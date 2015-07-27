@@ -15,7 +15,7 @@ import org.cc86.MMC.client.API.Module;
  */
 public class Dispatcher
 {
-    private final Module[] modules={new Mod_Radio(),new Mod_Stream()};
+    private final Module[] modules={new Mod_Radio(),new Mod_Stream(),new Mod_Jukebox()};
     
     public void sendPacketToModule(Packet p)
     {
