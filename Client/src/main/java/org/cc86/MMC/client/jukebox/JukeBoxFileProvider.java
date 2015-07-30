@@ -8,12 +8,19 @@ package org.cc86.MMC.client.jukebox;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import de.nplusc.izc.tools.IOtools.FileTK;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,9 +30,22 @@ import org.apache.logging.log4j.Logger;
  */
 public class JukeBoxFileProvider implements HttpHandler
 {
-    //fileID zu filemapping
+    //filename zu filemapping
     private HashMap<String, String> fileMapping = new HashMap<>();
+    
+    private Set<String> paths = new HashSet<>();
+    
+    //javabeans for SnakeYaml serialize
+    public Set<String> getPaths()
+    {
+        return paths;
+    }
 
+    public void setPaths(Set<String> paths)
+    {
+        this.paths = paths;
+    }
+    
     private static final Logger l = LogManager.getLogger();
 
     @Override
@@ -33,7 +53,6 @@ public class JukeBoxFileProvider implements HttpHandler
     {
         String fileID = exchange.getRequestURI().toString().substring(1);
         l.trace(fileID);
-
         
         boolean fx = fileMapping.containsKey(fileID);
         File file = new File(fileMapping.get(fileID));
@@ -59,5 +78,26 @@ public class JukeBoxFileProvider implements HttpHandler
         os.close();
 
     }
-
+    
+    public void addDirectoryForScan(String dir)
+    {
+        paths.add(dir);
+        updateList();
+    }
+    private final List<String> validFileExts = Arrays.asList
+        ("mp3","m4a","mp4","wav","flac","aac","ac3","wma","mod","m4a","ogg","flv");
+    
+    private void updateList()
+    {
+        List<String> files = new LinkedList<>();
+        paths.forEach((s)->
+        {
+           if()
+           files.addAll(Arrays.asList(FileTK.walkDirectoryRecursively(s)));
+        });
+        
+        files.stream().parallel().filter((s)->validFileExts.contains(s!=null?FileTK.getFileExt(s):""))
+                .sequential().forEach((s)->fileMapping.put(FileTK.getFileName(s), s));
+    }
+    
 }

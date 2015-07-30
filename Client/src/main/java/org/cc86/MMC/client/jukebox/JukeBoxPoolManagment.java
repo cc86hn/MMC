@@ -6,7 +6,11 @@
 package org.cc86.MMC.client.jukebox;
 
 import de.nplusc.izc.tools.baseTools.Messagers;
+import java.awt.EventQueue;
 import java.io.File;
+import java.util.Set;
+import javax.swing.DefaultListModel;
+import jnafilechooser.api.WindowsFileChooser;
 import jnafilechooser.api.WindowsFolderBrowser;
 import org.cc86.MMC.client.Menu;
 import org.cc86.MMC.client.Mod_Jukebox;
@@ -17,7 +21,7 @@ import org.cc86.MMC.client.Mod_Jukebox;
  */
 public class JukeBoxPoolManagment extends javax.swing.JPanel
 {
-    private Mod_Jukebox jbx;
+    private final Mod_Jukebox jbx;
     /**
      * Creates new form JukeBoxPoolManagment
      * @param x instance of the underlying mod_jukebox classs
@@ -41,7 +45,8 @@ public class JukeBoxPoolManagment extends javax.swing.JPanel
         btnAddFolder = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         lstFolders = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
+        btnRmvFolder = new javax.swing.JButton();
+        btnAddiZpl = new javax.swing.JButton();
 
         btnAddFolder.setText("Ordner hinzufügen");
         btnAddFolder.addActionListener(new java.awt.event.ActionListener()
@@ -52,15 +57,19 @@ public class JukeBoxPoolManagment extends javax.swing.JPanel
             }
         });
 
-        lstFolders.setModel(new javax.swing.AbstractListModel()
-        {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
+        lstFolders.setModel(new DefaultListModel<String>());
         jScrollPane1.setViewportView(lstFolders);
 
-        jButton1.setText("Ordner entfernen");
+        btnRmvFolder.setText("Element entfernen");
+
+        btnAddiZpl.setText("m3u/iZpl Playliste hinzufügen");
+        btnAddiZpl.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnAddiZplActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -68,12 +77,12 @@ public class JukeBoxPoolManagment extends javax.swing.JPanel
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnAddFolder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(111, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnAddiZpl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAddFolder, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnRmvFolder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -81,8 +90,10 @@ public class JukeBoxPoolManagment extends javax.swing.JPanel
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnAddFolder)
-                .addGap(29, 29, 29)
-                .addComponent(jButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAddiZpl)
+                .addGap(63, 63, 63)
+                .addComponent(btnRmvFolder)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -91,14 +102,52 @@ public class JukeBoxPoolManagment extends javax.swing.JPanel
     {//GEN-HEADEREND:event_btnAddFolderActionPerformed
          new Thread(()->{
             File fldr = new WindowsFolderBrowser().showDialog(Menu.getMenu());
-            Messagers.SingleLineMsg(fldr.getAbsolutePath(),"DebugOut");
+            //Messagers.SingleLineMsg(fldr.getAbsolutePath(),"DebugOut");
+            if(fldr==null)
+            {
+                return;
+            }
+            jbx.getFileProvider().addDirectoryForScan(fldr.getAbsolutePath());
+            resyncList();
         }).start();
     }//GEN-LAST:event_btnAddFolderActionPerformed
 
+    private void btnAddiZplActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnAddiZplActionPerformed
+    {//GEN-HEADEREND:event_btnAddiZplActionPerformed
+        new Thread(()->{
+            WindowsFileChooser wfc = new WindowsFileChooser();
+            
+            wfc.addFilter("Playlist Files", "m3u","izpl");
+            
+            if (!wfc.showOpenDialog(Menu.getMenu())) {
+                return;
+            }
+            File plf = wfc.getSelectedFile();
+             // do something with f
+
+            //
+            //Messagers.SingleLineMsg(plf.getAbsolutePath(),"DebugOut");
+            jbx.getFileProvider().addDirectoryForScan(plf.getAbsolutePath());
+            //resyncList();
+        }).start();
+    }//GEN-LAST:event_btnAddiZplActionPerformed
+
+    private void resyncList()
+    {
+        EventQueue.invokeLater(()->
+        {
+            Set<String> paths = jbx.getFileProvider().getPaths();
+            DefaultListModel<String> lm = (DefaultListModel<String>) lstFolders.getModel();
+            lm.clear();
+            paths.forEach(lm::addElement);
+        });
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddFolder;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnAddiZpl;
+    private javax.swing.JButton btnRmvFolder;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList lstFolders;
     // End of variables declaration//GEN-END:variables

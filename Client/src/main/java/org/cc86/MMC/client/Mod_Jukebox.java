@@ -38,11 +38,12 @@ public class Mod_Jukebox implements Module
     
     @Override
     public void connect(Connection c) {
+        fp = new JukeBoxFileProvider();
         try
         {
             this.c=c;
             HttpServer server = HttpServer.create(new InetSocketAddress("localhost",9265), 0);//,InetAddress.getByName("localhost"));
-            server.createContext("/", new JukeBoxFileProvider());//nimmt jeden beliebigen namen an
+            server.createContext("/", fp);//nimmt jeden beliebigen namen an
             server.setExecutor(null); // creates a default executor
             server.start();
         } catch (IOException ex)
@@ -64,7 +65,14 @@ public class Mod_Jukebox implements Module
     {
         pm=new JukeBoxPoolManagment(this);
         ui=new JukeBoxUI(this);
+        
         Menu.getMenu().registerTab("JukeBox", ui);
         Menu.getMenu().registerTab("JukeBox Lokaler Pool", pm);
     }
+    
+    public JukeBoxFileProvider getFileProvider()
+    {
+        return fp;
+    }
+    
 }
