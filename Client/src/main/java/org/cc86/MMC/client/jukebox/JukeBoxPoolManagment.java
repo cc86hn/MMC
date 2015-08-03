@@ -128,7 +128,7 @@ public class JukeBoxPoolManagment extends javax.swing.JPanel
             //
             //Messagers.SingleLineMsg(plf.getAbsolutePath(),"DebugOut");
             jbx.getFileProvider().addDirectoryForScan(plf.getAbsolutePath());
-            //resyncList();
+            resyncList();
         }).start();
     }//GEN-LAST:event_btnAddiZplActionPerformed
 

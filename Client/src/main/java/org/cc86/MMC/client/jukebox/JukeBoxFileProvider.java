@@ -8,6 +8,9 @@ package org.cc86.MMC.client.jukebox;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import de.nplusc.izc.iZpl.API.shared.InvalidPlayListFileException;
+import de.nplusc.izc.iZpl.API.shared.SinglePlayListItem;
+import de.nplusc.izc.iZpl.Utils.shared.PLFileIO;
 import de.nplusc.izc.tools.IOtools.FileTK;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -21,6 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -86,18 +90,42 @@ public class JukeBoxFileProvider implements HttpHandler
     }
     private final List<String> validFileExts = Arrays.asList
         ("mp3","m4a","mp4","wav","flac","aac","ac3","wma","mod","m4a","ogg","flv");
+    private final List<String> validPLFexts = Arrays.asList
+        ("izpl","m3u");
     
     private void updateList()
     {
         List<String> files = new LinkedList<>();
         paths.forEach((s)->
         {
-           if()
-           files.addAll(Arrays.asList(FileTK.walkDirectoryRecursively(s)));
+           if(new File(s).isFile()&&validPLFexts.contains(FileTK.getFileExt(s).toLowerCase()))
+           {
+               files.addAll(getiZplAsPlainList(s));
+           }
+           else
+           {
+               files.addAll(Arrays.asList(FileTK.walkDirectoryRecursively(s)));
+           }
+           
         });
         
-        files.stream().parallel().filter((s)->validFileExts.contains(s!=null?FileTK.getFileExt(s):""))
+        files.stream().parallel().filter((s)->validFileExts.contains(FileTK.getFileExt(s).toLowerCase()))
                 .sequential().forEach((s)->fileMapping.put(FileTK.getFileName(s), s));
+    }
+    
+    
+    private List<String> getiZplAsPlainList(String path)
+    {   
+        ArrayList<String> fileZ = new ArrayList<>();
+        try
+        {
+            PLFileIO.parseFullList(path,40,true).forEach((e)->fileZ.add(((SinglePlayListItem)e).getPath()));
+            
+        } catch (InvalidPlayListFileException ex)
+        {
+            java.util.logging.Logger.getLogger(JukeBoxFileProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return fileZ;
     }
     
 }

@@ -5,6 +5,8 @@
  */
 package org.cc86.MMC.client.jukebox;
 
+import java.util.List;
+import javax.swing.DefaultListModel;
 import org.cc86.MMC.client.Mod_Jukebox;
 
 /**
@@ -44,12 +46,7 @@ public class JukeBoxUI extends javax.swing.JPanel
         jScrollPane2 = new javax.swing.JScrollPane();
         txaDetails = new javax.swing.JTextArea();
 
-        lstPool.setModel(new javax.swing.AbstractListModel()
-        {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
+        lstPool.setModel(new DefaultListModel<String>());
         jScrollPane1.setViewportView(lstPool);
 
         jButton1.setText("Play");
@@ -104,7 +101,12 @@ public class JukeBoxUI extends javax.swing.JPanel
         );
     }// </editor-fold>//GEN-END:initComponents
 
-
+public void updateList(List<String> elements)
+{
+    
+}
+    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEnqueue;
     private javax.swing.JButton btnManageLocal;
