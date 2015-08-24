@@ -124,7 +124,7 @@ public class JukeBoxPoolManagment extends javax.swing.JPanel
             }
             File plf = wfc.getSelectedFile();
              // do something with f
-
+            
             //
             //Messagers.SingleLineMsg(plf.getAbsolutePath(),"DebugOut");
             jbx.getFileProvider().addDirectoryForScan(plf.getAbsolutePath());

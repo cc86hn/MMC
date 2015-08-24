@@ -15,11 +15,17 @@ import org.cc86.MMC.API.Processor;
  */
 public class AudioProcessor implements Processor
 {
-
+    private JukeBox jbx = new JukeBox();
+    
+    
     @Override
     public void process(Packet r, Handler h)
     {
-        
+        String pd = (String) r.getData().get("command");
+        if(pd.equals("playback_pool"))
+        {
+            jbx.updatePool(r, h);
+        }
     }
     
     void shutdown()

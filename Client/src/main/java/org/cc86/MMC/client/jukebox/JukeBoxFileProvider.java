@@ -24,9 +24,9 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cc86.MMC.client.Mod_Jukebox;
 
 /**
  *
@@ -36,6 +36,14 @@ public class JukeBoxFileProvider implements HttpHandler
 {
     //filename zu filemapping
     private HashMap<String, String> fileMapping = new HashMap<>();
+    
+    private final Mod_Jukebox jbx;
+
+    public JukeBoxFileProvider(Mod_Jukebox jbx)
+    {
+        this.jbx = jbx;
+    }
+    
     
     private Set<String> paths = new HashSet<>();
     
@@ -95,6 +103,7 @@ public class JukeBoxFileProvider implements HttpHandler
     
     private void updateList()
     {
+        fileMapping.clear();
         List<String> files = new LinkedList<>();
         paths.forEach((s)->
         {
@@ -111,6 +120,7 @@ public class JukeBoxFileProvider implements HttpHandler
         
         files.stream().parallel().filter((s)->validFileExts.contains(FileTK.getFileExt(s).toLowerCase()))
                 .sequential().forEach((s)->fileMapping.put(FileTK.getFileName(s), s));
+        jbx.sendOwnPoolpart(fileMapping);
     }
     
     
@@ -121,9 +131,10 @@ public class JukeBoxFileProvider implements HttpHandler
         {
             PLFileIO.parseFullList(path,40,true).forEach((e)->fileZ.add(((SinglePlayListItem)e).getPath()));
             
-        } catch (InvalidPlayListFileException ex)
+        } 
+        catch (InvalidPlayListFileException ex)
         {
-            java.util.logging.Logger.getLogger(JukeBoxFileProvider.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         return fileZ;
     }

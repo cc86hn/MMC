@@ -107,7 +107,8 @@ event:
 	settable only
 	eventID: packet type to watch for notification, only attributes that have a get can be watched
 	mode: register:registers this listener to the sending computer unregister: removes selected listener for computer
-	
+disconnect:
+	settable only, no other attributes. Tells the server that the client disconnected regulary
 	
 
 //category: vlc_control

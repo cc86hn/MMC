@@ -5,7 +5,11 @@
  */
 package org.cc86.MMC.client.jukebox;
 
+import java.awt.EventQueue;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import javax.swing.DefaultListModel;
 import org.cc86.MMC.client.Mod_Jukebox;
 
@@ -17,6 +21,9 @@ public class JukeBoxUI extends javax.swing.JPanel
 {
     private Mod_Jukebox jbx;
 
+    private HashMap<String,String> pool;
+            
+    
     /**
      * Creates new form JukeBoxUI
      * @param x instance of the underlying mod_jukebox classs
@@ -26,7 +33,15 @@ public class JukeBoxUI extends javax.swing.JPanel
         jbx=x;
         initComponents();
     }
-
+    public void updatePool(HashMap<String,String> pooldata)
+    {
+        pool=pooldata;
+        Set<String> pooltitles = pool.keySet();
+        final List<String> poollist = Arrays.asList(pooltitles.toArray(new String[0]));
+        EventQueue.invokeLater(()->{
+            ((DefaultListModel)lstPool.getModel()).clear();
+            poollist.forEach((s)->((DefaultListModel)lstPool.getModel()).addElement(s));});
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
