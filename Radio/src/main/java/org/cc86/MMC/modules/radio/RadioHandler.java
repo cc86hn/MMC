@@ -19,6 +19,7 @@ import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.MediaPlayerControl;
 import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.API.PlaybackListener;
 import org.cc86.MMC.API.PlaybackMode;
 import org.cc86.MMC.API.Processor;
 import org.cc86.MMC.API.Resources;
@@ -28,7 +29,7 @@ import org.yaml.snakeyaml.Yaml;
  *
  * @author tgoerner
  */
-public class RadioHandler implements Processor{
+public class RadioHandler implements Processor,PlaybackListener{
 
     @SuppressWarnings("FieldMayBeFinal")
     private HashMap<String,String> shortIdMappings;
@@ -55,6 +56,7 @@ public class RadioHandler implements Processor{
             shortIdMappings.put("SWR1", "http://mp3-live.swr.de/swr1bw_m.m3u");
             shortIdMappings.put("Antenne 1", "http://stream.antenne1.de/stream1/livestream.mp3");
         }
+        MediaPlayerControl.registerListener(this);
     }
     
     @Override
@@ -105,7 +107,7 @@ public class RadioHandler implements Processor{
                         {
                             url=shortIdMappings.get(url);
                         }
-                        MediaPlayerControl.playURL(url, false);
+                        MediaPlayerControl.playURL(url);
                         currentURL=url;
                         streamIsPlaying=true;
                         

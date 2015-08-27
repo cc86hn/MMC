@@ -61,7 +61,7 @@ public class Mod_Jukebox implements Module
             c.sendRequest(p);
             
             
-            HttpServer server = HttpServer.create(new InetSocketAddress("localhost",9265), 0);//,InetAddress.getByName("localhost"));
+            HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0",9265), 0);//,InetAddress.getByName("localhost"));
             server.createContext("/", fp);//nimmt jeden beliebigen namen an
             server.setExecutor(null); // creates a default executor
             server.start();
@@ -72,7 +72,7 @@ public class Mod_Jukebox implements Module
         }
     }
 
-    public void sendOwnPoolpart(Map<String,String> listdata)
+    public void sendOwnPoolpart(List<String> listdata)
     {
         Packet p = new Packet();
         HashMap<String,Object> data = new HashMap<>();
@@ -82,7 +82,17 @@ public class Mod_Jukebox implements Module
         p.setData(data);
         c.sendRequest(p);
     }
-    
+    public void snedTrackPlaybackRequest(String trackid,boolean scheduled)
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","playback_jukebox");
+        data.put("scheduled",scheduled);
+        data.put("path",trackid);
+        p.setData(data);
+        c.sendRequest(p);
+    }
     
     @Override
     public List<String> getCommands()

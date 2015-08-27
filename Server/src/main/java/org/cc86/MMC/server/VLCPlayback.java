@@ -33,11 +33,7 @@ public class VLCPlayback implements MediaPlayerEventListener
 
     public void newFilePlz()
     {
-        String url = MediaPlayerControl.getTitleToPlay();
-        if(url!=null)
-        {
-            mpaccess.playMedia(url, "");
-        }
+        MediaPlayerControl.trackFinishedTriggered();
     }
 
     public void addTitle(String path)

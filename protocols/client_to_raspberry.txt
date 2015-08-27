@@ -45,15 +45,21 @@ playback_seek
 	position: time in seconds for seeking.
 
 //not yet implemented
-playback_DLNA
-	properties:{path,scheduled}
+playback_jukebox
+	properties:{path,scheduled,list}
+		path & scheduled used @ set, list used @ get
 	set-able & get-able, @get-able return playlist
 	scheduled sets that the file should be added to the playlist instead of played directly
 	
-	path is in the form: ip/filename.extension
+	path is in the form: source/filename.extension
+	port used internally is 9265
+	
+playback_dlna
+	switches the playback to the DLNA input
+
 	
 playback_pool
-	set: allows to update your part of the pool, get: returns the complete pool as index
+	set: allows to update your part of the pool, sends data as a List,  get: returns the complete pool as a Map
 	properties: pool;
 	mapping from path to User-friendly name
 ==Webradio==

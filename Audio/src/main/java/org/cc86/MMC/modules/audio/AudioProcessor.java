@@ -22,9 +22,17 @@ public class AudioProcessor implements Processor
     public void process(Packet r, Handler h)
     {
         String pd = (String) r.getData().get("command");
-        if(pd.equals("playback_pool"))
+        if(r.getData().get("type").equals("set"))
         {
-            jbx.updatePool(r, h);
+            switch(pd)
+            {
+                case "playback_pool":
+                    jbx.updatePool(r, h);
+                break;
+                case "playback_jukebox":
+                    jbx.start_playback(r, h);
+                break;
+            }
         }
     }
     

@@ -119,8 +119,8 @@ public class JukeBoxFileProvider implements HttpHandler
         });
         
         files.stream().parallel().filter((s)->validFileExts.contains(FileTK.getFileExt(s).toLowerCase()))
-                .sequential().forEach((s)->fileMapping.put(FileTK.getFileName(s), s));
-        jbx.sendOwnPoolpart(fileMapping);
+                .sequential().forEach((s)->fileMapping.put(FileTK.getFileName(s).replaceAll("[^\\x00-\\x7F]", "").replaceAll(" ", ""), s));
+        jbx.sendOwnPoolpart(Arrays.asList(fileMapping.keySet().toArray(new String[0])));
     }
     
     

@@ -6,6 +6,7 @@
 package org.cc86.MMC.API;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.cc86.MMC.server.VLCPlayback;
 
 /**
@@ -14,38 +15,76 @@ import org.cc86.MMC.server.VLCPlayback;
  */
 public class MediaPlayerControl
 {
-
-    private static ArrayList<String> playlist = new ArrayList<>();
+    
+    static
+    {
+        shouldntbeneededatall();
+    }
+    
+    
+    
     private static String nowPlaying = "";
-
+    private static final List<PlaybackListener> listeners = new ArrayList<>();
     //TODO logik!
     private static final VLCPlayback backend = new VLCPlayback();
 
-    public static void playURL(String url, boolean enqueue)
+    private static void shouldntbeneededatall()
     {
-        if (!enqueue)
+        Thread t = new Thread(()->
         {
-            playlist.clear();
-        }
-
-        playlist.add(url);
-        if (playlist.size() == 1)
-        {
-            backend.newFilePlz();
-        }
+            synchronized(MediaPlayerControl.class)
+            {
+                try
+                {
+                    MediaPlayerControl.class.wait();
+                    listeners.forEach((PlaybackListener l)->l.titleFinished(nowPlaying));
+                } catch (InterruptedException ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        t.setName("MediaPlayerEVTDispatch");
+    }
+    
+    
+    public static void playURL(String url)
+    {
+        backend.addTitle(url);
+        nowPlaying=url;
     }
 
-    public static String getTitleToPlay()
+    public static void registerListener(PlaybackListener l)
     {
-        if (!playlist.isEmpty())
+        if(!listeners.contains(l))
         {
-            nowPlaying = playlist.remove(0);
-            return nowPlaying;
+            listeners.add(l);
         }
-        nowPlaying = "";
-        return null;
     }
+    
+    public static void unregisterListener(PlaybackListener l)
+    {
+        if(listeners.contains(l))
+        {
+            listeners.remove(l);
+        }
+    }
+    
+    
+    public static void trackFinishedTriggered()
+    {
+        synchronized(MediaPlayerControl.class)
+        {
 
+            MediaPlayerControl.class.notify();
+
+        }
+        
+    }
+    
+    
+    
+    
     public static void control(PlaybackMode m)
     {
         switch (m)
@@ -72,17 +111,17 @@ public class MediaPlayerControl
 
     public static boolean seekable()
     {
-        return false;
+        return backend.isSeekable();
     }
 
-    public void seek(int seconds)
+    public static  void seek(int seconds)
     {
-
+        backend.seek(seconds);
     }
 
-    public String getCurrentUrl()
+    public static String getCurrentUrl()
     {
-        return null;
+        return nowPlaying;
     }
 
 }

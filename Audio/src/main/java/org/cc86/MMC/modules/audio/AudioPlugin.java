@@ -20,7 +20,8 @@ public class AudioPlugin implements Plugin{
     @Override
     public void register() {
         h = new AudioProcessor();
-        API.getDispatcher().registerOnRequestType("Playback_DLNA", h);
+        API.getDispatcher().registerOnRequestType("playback_dlna", h);
+        API.getDispatcher().registerOnRequestType("playback_jukebox", h);
         API.getDispatcher().registerOnRequestType("playback_pool", h);
         API.getDispatcher().registerOnRequestType("playback_seek", h); 
         API.getDispatcher().registerOnRequestType("playback_status", h); 
