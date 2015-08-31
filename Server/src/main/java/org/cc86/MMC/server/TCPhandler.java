@@ -52,6 +52,7 @@ public class TCPhandler implements Handler{
                         
                     } catch (IOException ex) {
                         l.warn("Lost connection"); //TODO cleanup
+                        Main.m.getPluginmgr().notifyClientDisconnect(this, false);
                         Main.m.getEvtmgr().unregisterAllListenesForHandler(this);
                         break;
                     }

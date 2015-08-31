@@ -40,4 +40,12 @@ public class AudioProcessor implements Processor
     {
         
     }
+    void freeUpAudio()
+    {
+        jbx.freeUpAudio();
+    }
+    void onClientDisconnect(Handler h, boolean graceful)
+    {
+        jbx.onClientDisconnect(h, graceful);
+    }
 }

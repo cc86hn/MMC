@@ -34,5 +34,13 @@ public interface Plugin {
      * event that runs before the program shutdowns
      */
     public void shutdown();
-      
+    
+    /**
+     * Triggered when a Client disconnects for some reason
+     * @param h Reference to the client handler
+     * @param graceful true if the disconnect was initiated and announced with a disconnect packet
+     */
+    public void onClientDisconnect(Handler h, boolean graceful);
+           
+    
 }

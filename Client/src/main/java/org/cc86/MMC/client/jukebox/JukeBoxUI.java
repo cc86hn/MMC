@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import javax.swing.DefaultListModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.client.Mod_Jukebox;
 
 /**
@@ -19,6 +21,7 @@ import org.cc86.MMC.client.Mod_Jukebox;
  */
 public class JukeBoxUI extends javax.swing.JPanel
 {
+    private static final Logger l = LogManager.getLogger();
     private Mod_Jukebox jbx;
 
     private HashMap<String,String> pool;
@@ -40,7 +43,8 @@ public class JukeBoxUI extends javax.swing.JPanel
         final List<String> poollist = Arrays.asList(pooltitles.toArray(new String[0]));
         EventQueue.invokeLater(()->{
             ((DefaultListModel)lstPool.getModel()).clear();
-            poollist.forEach((s)->((DefaultListModel)lstPool.getModel()).addElement(s));});
+            poollist.forEach((s)->((DefaultListModel)lstPool.getModel()).addElement(s));
+        });
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -60,6 +64,8 @@ public class JukeBoxUI extends javax.swing.JPanel
         btnEnqueue = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         txaDetails = new javax.swing.JTextArea();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        lstQUE = new javax.swing.JList();
 
         lstPool.setModel(new DefaultListModel<String>());
         lstPool.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -80,9 +86,14 @@ public class JukeBoxUI extends javax.swing.JPanel
             }
         });
 
+        txaDetails.setEditable(false);
         txaDetails.setColumns(20);
         txaDetails.setRows(5);
+        txaDetails.setEnabled(false);
         jScrollPane2.setViewportView(txaDetails);
+
+        lstQUE.setModel(new DefaultListModel());
+        jScrollPane3.setViewportView(lstQUE);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -103,15 +114,18 @@ public class JukeBoxUI extends javax.swing.JPanel
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(btnEnqueue)
                                     .addComponent(btnManageLocal))
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
-                .addGap(203, 203, 203)
+                .addComponent(jScrollPane3)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnEnqueue)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnManageLocal)
@@ -129,8 +143,21 @@ public class JukeBoxUI extends javax.swing.JPanel
         jbx.snedTrackPlaybackRequest(trackid, true);
     }//GEN-LAST:event_btnEnqueueActionPerformed
 
-public void updateList(List<String> elements)
+public void updateList(final List<String> elements)
 {
+    l.info("updateList()");
+    EventQueue.invokeLater(()->{
+        DefaultListModel mdl = (DefaultListModel) lstQUE.getModel();
+        mdl.clear();
+        
+        if(elements==null||elements.isEmpty())
+        {
+            l.info("empty LST");
+            return;
+        }
+          
+        elements.forEach((s)->mdl.addElement(s));
+    });
     
 }
     
@@ -142,7 +169,9 @@ public void updateList(List<String> elements)
     private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JList lstPool;
+    private javax.swing.JList lstQUE;
     private javax.swing.JTextArea txaDetails;
     // End of variables declaration//GEN-END:variables
 }

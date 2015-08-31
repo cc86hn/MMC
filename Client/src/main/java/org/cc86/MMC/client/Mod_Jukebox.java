@@ -28,7 +28,7 @@ import org.cc86.MMC.client.jukebox.JukeBoxUI;
  */
 public class Mod_Jukebox implements Module
 {
-        private static final Logger l = LogManager.getLogger();
+    private static final Logger l = LogManager.getLogger();
     private Connection c;
     private JukeBoxFileProvider fp;
     private JukeBoxUI ui;
@@ -41,6 +41,10 @@ public class Mod_Jukebox implements Module
         if(mode.equals("playback_pool"))
         {
             ui.updatePool((HashMap<String, String>) msg.getData().get("pool"));
+        }
+        if(mode.equals("playback_jukebox"))
+        {
+            ui.updateList((List<String>) msg.getData().get("list"));
         }
     }
 
@@ -59,6 +63,21 @@ public class Mod_Jukebox implements Module
             data.put("eventID","playback_pool");
             p.setData(data);
             c.sendRequest(p);
+            try
+            {
+                Thread.sleep(10); //HACK, dont be tooo fast
+            } catch (InterruptedException ex)
+            {
+                ex.printStackTrace();
+            }
+            Packet p2 = new Packet();
+            HashMap<String,Object> data2 = new HashMap<>();
+            data2.put("type","set");
+            data2.put("command","event");
+            data2.put("mode","register");
+            data2.put("eventID","playback_jukebox");
+            p2.setData(data2);
+            c.sendRequest(p2);
             
             
             HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0",9265), 0);//,InetAddress.getByName("localhost"));
@@ -97,7 +116,7 @@ public class Mod_Jukebox implements Module
     @Override
     public List<String> getCommands()
     {
-        return Arrays.asList(new String[]{"playback_pool","playback_DLNA"});
+        return Arrays.asList(new String[]{"playback_pool","playback_jukebox"});
     }
     public void loadUI()
     {

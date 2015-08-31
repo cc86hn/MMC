@@ -6,8 +6,11 @@
 package org.cc86.MMC.modules.stream;
 
 import de.nplusc.izc.tools.baseTools.Tools;
+import java.util.HashMap;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.cc86.MMC.API.API;
+import org.cc86.MMC.API.Handler;
+import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.API.Plugin;
 import org.cc86.MMC.API.Resources;
 
@@ -40,8 +43,20 @@ public class StreamPlugin implements Plugin{
     }
 
     @Override
-    public void freeUpResources(Resources... res)
-    {
+    public void freeUpResources(Resources... res)    {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void onClientDisconnect(Handler h, boolean graceful)
+
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","stream");
+        data.put("disconnect","disconnect");
+        p.setData(data);
+        this.h.process(p, h);
     }
 }

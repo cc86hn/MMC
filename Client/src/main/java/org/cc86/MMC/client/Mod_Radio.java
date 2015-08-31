@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.io.IoBuilder;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.client.API.Connection;
 import org.cc86.MMC.client.API.Module;

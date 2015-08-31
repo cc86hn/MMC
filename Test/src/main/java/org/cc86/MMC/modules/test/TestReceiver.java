@@ -7,6 +7,7 @@
 package org.cc86.MMC.modules.test;
 
 import org.cc86.MMC.API.API;
+import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Plugin;
 import org.cc86.MMC.API.Resources;
 
@@ -37,6 +38,12 @@ public class TestReceiver implements Plugin
 
     @Override
     public void freeUpResources(Resources... res)
+    {
+        
+    }
+
+    @Override
+    public void onClientDisconnect(Handler h, boolean graceful)
     {
         
     }

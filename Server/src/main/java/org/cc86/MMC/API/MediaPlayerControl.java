@@ -18,7 +18,8 @@ public class MediaPlayerControl
     
     static
     {
-        shouldntbeneededatall();
+        //fugly HACK, fuck you javac for spitting out a error
+        threadlauncher();
     }
     
     
@@ -28,7 +29,7 @@ public class MediaPlayerControl
     //TODO logik!
     private static final VLCPlayback backend = new VLCPlayback();
 
-    private static void shouldntbeneededatall()
+    private static void threadlauncher()
     {
         Thread t = new Thread(()->
         {

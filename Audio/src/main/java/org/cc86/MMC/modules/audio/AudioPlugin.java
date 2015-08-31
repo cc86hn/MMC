@@ -5,7 +5,9 @@
  */
 package org.cc86.MMC.modules.audio;
 
+import java.util.Arrays;
 import org.cc86.MMC.API.API;
+import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Plugin;
 import org.cc86.MMC.API.Resources;
 
@@ -43,7 +45,16 @@ public class AudioPlugin implements Plugin{
     @Override
     public void freeUpResources(Resources... res)
     {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(Arrays.asList(res).contains(Resources.AUDIODATA))
+        {
+            h.freeUpAudio();
+        }
+    }
+
+    @Override
+    public void onClientDisconnect(Handler h, boolean graceful)
+    {
+        this.h.onClientDisconnect(h, graceful);
     }
     
 }

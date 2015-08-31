@@ -85,6 +85,7 @@ public class TCPConnection implements Connection
                         } catch (InterruptedException ex) {
                         }
                         System.out.println("MSG sent");
+                        l.info("PKT="+returnMsg);
                         out.println(returnMsg);
                         out.flush();
                         returnMsg="";

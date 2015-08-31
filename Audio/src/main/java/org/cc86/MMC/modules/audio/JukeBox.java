@@ -17,6 +17,7 @@ import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.MediaPlayerControl;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.API.PlaybackListener;
+import org.cc86.MMC.API.PlaybackMode;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -25,6 +26,8 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class JukeBox implements PlaybackListener
 {
+    
+    private boolean isPlaying=false;
     private static final Logger l = LogManager.getLogger();
     private HashMap<String,String> pool = new HashMap<>();
     private HashMap<Handler,List<String>> userLists = new HashMap<>();
@@ -36,9 +39,17 @@ public class JukeBox implements PlaybackListener
 
 
     
+    
+    
+    
     public void updatePool(Packet p, Handler h)
     {
         userLists.put(h, (List<String>) p.getData().get("pool"));
+        processPool();
+    }
+    
+    private void processPool()
+    {
         pool.clear();
         userLists.forEach((k,v)->
         {
@@ -52,23 +63,31 @@ public class JukeBox implements PlaybackListener
         evtdata.put("pool",pool);
         evt.setData(evtdata);
         API.dispatchEvent(evt);
+        //TODO: sync queue with pool to remove nonexistent refs
+        List<String[]> killList = new ArrayList<>();
+        queue.forEach((qi)->{if(!pool.containsValue(qi[2])){killList.add(qi);}});
+        killList.forEach((qi)->queue.remove(qi));
     }
+    
     
     public void start_playback(Packet p, Handler h)
     {
         l.info("Playback enqueue");
         l.trace(new Yaml().dump(p));
         HashMap<String,Object> data = p.getData();
-        String[] fp = ((String) data.get("path")).split("/");
+        String trkid = (String) data.get("path");
+        String[] fp = trkid.split("/");
         boolean enqueue = (boolean) data.get("scheduled");
+        l.info("scheduled="+enqueue);
         String streamurl = "http://"+fp[0]+":9265/"+fp[1];
-        if(enqueue&&!queue.isEmpty())
+        if(enqueue&&(!queue.isEmpty()||isPlaying))
         {
             l.trace("Enqueueing");
-            queue.add(new String[]{fp[1], streamurl});
+            queue.add(new String[]{fp[1], streamurl,trkid});
         }
         else
         {
+            isPlaying=true;
             l.trace("playing");
             MediaPlayerControl.playURL(streamurl);
         }
@@ -99,4 +118,17 @@ public class JukeBox implements PlaybackListener
         evt.setData(evtdata);
         API.dispatchEvent(evt);
     }
+    void freeUpAudio()
+    {
+        if(isPlaying)
+        {
+            MediaPlayerControl.control(PlaybackMode.STOP);
+        }
+    }
+    void onClientDisconnect(Handler h, boolean graceful)
+    {
+        userLists.remove(h);
+        processPool();
+    }
+    
 }

@@ -63,6 +63,7 @@ public class EventManager implements Processor
             switch (mode)
             {
                 case "register":
+                    l.info("registering "+h.getClientIP()+" for "+eventID);
                     List<Handler> listeners = listenerPool.get(eventID);
                     if(listeners==null)
                     {
