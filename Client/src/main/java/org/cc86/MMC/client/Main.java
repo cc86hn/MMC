@@ -28,6 +28,8 @@ import org.cc86.MMC.client.API.Connection;
  */
 public class Main
 {
+
+    
     private static final Logger l = LogManager.getLogger();
     //private static TestsUI ui;
     //private static RadioUI radio;
@@ -38,6 +40,7 @@ public class Main
     
     public static void main(String[] args)
     {
+    
         setupLogging(true);
         TimeoutManager m = new TimeoutManager(3, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
         m.start();
@@ -251,5 +254,6 @@ public class Main
         cx.updateLoggers();
     }
     
+          
     
 }

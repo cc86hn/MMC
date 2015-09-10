@@ -32,7 +32,11 @@ public class AudioProcessor implements Processor
                 case "playback_jukebox":
                     jbx.start_playback(r, h);
                 break;
+                case "playback_control":
+                    jbx.playback_control(r, h);
+                break;
             }
+            
         }
     }
     

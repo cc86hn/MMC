@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.swing.DefaultListModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.client.Mod_Jukebox;
 
 /**
@@ -46,6 +47,13 @@ public class JukeBoxUI extends javax.swing.JPanel
             poollist.forEach((s)->((DefaultListModel)lstPool.getModel()).addElement(s));
         });
     }
+    public void updateStatus(final HashMap<String,Object> status)
+    {
+        EventQueue.invokeLater(()->{
+            lblNowPlaying.setText("Now Playing "+status.get("title"));
+        });
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -58,24 +66,38 @@ public class JukeBoxUI extends javax.swing.JPanel
 
         jScrollPane1 = new javax.swing.JScrollPane();
         lstPool = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        btnManageLocal = new javax.swing.JButton();
+        btnPushDirect = new javax.swing.JButton();
+        btnSkip = new javax.swing.JButton();
         btnEnqueue = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         txaDetails = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         lstQUE = new javax.swing.JList();
+        lblNowPlaying = new javax.swing.JLabel();
+        btnPlayPause = new javax.swing.JButton();
+        btnLoop = new javax.swing.JButton();
 
         lstPool.setModel(new DefaultListModel<String>());
         lstPool.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(lstPool);
 
-        jButton1.setText("Play");
+        btnPushDirect.setText("Sofort abspielen");
+        btnPushDirect.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnPushDirectActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Skip");
-
-        btnManageLocal.setText("Lokale Liste verwalten");
+        btnSkip.setText("Skip");
+        btnSkip.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnSkipActionPerformed(evt);
+            }
+        });
 
         btnEnqueue.setText("Einreihen");
         btnEnqueue.addActionListener(new java.awt.event.ActionListener()
@@ -95,45 +117,66 @@ public class JukeBoxUI extends javax.swing.JPanel
         lstQUE.setModel(new DefaultListModel());
         jScrollPane3.setViewportView(lstQUE);
 
+        lblNowPlaying.setText("Now Playing:");
+
+        btnPlayPause.setText("Play");
+
+        btnLoop.setText("Schleife");
+        btnLoop.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnLoopActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 405, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblNowPlaying, javax.swing.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(btnEnqueue)
-                                    .addComponent(btnManageLocal))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE))
+                                .addComponent(btnPlayPause, javax.swing.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(btnSkip, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(btnEnqueue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnPushDirect, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnLoop, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 459, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane3)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnEnqueue)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnManageLocal)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEnqueue)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnPushDirect)
+                        .addGap(16, 16, 16)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnSkip)
+                            .addComponent(btnPlayPause))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addGap(46, 46, 46))
+                    .addComponent(lblNowPlaying)
+                    .addComponent(btnLoop))
+                .addGap(16, 16, 16))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -142,6 +185,22 @@ public class JukeBoxUI extends javax.swing.JPanel
         String trackid = pool.get((String)lstPool.getSelectedValue());
         jbx.snedTrackPlaybackRequest(trackid, true);
     }//GEN-LAST:event_btnEnqueueActionPerformed
+
+    private void btnSkipActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSkipActionPerformed
+    {//GEN-HEADEREND:event_btnSkipActionPerformed
+        jbx.skip();
+    }//GEN-LAST:event_btnSkipActionPerformed
+
+    private void btnPushDirectActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnPushDirectActionPerformed
+    {//GEN-HEADEREND:event_btnPushDirectActionPerformed
+        String trackid = pool.get((String)lstPool.getSelectedValue());
+        jbx.snedTrackPlaybackRequest(trackid, false);
+    }//GEN-LAST:event_btnPushDirectActionPerformed
+
+    private void btnLoopActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnLoopActionPerformed
+    {//GEN-HEADEREND:event_btnLoopActionPerformed
+        jbx.loop();
+    }//GEN-LAST:event_btnLoopActionPerformed
 
 public void updateList(final List<String> elements)
 {
@@ -160,16 +219,22 @@ public void updateList(final List<String> elements)
     });
     
 }
-    
+
+public void showStatus(Packet p)
+{
+    HashMap<String,Object> data = p.getData();
+}
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEnqueue;
-    private javax.swing.JButton btnManageLocal;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton btnLoop;
+    private javax.swing.JButton btnPlayPause;
+    private javax.swing.JButton btnPushDirect;
+    private javax.swing.JButton btnSkip;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel lblNowPlaying;
     private javax.swing.JList lstPool;
     private javax.swing.JList lstQUE;
     private javax.swing.JTextArea txaDetails;

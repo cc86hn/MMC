@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.client.API.Connection;
 import org.cc86.MMC.client.API.Module;
+import org.cc86.MMC.client.API.Utilities;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -122,15 +123,7 @@ public class Mod_Radio implements Module
     @Override
     public void connect(Connection c) {
         this.c=c;
-        
-        Packet p = new Packet();
-        HashMap<String,Object> data = new HashMap<>();
-        data.put("type","set");
-        data.put("command","event");
-        data.put("mode","register");
-        data.put("eventID","webradio");
-        p.setData(data);
-        c.sendRequest(p);
+        Utilities.registerOnEvent("webradio",c);
         
     }
     

@@ -47,11 +47,15 @@ public class TCPConnection implements Connection
                     try {
                         String ln = r.readLine();
                         l.trace("packet line = "+ln);
-                        while(!ln.equals("---"))
+                        while(ln!=null&&!ln.equals("---"))
                         {
                             request+=ln+"\n";
                             
                             ln=r.readLine();
+                        }
+                        if(ln==null)
+                        {
+                            System.exit(9263);
                         }
                         
                     } catch (IOException ex) {

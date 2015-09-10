@@ -5,6 +5,8 @@
  */
 package org.cc86.MMC.server;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.MediaPlayerControl;
 import org.cc86.MMC.API.StatusMode;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
@@ -18,7 +20,7 @@ import uk.co.caprica.vlcj.player.MediaPlayerFactory;
  */
 public class VLCPlayback implements MediaPlayerEventListener
 {
-
+    private static final Logger l = LogManager.getLogger();
     private final MediaPlayer mpaccess;
     private final MediaPlayerFactory f;
 
@@ -33,11 +35,13 @@ public class VLCPlayback implements MediaPlayerEventListener
 
     public void newFilePlz()
     {
+        l.info("Track finished");
         MediaPlayerControl.trackFinishedTriggered();
     }
 
     public void addTitle(String path)
     {
+        l.trace("TrackSwitch://"+path);
         mpaccess.stop();
         mpaccess.playMedia(path);
     }
@@ -67,6 +71,7 @@ public class VLCPlayback implements MediaPlayerEventListener
 
     public void skipTitle()
     {
+        l.trace("SkipCore");
         if (StatusMode.getAudioMode() == StatusMode.FILE)//feature nur bei DLNA-mode verfügbar
         {
             newFilePlz();

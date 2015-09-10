@@ -6,6 +6,8 @@
 package org.cc86.MMC.modules.audio;
 
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,6 +34,7 @@ public class JukeBox implements PlaybackListener
     private HashMap<String,String> pool = new HashMap<>();
     private HashMap<Handler,List<String>> userLists = new HashMap<>();
     private List<String[]> queue = new ArrayList<>();
+    private String currentTrackTitle = "";
     public JukeBox()
     {
         MediaPlayerControl.registerListener(this);
@@ -63,7 +66,6 @@ public class JukeBox implements PlaybackListener
         evtdata.put("pool",pool);
         evt.setData(evtdata);
         API.dispatchEvent(evt);
-        //TODO: sync queue with pool to remove nonexistent refs
         List<String[]> killList = new ArrayList<>();
         queue.forEach((qi)->{if(!pool.containsValue(qi[2])){killList.add(qi);}});
         killList.forEach((qi)->queue.remove(qi));
@@ -72,39 +74,106 @@ public class JukeBox implements PlaybackListener
     
     public void start_playback(Packet p, Handler h)
     {
-        l.info("Playback enqueue");
-        l.trace(new Yaml().dump(p));
-        HashMap<String,Object> data = p.getData();
-        String trkid = (String) data.get("path");
-        String[] fp = trkid.split("/");
-        boolean enqueue = (boolean) data.get("scheduled");
-        l.info("scheduled="+enqueue);
-        String streamurl = "http://"+fp[0]+":9265/"+fp[1];
-        if(enqueue&&(!queue.isEmpty()||isPlaying))
+        try
         {
-            l.trace("Enqueueing");
-            queue.add(new String[]{fp[1], streamurl,trkid});
-        }
-        else
+            l.info("Playback enqueue");
+            l.trace(new Yaml().dump(p));
+            HashMap<String,Object> data = p.getData();
+            String trkid = (String) data.get("path");
+            String[] fp = trkid.split("/");
+            boolean enqueue = (boolean) data.get("scheduled");
+            l.info("scheduled="+enqueue);
+            String streamurl = "http://"+fp[0]+":9265/"+URLEncoder.encode(fp[1], "UTF-8");;
+            if(enqueue&&(!queue.isEmpty()||isPlaying))
+            {
+                l.trace("Enqueueing");
+                queue.add(new String[]{fp[1], streamurl,trkid});
+            }
+            else
+            {
+                currentTrackTitle = fp[1];
+                isPlaying=true;
+                l.trace("playing");
+                MediaPlayerControl.playURL(streamurl);
+            }
+            sendQueue();
+        } catch (UnsupportedEncodingException ex)
         {
-            isPlaying=true;
-            l.trace("playing");
-            MediaPlayerControl.playURL(streamurl);
+            ex.printStackTrace();
         }
-        sendQueue();
     }
+
+    @Override
+    public void trackStarting(String title)
+    {
+        Packet evt = new Packet();
+        HashMap<String,Object> evtdata = new HashMap<>();
+        evtdata.put("command","playback_status");
+        evtdata.put("type","response");
+        evtdata.put("title",currentTrackTitle);
+        evtdata.put("duration",MediaPlayerControl.getLength());
+        evtdata.put("time",MediaPlayerControl.getTime());
+        evtdata.put("seekable",MediaPlayerControl.seekable());
+        evt.setData(evtdata);
+        API.dispatchEvent(evt);
+    }
+    
+    
     
     @Override
     public void titleFinished(String title)
     {
+        l.trace("FinishTrigger_JBX");
         if(queue.size()>=1)
         {
             MediaPlayerControl.playURL(queue.get(0)[1]);
+            currentTrackTitle = queue.get(0)[0];
+            queue.remove(0);
+        }
+        else
+        {
+            isPlaying=false;
+            MediaPlayerControl.control(PlaybackMode.STOP);
+            Packet evt = new Packet();
+            HashMap<String,Object> evtdata = new HashMap<>();
+            evtdata.put("command","playback_status");
+            evtdata.put("type","response");
+            evtdata.put("title","");
+            evtdata.put("duration",0);
+            evtdata.put("time",0);
+            evtdata.put("seekable",false);
+            evt.setData(evtdata);
+            API.dispatchEvent(evt);
+            
+            
         }
         sendQueue();
     }
 
-
+    public void playback_control(Packet p, Handler h)
+    {
+        String act = p.getData().get("action")+"";
+        l.trace("action://"+act);
+        switch(act.toLowerCase())
+        {
+            case "skip":
+                MediaPlayerControl.control(PlaybackMode.SKIP);
+            break;
+            case "play":
+                MediaPlayerControl.control(PlaybackMode.PLAY);
+            break;
+            case "pause":
+                MediaPlayerControl.control(PlaybackMode.PAUSE);
+            break;
+            case "stop":
+                isPlaying=false;
+                MediaPlayerControl.control(PlaybackMode.STOP);
+            break;
+            case "loop":
+                MediaPlayerControl.control(PlaybackMode.LOOP);
+            break;
+        }   
+    }
     private void sendQueue()
     {
         ArrayList<String> lst = new ArrayList<>();

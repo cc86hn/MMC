@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -64,6 +66,7 @@ public class JukeBoxFileProvider implements HttpHandler
     public void handle(HttpExchange exchange) throws IOException
     {
         String fileID = exchange.getRequestURI().toString().substring(1);
+        fileID=URLDecoder.decode(fileID, "UTF-8");
         l.trace(fileID);
         
         boolean fx = fileMapping.containsKey(fileID);
@@ -119,7 +122,7 @@ public class JukeBoxFileProvider implements HttpHandler
         });
         
         files.stream().parallel().filter((s)->validFileExts.contains(FileTK.getFileExt(s).toLowerCase()))
-                .sequential().forEach((s)->fileMapping.put(FileTK.getFileName(s).replaceAll("[^\\x00-\\x7F]", "").replaceAll(" ", ""), s));
+                .sequential().forEach((s)->fileMapping.put(FileTK.getFileName(s)/*.replaceAll("[^\\x00-\\x7F]", "").replaceAll(" ", "")*/, s));
         jbx.sendOwnPoolpart(Arrays.asList(fileMapping.keySet().toArray(new String[0])));
     }
     

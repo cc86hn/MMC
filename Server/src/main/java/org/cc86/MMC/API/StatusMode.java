@@ -18,7 +18,7 @@ public enum StatusMode {
     }
     public static  StatusMode getAudioMode()
     {
-        return null;
+        return FILE;
     }
     
 }

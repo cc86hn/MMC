@@ -26,10 +26,10 @@ volume:
 
 	
 ==Music related==
-//not yet implemented
+//partially implemented
 playback_control:
-	No get supported.
-	action: {play:pause:fastforward:skip}
+	get returns current playback state.
+	action: {play:pause:fastforward:skip:loop}
 
 //not yet implemented
 playback_status:

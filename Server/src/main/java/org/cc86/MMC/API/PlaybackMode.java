@@ -10,5 +10,5 @@ package org.cc86.MMC.API;
  * @author tgoerner
  */
 public enum PlaybackMode {
-    PLAY,PAUSE,STOP,SKIP,FASTER,SLOWER;
+    PLAY,PAUSE,STOP,SKIP,FASTER,SLOWER,LOOP;
 }

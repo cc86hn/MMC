@@ -245,6 +245,7 @@ public class RadioUI extends JPanel
     {
         EventQueue.invokeLater(()->lblStation.setText((!station.isEmpty())?"Aktuelle Station: "+station:"Kein Sender aktiv"));
     }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelPlayback;
     private javax.swing.JButton btnF5;

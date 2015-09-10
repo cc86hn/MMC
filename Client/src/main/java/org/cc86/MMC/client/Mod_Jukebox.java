@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.client.API.Connection;
 import org.cc86.MMC.client.API.Module;
+import org.cc86.MMC.client.API.Utilities;
 import org.cc86.MMC.client.jukebox.JukeBoxFileProvider;
 import org.cc86.MMC.client.jukebox.JukeBoxPoolManagment;
 import org.cc86.MMC.client.jukebox.JukeBoxUI;
@@ -46,39 +47,22 @@ public class Mod_Jukebox implements Module
         {
             ui.updateList((List<String>) msg.getData().get("list"));
         }
+        if(mode.equals("playback_status"))
+        {
+            ui.updateStatus(msg.getData());
+        }
     }
-
-    
     @Override
     public void connect(Connection c) {
         fp = new JukeBoxFileProvider(this);
         try
         {
             this.c=c;
-            Packet p = new Packet();
-            HashMap<String,Object> data = new HashMap<>();
-            data.put("type","set");
-            data.put("command","event");
-            data.put("mode","register");
-            data.put("eventID","playback_pool");
-            p.setData(data);
-            c.sendRequest(p);
-            try
-            {
-                Thread.sleep(10); //HACK, dont be tooo fast
-            } catch (InterruptedException ex)
-            {
-                ex.printStackTrace();
-            }
-            Packet p2 = new Packet();
-            HashMap<String,Object> data2 = new HashMap<>();
-            data2.put("type","set");
-            data2.put("command","event");
-            data2.put("mode","register");
-            data2.put("eventID","playback_jukebox");
-            p2.setData(data2);
-            c.sendRequest(p2);
             
+            Utilities.registerOnEvent("playback_pool",c);
+            Utilities.registerOnEvent("playback_jukebox",c);
+            Utilities.registerOnEvent("playback_status",c);
+            Utilities.registerOnEvent("playback_control",c);
             
             HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0",9265), 0);//,InetAddress.getByName("localhost"));
             server.createContext("/", fp);//nimmt jeden beliebigen namen an
@@ -112,11 +96,31 @@ public class Mod_Jukebox implements Module
         p.setData(data);
         c.sendRequest(p);
     }
+    public void skip()
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","playback_control");
+        data.put("action","skip");
+        p.setData(data);
+        c.sendRequest(p);
+    }
+    public void loop()
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","playback_control");
+        data.put("action","loop");
+        p.setData(data);
+        c.sendRequest(p);
+    }
     
     @Override
     public List<String> getCommands()
     {
-        return Arrays.asList(new String[]{"playback_pool","playback_jukebox"});
+        return Arrays.asList(new String[]{"playback_pool","playback_jukebox","playback_status"});
     }
     public void loadUI()
     {

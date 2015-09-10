@@ -12,5 +12,5 @@ package org.cc86.MMC.API;
 public interface PlaybackListener
 {
     public default void titleFinished(String title){};
-    
+    public default void trackStarting(String title){};
 }
