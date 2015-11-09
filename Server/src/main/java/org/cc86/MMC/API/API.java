@@ -6,6 +6,7 @@
 package org.cc86.MMC.API;
 
 import java.io.File;
+import java.util.HashMap;
 import org.cc86.MMC.server.Dispatcher;
 import org.cc86.MMC.server.Main;
 
@@ -36,5 +37,15 @@ public class API {
     public static void dispatchEvent(Packet p)
     {
         Main.m.getEvtmgr().sendEventToRegisteredClients(p);
+    }
+    public static void makeSimpleEvent(String eventID,String paramname,Object paramval)
+    {
+        Packet evt = new Packet();
+        HashMap<String,Object> evtdata = new HashMap<>();
+        evtdata.put("command",eventID);
+        evtdata.put("type","response");
+        evtdata.put(paramname,paramval);
+        evt.setData(evtdata);
+        API.dispatchEvent(evt);
     }
 }

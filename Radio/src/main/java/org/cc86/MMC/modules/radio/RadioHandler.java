@@ -139,13 +139,7 @@ public class RadioHandler implements Processor,PlaybackListener{
                     }
                     if(set)
                     {
-                        HashMap<String,Object> response=new HashMap<>();
-                        response.put("URL",currentURL);
-                        response.put("command","webradio");
-                        response.put("type","response");
-                        Packet rsp = new Packet();
-                        rsp.setData(response);
-                        API.dispatchEvent(rsp);
+                        API.makeSimpleEvent("webradio", "URL", currentURL);
                     }
                 }
                 else

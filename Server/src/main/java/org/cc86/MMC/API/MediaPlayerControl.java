@@ -151,13 +151,7 @@ public class MediaPlayerControl
                 loop=!loop;
                 break;
         }
-        Packet evt = new Packet();
-        HashMap<String,Object> evtdata = new HashMap<>();
-        evtdata.put("command","playback_control");
-        evtdata.put("type","response");
-        evtdata.put("action",(m+"").toLowerCase());
-        evt.setData(evtdata);
-        API.dispatchEvent(evt);
+        API.makeSimpleEvent("playback_control", "action", (m+"").toLowerCase());
     }
 
     public static boolean seekable()

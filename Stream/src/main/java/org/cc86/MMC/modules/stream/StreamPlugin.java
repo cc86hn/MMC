@@ -5,9 +5,7 @@
  */
 package org.cc86.MMC.modules.stream;
 
-import de.nplusc.izc.tools.baseTools.Tools;
 import java.util.HashMap;
-import org.apache.logging.log4j.io.IoBuilder;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Packet;

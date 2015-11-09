@@ -12,8 +12,10 @@ package org.cc86.MMC.API;
 public interface Plugin {
     /**
      * gets triggered on pluginload so the plugin can register its available listeners for certain Messages
+     * 
+     * @throws org.cc86.MMC.API.PluginNotReadyException when the plugin cannot start up for some reason
      */
-    public void register();
+    public void register() throws PluginNotReadyException;
     /**
      * gets the name of the plugin for the Pluginlist
      * @return Name of the plugin

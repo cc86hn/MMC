@@ -10,7 +10,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -58,14 +57,7 @@ public class JukeBox implements PlaybackListener
         {
             final String sip = k.getClientIP();v.forEach((v2)->pool.put(v2, sip+"/"+v2));
         });
-        
-        Packet evt = new Packet();
-        HashMap<String,Object> evtdata = new HashMap<>();
-        evtdata.put("command","playback_pool");
-        evtdata.put("type","response");
-        evtdata.put("pool",pool);
-        evt.setData(evtdata);
-        API.dispatchEvent(evt);
+        API.makeSimpleEvent("playback_pool", "pool", pool);
         List<String[]> killList = new ArrayList<>();
         queue.forEach((qi)->{if(!pool.containsValue(qi[2])){killList.add(qi);}});
         killList.forEach((qi)->queue.remove(qi));
@@ -178,14 +170,7 @@ public class JukeBox implements PlaybackListener
     {
         ArrayList<String> lst = new ArrayList<>();
         queue.forEach((e)->lst.add(e[1]));
-
-        Packet evt = new Packet();
-        HashMap<String,Object> evtdata = new HashMap<>();
-        evtdata.put("command","playback_jukebox");
-        evtdata.put("type","response");
-        evtdata.put("list",lst);
-        evt.setData(evtdata);
-        API.dispatchEvent(evt);
+        API.makeSimpleEvent("playback_jukebox", "list", lst);
     }
     void freeUpAudio()
     {

@@ -22,8 +22,9 @@ Commands available
 ================================================================
 ==Audio general==
 volume:
-	value: integer from 0 to 255 denoting the volume
-
+	value: integer from 0 to 100 denoting the volume in %
+device_power:
+	value: 0 or 1; ==off 1=on;
 	
 ==Music related==
 //partially implemented

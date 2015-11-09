@@ -213,21 +213,17 @@ public class StreamProcessor implements Processor
             }
             if(set)
             {
-                Packet evt = new Packet();
-                HashMap<String,Object> evtdata = new HashMap<>();
+                String[] evtparam;
                 String tport = ""+(command.equals(MODE_MP4)?target:0);
-                evtdata.put("command","stream");
-                evtdata.put("type","response");
                 if(streamSources.isEmpty())
                 {
-                    evtdata.put("streamsource",new String[]{"","",""});
+                    evtparam = new String[]{"","",""};
                 }
                 else
                 {
-                    evtdata.put("streamsource",new String[]{h.getClientIP(),tport,command});
+                    evtparam = new String[]{h.getClientIP(),tport,command};
                 }
-                evt.setData(evtdata);
-                API.dispatchEvent(evt);
+                API.makeSimpleEvent("stream", "streamsource", evtparam);
             }
             if(!set)
             {

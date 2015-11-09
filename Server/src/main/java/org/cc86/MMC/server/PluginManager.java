@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Plugin;
+import org.cc86.MMC.API.PluginNotReadyException;
 import org.cc86.MMC.API.Resources;
 import org.yaml.snakeyaml.Yaml;
 
@@ -33,7 +34,7 @@ public class PluginManager {
     private static final Logger l = LogManager.getLogger();
     private List<Plugin> detectedPlugs = new ArrayList<>();
     
-    public void loadPlugins()
+    public void loadPlugins() 
     {
         Yaml y = new Yaml();
         String[] jarsInPluginFolder = FileTK.getDirectoryContent(API.PLUGINPATH);
@@ -76,9 +77,19 @@ public class PluginManager {
                 {
                     ex.printStackTrace();
                 }
-                catch (IOException ex)
+                catch ( IOException ex)
                 {
                     ex.printStackTrace();
+                } catch (PluginNotReadyException ex)
+                {
+                    l.error("Plugin startup failed, shutting down");
+                    l.error(ex.getCause());
+                    for (Plugin detectedPlugin : detectedPlugs)
+                    {
+                        detectedPlugin.shutdown();
+                       
+                    }
+                    System.exit(1);
                 }
                 
             }

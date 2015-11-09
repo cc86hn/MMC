@@ -1,0 +1,177 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.cc86.MMC.modules.audio;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.function.Consumer;
+
+/**
+ *
+ * @author tgoerner
+ */
+public class SWTTYProvider
+{
+    //startup sudo pigpiod
+    //M 10 W nach /dev/pigpio
+    //Output in /dev/pigout
+    //M 9 R
+
+    //cat auf /dev/pigout & /dev/pigerr
+    static String[] alphabet = "a#b#c#d#e#f#g#h#i#j#k#l#m#n#o#p#q#r#s#t#u#v#w#x#y#z".split("#");
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args)
+    {
+        uartHandler(System.out::println, System.in, true);
+    }
+
+    private static void setup(PrintStream pigpiostream)
+    {
+
+        pigpiostream.println("M 10 W");
+        pigpiostream.println("M 9 R");
+        pigpiostream.println("SLRO 9 2400 8");
+    }
+
+    public static void uartHandler(final Consumer<String> out, final InputStream ctrl, final boolean addPrefix)
+    {
+        new Thread(() ->
+        {
+            OutputStream fos = null;
+
+            try
+            {
+            //final Socket s = new Socket("127.0.0.1", 8888);
+                //fis = new FileInputStream();
+                if (!new File("/dev/pigpio").exists())
+                {
+                    System.out.println("no running pigpiod, shutting down");
+                    System.exit(0);
+                }
+                fos = new FileOutputStream("/dev/pigpio");
+            //fos = s.getOutputStream();/*new InputStreamReader(s.getInputStream()*/
+
+                PrintStream ps = new PrintStream(fos);
+                setup(ps);
+
+                new Thread(() ->
+                {
+                    StringBuffer sb = new StringBuffer();
+                    BufferedReader br;
+                    try
+                    {
+                        br = new BufferedReader(new FileReader("/dev/pigout"));
+                        while (true)
+                        {
+                            String in = br.readLine();
+                            /*if(!in.startsWith("0"))
+                             {
+                             System.out.println(in);
+                             }//*/
+                            //System.out.println("Incoming serial msg");
+                            String[] insplit = in.split(" ");
+                            //System.out.println(in);
+                            if (insplit.length > 1)
+                            {
+                                for (int i = 1; i < insplit.length; i++)
+                                {
+                                    char chr = (char) Integer.parseInt(insplit[i]);
+                                    sb.append(chr);
+                                    if (chr == 10)
+                                    {
+                                        out.accept((addPrefix ? "Response:" : "") + sb);
+                                        sb = new StringBuffer();
+                                    }
+
+                                }
+                                //System.out.println();
+                            }
+                        }
+                    } catch (FileNotFoundException ex)
+                    {
+                        ex.printStackTrace();
+                    } catch (IOException ex)
+                    {
+                        ex.printStackTrace();
+                    }
+                }).start();//*/
+                startReaderTickThread(ps);
+                BufferedReader bs = new BufferedReader(new InputStreamReader(ctrl));
+                while (true)
+                {
+                    String line = bs.readLine() + "\n";//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
+                    //System.err.print("OUT:"+line);
+                    //ps.println(line);
+                    writeSerialPacket(line, ps);
+                    //Thread.sleep(1000);
+                }
+            } catch (Exception ex)
+            {
+                ex.printStackTrace();
+            } finally
+            {
+                try
+                {
+                    //fis.close();
+                    fos.close();
+                } catch (IOException ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    @SuppressWarnings("SleepWhileInLoop")
+    private static void startReaderTickThread(final PrintStream ps)
+    {
+        new Thread(() ->
+        {
+            while (true)
+            {
+                ps.println("SLR 9 20");
+                try
+                {
+                    Thread.sleep(10); //absicht
+                } catch (InterruptedException ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private static void writeSerialPacket(String msg, PrintStream pigpio_out)
+    {
+        final StringBuffer hexed = new StringBuffer();
+        msg.chars().forEach((i) ->
+        {
+            hexed.append("0x").append(Integer.toHexString(i)).append(" ");
+        });
+
+        String start = "WVCLR";
+        String prepare = "WVCRE";
+        String send = "WVTX 0";
+        String msgcmd = "WVAS 10 2400 8 2 0 " + hexed.toString();
+        //System.out.println(msgcmd);
+        pigpio_out.println(start);
+        pigpio_out.println(msgcmd);
+        pigpio_out.println(prepare);
+        pigpio_out.println(send);
+
+    }
+}
