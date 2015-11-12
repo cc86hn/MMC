@@ -15,6 +15,12 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,80 +46,108 @@ public class Main
     
     public static void main(String[] args)
     {
-    
-        setupLogging(true);
-        TimeoutManager m = new TimeoutManager(3, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
-        m.start();
-        String srvr =serverDiscovery();
-        l.info(srvr);
-        if(srvr.equals("0.0.0.0"))
-        {
-            l.error("NO SERVER FOUND");
-            System.exit(0);
-                    
-        }
-        c=new TCPConnection(srvr, 0xCC86);
+        args=new String[]{"--demo"};
+        CommandLineParser parser = new DefaultParser();
+        Options options = new Options();
+        options.addOption("d", "demo", false, "Demo UI modus für die H+E in Schuttgart");
         try 
         {
-            c.connect();
-        }
-        catch (IOException ex) 
-        {
-            //System.out.println(ex.m);
-            System.out.println("Ell-Emm-AhhX2");
-            l.error("FAILED TO CONNECT");
-            System.exit(0);
-        }
-        piIP=srvr;
-        disp.connect(c);
-        Runtime.getRuntime().addShutdownHook(new Thread(disp::quit));
-        m.disarm();
-        
-                /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try
-        {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+            
+            CommandLine cl = parser.parse(options, args);
+            //Main.setupLogging(cl.hasOption("verbose"));
+            setupLogging(true);
+
+            TimeoutManager m = new TimeoutManager(3, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
+            m.start();
+            String srvr =serverDiscovery();
+            l.info(srvr);
+            if(srvr.equals("0.0.0.0"))
             {
-                if ("Nimbus".equals(info.getName()))
+                l.error("NO SERVER FOUND");
+                System.exit(0);
+                
+            }
+            c=new TCPConnection(srvr, 0xCC86);
+            try
+            {
+                c.connect();
+            }
+            catch (IOException ex)
+            {
+                //System.out.println(ex.m);
+                System.out.println("Ell-Emm-AhhX2");
+                l.error("FAILED TO CONNECT");
+                System.exit(0);
+            }
+            piIP=srvr;
+            disp.connect(c);
+            Runtime.getRuntime().addShutdownHook(new Thread(disp::quit));
+            m.disarm();
+            
+            /* Set the Nimbus look and feel */
+            //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+            /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+            * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+            */
+            try
+            {
+                for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
                 {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+                    if ("Nimbus".equals(info.getName()))
+                    {
+                        javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
                 }
             }
-        }
-        catch (ClassNotFoundException ex)
-        {
-            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (InstantiationException ex)
-        {
-            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (IllegalAccessException ex)
-        {
-            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
+            catch (ClassNotFoundException ex)
+            {
+                java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+            catch (InstantiationException ex)
+            {
+                java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+            catch (IllegalAccessException ex)
+            {
+                java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+            catch (javax.swing.UnsupportedLookAndFeelException ex)
+            {
+                java.util.logging.Logger.getLogger(TestsUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+            //</editor-fold>
+            //</editor-fold>
+            
+            /* Create and display the form */
+            
+            if(cl.hasOption("demo"))
+            {
+                java.awt.EventQueue.invokeLater(()->
+                {
+                    //ui = new TestsUI();
+                    //ui.setVisible(true);
+                    Menu.bootUI();
+                });
+            }
 
-        /* Create and display the form */
-        
-        
-        
-        java.awt.EventQueue.invokeLater(()->
+            else
+            {
+                java.awt.EventQueue.invokeLater(()->
+                {
+                    //ui = new TestsUI();
+                    //ui.setVisible(true);
+                    Menu.bootUI();
+                });
+            }
+            
+        }
+        catch (ParseException ex)
         {
-             //ui = new TestsUI();
-            //ui.setVisible(true);
-            Menu.bootUI();
-        });
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("client", options);
+           // ex.printStackTrace();
+        }
         
         
     }
