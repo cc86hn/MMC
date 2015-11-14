@@ -48,9 +48,10 @@ private static final Logger l = LogManager.getLogger();
 
         pigpiostream.println("M 10 W");
         pigpiostream.println("M 9 R");
-        pigpiostream.println("SLRO 9 2400 8");
+        pigpiostream.println("SLRO 9 2400 9");
     }
 
+@Override
     public void uartHandler(final Consumer<String> out, final InputStream ctrl, final boolean addPrefix)
     {
         new Thread(() ->
@@ -76,6 +77,7 @@ private static final Logger l = LogManager.getLogger();
                 {
                     StringBuffer sb = new StringBuffer();
                     StringBuffer sb2 = new StringBuffer();
+                    List<Character> bfr  = new ArrayList<>();
                     BufferedReader br;
                     try
                     {
@@ -83,14 +85,14 @@ private static final Logger l = LogManager.getLogger();
                        br = new BufferedReader(new FileReader("/dev/pigout"));
                         while (true)
                         {
-                            List<Character> bfr  = new ArrayList<>();
+                            
                             String in = br.readLine();
                             /*if(!in.startsWith("0"))
                             {
                                 System.out.println(in);
                             }//*/
                                 //System.out.println("Incoming serial msg");
-                            if(false&(!in.equals("0")))
+                            if(false&&(!in.equals("0")))
                                l.trace("DEBUG:"+in);
                             String[] insplit = in.split(" ");
 
@@ -108,10 +110,13 @@ private static final Logger l = LogManager.getLogger();
                             {
                                 char val = bfr.remove(0);
                                 char par = bfr.remove(0);
+                                //l.trace("RAW:("+val+"|"+par+")");
                                 int data = (val<<8)+par;
                                 if(numberOfSetBits(data)%2==1)
                                 {
                                     l.warn("PARITY ERROR");
+                                    l.trace(String.format("%8s", Integer.toBinaryString(val)).replace(' ', '0'));
+                                    l.trace(String.format("%8s", Integer.toBinaryString(par)).replace(' ', '0'));
                                 }
                                 sb.append(val);
                                 sb2.append(String.format("%8s", Integer.toBinaryString(val)).replace(' ', '0')).append(" ");
