@@ -48,4 +48,9 @@ public class API {
         evt.setData(evtdata);
         API.dispatchEvent(evt);
     }
+    
+    public static boolean getMockMode()
+    {
+        return Main.getMockMode();
+    }
 }

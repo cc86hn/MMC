@@ -15,7 +15,7 @@ import org.cc86.MMC.client.API.Module;
  */
 public class Dispatcher
 {
-    private final Module[] modules={new Mod_Radio(),new Mod_Stream(),new Mod_Jukebox()};
+    private final Module[] modules={new Mod_Radio(),new Mod_Stream(),new Mod_Jukebox(),new Mod_Stereo()};
     
     public void sendPacketToModule(Packet p)
     {
@@ -30,11 +30,14 @@ public class Dispatcher
         }
         
     }
-    
     public void startUIs()
     {
+        startUIs(false);
+    }
+    public void startUIs(boolean demomode)
+    {
         for (Module module : modules) {
-            module.loadUI();
+            module.loadUI(demomode);
         }
     }
     

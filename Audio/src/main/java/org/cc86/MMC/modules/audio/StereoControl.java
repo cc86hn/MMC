@@ -29,13 +29,14 @@ public class StereoControl implements Processor
     private static final String RESPONSE_HEADER = "CHG";
     private static final String VOLUME_RESPONSE = "VOL";
     private static final String STATE_RESPONSE = "PWR";
+    private static final String SRCSEL_RESPONSE = "SRC";
     private static final String VOLUME_SET_COMMAND = "SET VOL %d";
     private static final String VOLUME_GET_COMMAND = "GET VOL";
     private static final String POWER_SET_COMMAND = "SET PWR %d";
     private static final String POWER_GET_COMMAND = "GET PWR";
     private boolean pwr = false;
     private int volume=0;
-    
+    private String src = "";
     private PrintStream serialControl;
     public StereoControl()
     {
@@ -43,7 +44,14 @@ public class StereoControl implements Processor
         try
         {
             serialControl = new PrintStream(new PipedOutputStream(ttycontrolend));
-            SWTTYProvider.uartHandler(this::processUARTLine, ttycontrolend, false);
+            if(API.getMockMode())
+            {
+                new MockSWTTYProvider().uartHandler(this::processUARTLine, ttycontrolend, false);
+            }
+            else
+            {
+                new SWTTYProvider().uartHandler(this::processUARTLine, ttycontrolend, false);
+            }
             
         } catch (IOException ex)
         {
@@ -57,16 +65,22 @@ public class StereoControl implements Processor
         if(response.length>=3&&response[0].equals("CHG"))
         {
             String val = response[1];
+            String par = response[2].trim();
             switch(val)
             {
-                case "VOL":
-                    volume = Integer.valueOf(val);
-                    API.makeSimpleEvent("volume", "value", val);
+                case VOLUME_RESPONSE:
+                    volume = Integer.valueOf(par);
+                    API.makeSimpleEvent("volume", "value", volume);
                 break;
-                case "PWR":
-                    pwr=val.equals("1");
-                    API.makeSimpleEvent("device_power", "value", val);
+                case STATE_RESPONSE:
+                    pwr=val.equals("ON");
+                    API.makeSimpleEvent("device_power", "value", par);
                 break;
+                case SRCSEL_RESPONSE:
+                    src=par;
+                    API.makeSimpleEvent("src_select", "value", par);
+                break;
+                    
             }
         }
     }

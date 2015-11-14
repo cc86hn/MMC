@@ -5,6 +5,12 @@
  */
 package org.cc86.MMC.server;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,11 +28,29 @@ public class Main {
     private Dispatcher dispatcher;
     private EventManager evtmgr;
     private ServerCore core;
-    
-    
+
+    private static boolean mockmode = false;
     public static void main(String[] args) {
-        setupLogging(true);//TODO CMDLINE
-        m.bootstrap();
+        CommandLineParser parser = new DefaultParser();
+        Options options = new Options();
+        options.addOption("m", "mock", false, "Mock-Modus für verschiedenerlei Komponenten");
+        options.addOption("v", "verbose", false, "Mock-Modus für verschiedenerlei Komponenten");
+        try 
+        {
+            
+            CommandLine cl = parser.parse(options, args);
+            setupLogging((cl.hasOption("verbose")));//TODO CMDLINE
+            mockmode = (cl.hasOption("mock"));
+            m.bootstrap();
+            
+                    
+        }
+        catch (ParseException ex)
+        {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("client", options);
+           // ex.printStackTrace();
+        }
     }
     
     public PluginManager getPluginmgr()
@@ -65,7 +89,10 @@ public class Main {
     }
     
     
-    
+    public static boolean getMockMode()
+    {
+        return mockmode;
+    }
     
     private void bootstrap()
     {

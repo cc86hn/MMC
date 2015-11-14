@@ -24,8 +24,9 @@ Commands available
 volume:
 	value: integer from 0 to 100 denoting the volume in %
 device_power:
-	value: 0 or 1; ==off 1=on;
-	
+	value: OFF or ON; ==off 1=on;
+src_select:
+	value: One of the following values: TUNER PHONO EXT CD TAPE
 ==Music related==
 //partially implemented
 playback_control:

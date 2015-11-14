@@ -5,21 +5,42 @@
  */
 package org.cc86.MMC.client;
 
+import de.nplusc.izc.tools.baseTools.Messagers;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  *
  * @author tgoerner
  */
-public class DemoUI extends javax.swing.JFrame
+public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 {
-
+ private static final Logger l = LogManager.getLogger();
     /**
      * Creates new form DemoUI
      */
     public DemoUI()
     {
         initComponents();
+        btnMinus.setVisible(false);
+        btnPlus.setVisible(false);
     }
 
+    private static DemoUI m = new DemoUI();
+
+    public static void bootUI()
+    {
+        Main.getDispatcher().startUIs(true);
+        m.setVisible(true);
+        
+        //l.trace("Ach LEgg mi doch am arsch");
+        //m.pGeneral.add()
+    }
+    public static  DemoUI getUI()
+    {
+        
+        return m;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -30,21 +51,143 @@ public class DemoUI extends javax.swing.JFrame
     private void initComponents()
     {
 
+        jLabel2 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        btnPower = new javax.swing.JToggleButton();
+        jLabel3 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        sourcesList = new javax.swing.JList();
+        jLabel1 = new javax.swing.JLabel();
+        volumeSlider = new javax.swing.JSlider();
+        btnPlus = new javax.swing.JButton();
+        btnMinus = new javax.swing.JButton();
+        lblEgg = new javax.swing.JLabel();
+
+        jLabel2.setText("jLabel2");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        jPanel1.setMaximumSize(new java.awt.Dimension(500, 32767));
+        jPanel1.setMinimumSize(new java.awt.Dimension(500, 0));
 
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
+        jLabel4.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("An/Aus-Status");
+
+        btnPower.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+        btnPower.setText("Unbekannt");
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Eingang");
+
+        sourcesList.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
+        sourcesList.setModel(new javax.swing.AbstractListModel()
+            {
+                String[] strings = { "Tuner", "CD", "Tape", "Phono","Extern"};
+                public int getSize() { return strings.length; }
+                public Object getElementAt(int i) { return strings[i]; }
+            });
+            sourcesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+            sourcesList.setEnabled(false);
+            jScrollPane1.setViewportView(sourcesList);
+
+            jLabel1.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+            jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            jLabel1.setText("Lautstärke");
+
+            volumeSlider.setMajorTickSpacing(10);
+            volumeSlider.setMinorTickSpacing(5);
+            volumeSlider.setPaintLabels(true);
+            volumeSlider.setEnabled(false);
+
+            btnPlus.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+            btnPlus.setText("+");
+
+            btnMinus.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
+            btnMinus.setText("-");
+            btnMinus.addActionListener(new java.awt.event.ActionListener()
+            {
+                public void actionPerformed(java.awt.event.ActionEvent evt)
+                {
+                    btnMinusActionPerformed(evt);
+                }
+            });
+
+            lblEgg.setText("π");
+            lblEgg.addMouseListener(new java.awt.event.MouseAdapter()
+            {
+                public void mousePressed(java.awt.event.MouseEvent evt)
+                {
+                    lblEggMousePressed(evt);
+                }
+            });
+
+            javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+            jPanel1.setLayout(jPanel1Layout);
+            jPanel1Layout.setHorizontalGroup(
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(lblEgg, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(volumeSlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addComponent(btnMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnPlus, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addContainerGap())
+                        .addComponent(btnPower, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            );
+            jPanel1Layout.setVerticalGroup(
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jLabel4)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(btnPower, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jLabel3)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(jLabel1)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(volumeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnPlus, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblEgg))
+            );
+
+            getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+
+            pack();
+        }// </editor-fold>//GEN-END:initComponents
+
+    private void btnMinusActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnMinusActionPerformed
+    {//GEN-HEADEREND:event_btnMinusActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnMinusActionPerformed
+
+    private void lblEggMousePressed(java.awt.event.MouseEvent evt)//GEN-FIRST:event_lblEggMousePressed
+    {//GEN-HEADEREND:event_lblEggMousePressed
+        Messagers.SingleLineMsg("Kein Zugang", "Okay");
+    }//GEN-LAST:event_lblEggMousePressed
 
     /**
      * @param args the command line arguments
@@ -82,15 +225,57 @@ public class DemoUI extends javax.swing.JFrame
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable()
+        java.awt.EventQueue.invokeLater(() ->
         {
-            public void run()
-            {
-                new DemoUI().setVisible(true);
-            }
+            new DemoUI().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnMinus;
+    private javax.swing.JButton btnPlus;
+    private javax.swing.JToggleButton btnPower;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblEgg;
+    private javax.swing.JList sourcesList;
+    private javax.swing.JSlider volumeSlider;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void setVolumeSlider(int volume)
+    {
+        l.trace("VOLCHANGE:"+volume);
+        java.awt.EventQueue.invokeLater(() ->
+        {
+            
+            volumeSlider.setValue(volume);
+        });
+    }
+
+    @Override
+    public void setSource(Sources s)
+    {
+        l.trace("SRC:"+s);
+        java.awt.EventQueue.invokeLater(() ->
+        {
+            sourcesList.setSelectedIndex(s.ordinal());
+        });
+    }
+
+    @Override
+    public void setPowerState(boolean on)
+    {
+        l.trace("PWR:"+on);
+        java.awt.EventQueue.invokeLater(() ->
+        {
+            btnPower.setText(on?"an":"aus");
+            btnPower.setSelected(on);
+        });
+    }
 }

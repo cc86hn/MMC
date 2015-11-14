@@ -60,8 +60,12 @@ public class Mod_Radio implements Module
     }
     
     @Override
-    public void loadUI() 
+    public void loadUI(boolean demomode) 
     {
+        if(demomode)
+        {
+            return;
+        }
         ui= new RadioUI();
         Menu.getMenu().registerTab("Radio", ui);
        /* Thread t = new Thread(()->

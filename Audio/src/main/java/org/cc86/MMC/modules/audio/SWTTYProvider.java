@@ -15,19 +15,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
  * @author tgoerner
  */
-public class SWTTYProvider
+public class SWTTYProvider implements TTYProvider
 {
     //startup sudo pigpiod
     //M 10 W nach /dev/pigpio
     //Output in /dev/pigout
     //M 9 R
-
+private static final Logger l = LogManager.getLogger();
     //cat auf /dev/pigout & /dev/pigerr
     static String[] alphabet = "a#b#c#d#e#f#g#h#i#j#k#l#m#n#o#p#q#r#s#t#u#v#w#x#y#z".split("#");
 
@@ -36,7 +40,7 @@ public class SWTTYProvider
      */
     public static void main(String[] args)
     {
-        uartHandler(System.out::println, System.in, true);
+       new SWTTYProvider().uartHandler(System.out::println, System.in, true);
     }
 
     private static void setup(PrintStream pigpiostream)
@@ -47,7 +51,7 @@ public class SWTTYProvider
         pigpiostream.println("SLRO 9 2400 8");
     }
 
-    public static void uartHandler(final Consumer<String> out, final InputStream ctrl, final boolean addPrefix)
+    public void uartHandler(final Consumer<String> out, final InputStream ctrl, final boolean addPrefix)
     {
         new Thread(() ->
         {
@@ -55,15 +59,15 @@ public class SWTTYProvider
 
             try
             {
-            //final Socket s = new Socket("127.0.0.1", 8888);
+                //final Socket s = new Socket("127.0.0.1", 8888);
                 //fis = new FileInputStream();
-                if (!new File("/dev/pigpio").exists())
+                if(!new File("/dev/pigpio").exists())
                 {
-                    System.out.println("no running pigpiod, shutting down");
+                    l.error("no running pigpiod, shutting down");
                     System.exit(0);
                 }
                 fos = new FileOutputStream("/dev/pigpio");
-            //fos = s.getOutputStream();/*new InputStreamReader(s.getInputStream()*/
+                //fos = s.getOutputStream();/*new InputStreamReader(s.getInputStream()*/
 
                 PrintStream ps = new PrintStream(fos);
                 setup(ps);
@@ -71,34 +75,56 @@ public class SWTTYProvider
                 new Thread(() ->
                 {
                     StringBuffer sb = new StringBuffer();
+                    StringBuffer sb2 = new StringBuffer();
                     BufferedReader br;
                     try
                     {
-                        br = new BufferedReader(new FileReader("/dev/pigout"));
+                       int pl = 0;
+                       br = new BufferedReader(new FileReader("/dev/pigout"));
                         while (true)
                         {
+                            List<Character> bfr  = new ArrayList<>();
                             String in = br.readLine();
                             /*if(!in.startsWith("0"))
-                             {
-                             System.out.println(in);
-                             }//*/
-                            //System.out.println("Incoming serial msg");
-                            String[] insplit = in.split(" ");
-                            //System.out.println(in);
-                            if (insplit.length > 1)
                             {
-                                for (int i = 1; i < insplit.length; i++)
+                                System.out.println(in);
+                            }//*/
+                                //System.out.println("Incoming serial msg");
+                            if(false&(!in.equals("0")))
+                               l.trace("DEBUG:"+in);
+                            String[] insplit = in.split(" ");
+
+                            if(insplit.length>1)
+                            {
+                                for(int i=1;i<insplit.length;i++)
                                 {
-                                    char chr = (char) Integer.parseInt(insplit[i]);
-                                    sb.append(chr);
-                                    if (chr == 10)
-                                    {
-                                        out.accept((addPrefix ? "Response:" : "") + sb);
-                                        sb = new StringBuffer();
-                                    }
+                                    char chr = (char)Integer.parseInt(insplit[i]);
+                                    bfr.add(chr);
 
                                 }
                                 //System.out.println();
+                            }
+                            while(bfr.size()>1) //2er-pärchen rausholen
+                            {
+                                char val = bfr.remove(0);
+                                char par = bfr.remove(0);
+                                int data = (val<<8)+par;
+                                if(numberOfSetBits(data)%2==1)
+                                {
+                                    l.warn("PARITY ERROR");
+                                }
+                                sb.append(val);
+                                sb2.append(String.format("%8s", Integer.toBinaryString(val)).replace(' ', '0')).append(" ");
+                                pl++;
+                                if(val=='\n')//||val=='\r'||pl>=10)
+                                {
+                                    out.accept((addPrefix?"Response:":"")+sb);
+                                    l.trace("DEBUG:"+sb2);
+                                    sb = new StringBuffer();
+                                    sb2 = new StringBuffer();
+                                    pl=0;
+                                }
+
                             }
                         }
                     } catch (FileNotFoundException ex)
@@ -109,20 +135,22 @@ public class SWTTYProvider
                         ex.printStackTrace();
                     }
                 }).start();//*/
-                startReaderTickThread(ps);
-                BufferedReader bs = new BufferedReader(new InputStreamReader(ctrl));
+                 startReaderTickThread(ps);
+                 BufferedReader bs = new BufferedReader(new InputStreamReader(ctrl));
                 while (true)
                 {
-                    String line = bs.readLine() + "\n";//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
+                    String line = bs.readLine()+"\n";//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
                     //System.err.print("OUT:"+line);
                     //ps.println(line);
                     writeSerialPacket(line, ps);
                     //Thread.sleep(1000);
                 }
-            } catch (Exception ex)
+            } 
+            catch (Exception ex)
             {
                 ex.printStackTrace();
-            } finally
+            }
+            finally
             {
                 try
                 {
@@ -155,23 +183,34 @@ public class SWTTYProvider
         }).start();
     }
 
+      
     private static void writeSerialPacket(String msg, PrintStream pigpio_out)
     {
         final StringBuffer hexed = new StringBuffer();
-        msg.chars().forEach((i) ->
+        msg.chars().forEach((i)->
         {
-            hexed.append("0x").append(Integer.toHexString(i)).append(" ");
+            int bits = numberOfSetBits(i);
+            
+            hexed.append("0x").append(Integer.toHexString(i)).append(" ").append("0x").append(Integer.toHexString(bits%2)).append(" ");
         });
-
+        
         String start = "WVCLR";
         String prepare = "WVCRE";
         String send = "WVTX 0";
-        String msgcmd = "WVAS 10 2400 8 2 0 " + hexed.toString();
-        //System.out.println(msgcmd);
+        String msgcmd = "WVAS 10 2400 9 2 0 "+hexed.toString();
+        l.trace("DEBUG:"+msgcmd);
         pigpio_out.println(start);
         pigpio_out.println(msgcmd);
         pigpio_out.println(prepare);
         pigpio_out.println(send);
-
+        
+    }
+    private static int numberOfSetBits(int i)
+    {
+         // Java: use >>> instead of >>
+         // C or C++: use uint32_t
+         i = i - ((i >>> 1) & 0x55555555);
+         i = (i & 0x33333333) + ((i >>> 2) & 0x33333333);
+         return (((i + (i >>> 4)) & 0x0F0F0F0F) * 0x01010101) >>> 24;
     }
 }

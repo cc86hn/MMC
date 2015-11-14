@@ -15,6 +15,8 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -75,7 +77,7 @@ public class Main
             catch (IOException ex)
             {
                 //System.out.println(ex.m);
-                System.out.println("Ell-Emm-AhhX2");
+                l.trace("Ell-Emm-AhhX2");
                 l.error("FAILED TO CONNECT");
                 System.exit(0);
             }
@@ -120,14 +122,21 @@ public class Main
             //</editor-fold>
             
             /* Create and display the form */
-            
+            try
+            {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            }
+            catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e)
+            {
+                l.error("Fehler beim Setzen des LookAndFeels");
+            }
             if(cl.hasOption("demo"))
             {
                 java.awt.EventQueue.invokeLater(()->
                 {
                     //ui = new TestsUI();
                     //ui.setVisible(true);
-                    Menu.bootUI();
+                    DemoUI.bootUI();
                 });
             }
 

@@ -37,6 +37,10 @@ public class Mod_Jukebox implements Module
     @Override
     public void receiveMsgFromServer(Packet msg)
     {
+        if(ui==null)
+        {
+            return;
+        }
         l.info("Jukebox received packet");
         String mode = (String) msg.getData().get("command");
         if(mode.equals("playback_pool"))
@@ -122,8 +126,14 @@ public class Mod_Jukebox implements Module
     {
         return Arrays.asList(new String[]{"playback_pool","playback_jukebox","playback_status"});
     }
-    public void loadUI()
+    
+    @Override
+    public void loadUI(boolean demomode)
     {
+        if(demomode)
+        {
+            return;
+        }
         pm=new JukeBoxPoolManagment(this);
         ui=new JukeBoxUI(this);
         

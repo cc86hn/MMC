@@ -33,7 +33,10 @@ public class Mod_Stream implements Module
     @Override
     public void receiveMsgFromServer(Packet msg)
     {
-
+        if(ui==null)
+        {
+            return;
+        }
         if(msg.getData().containsKey("disconnect"))
         {
             l.info("disconnect");
@@ -70,8 +73,12 @@ public class Mod_Stream implements Module
     MP4Thread mp4Thread=null;
     
     @Override
-    public void loadUI() 
+    public void loadUI(boolean demomode) 
     {
+        if(demomode)
+        {
+            return;
+        }
         l.info("figgdi");
         ui= new StreamUI();
         Menu.getMenu().registerTab("ScreenStream", ui);
