@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +47,7 @@ public class TCPhandler implements Handler{
                         while(!ln.equals("---"))
                         {
                             request+=ln+"\n";
-                            l.trace(ln);
+                            l.trace(ln.replace("\0",""));
                             ln=r.readLine();
                         }
                         

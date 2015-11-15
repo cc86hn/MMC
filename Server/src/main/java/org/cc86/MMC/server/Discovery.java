@@ -38,10 +38,10 @@ public class Discovery implements Runnable
 
         //Packet received
         l.info("Discovery packet received from: " + packet.getAddress().getHostAddress());
-        l.info("Packet received; data: " + new String(packet.getData()));
+        String message = new String(packet.getData()).replace("\0", "").trim();
+        l.info("Packet received; data: " + message);
 
-        //See if the packet holds the right command (message)
-        String message = new String(packet.getData()).trim();
+        //See if the packet holds the right command (message);
         if (message.equals("DISCOVER_MMC_REQUEST")) {
           byte[] sendData = "DISCOVER_MMC_RESPONSE".getBytes();
 

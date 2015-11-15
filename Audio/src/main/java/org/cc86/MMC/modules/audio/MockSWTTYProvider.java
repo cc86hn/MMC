@@ -38,12 +38,14 @@ public class MockSWTTYProvider implements TTYProvider
         }).start();
         new Thread(() ->
         {
+            l.trace("starting reader thread");
             BufferedReader br = new BufferedReader(new InputStreamReader(ctrl));
             while(true)
             {
                 try
                 {
-                   l.trace(br.readLine());
+                    l.trace("waiting for line...");
+                    l.trace("UART_SEND:"+br.readLine());
                 } catch (IOException ex)
                 {
                     ex.printStackTrace();

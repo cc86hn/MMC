@@ -6,6 +6,7 @@
 package org.cc86.MMC.client;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.client.API.Connection;
@@ -65,5 +66,51 @@ public class Mod_Stereo implements Module
         {
             ui=new StereoControl();
         }
+        
+        ui.afterLoad();
+    }
+    public void syncDevice()
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","dev_sync");
+        p.setData(data);
+        c.sendRequest(p);
+    }
+    
+    public void speaker_select(String... speakers)
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","speaker_select");
+        data.put("speakers",Arrays.asList(speakers));
+        p.setData(data);
+        c.sendRequest(p);
+    }
+    /**
+     * Volume control
+     * @param command 0 to 100 or UP and DOWN 
+     */
+    public void setVolume(String command)
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","volume");
+        data.put("value",command);
+        p.setData(data);
+        c.sendRequest(p);
+    }
+    public void setPower(boolean on)
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","dev_sync");
+        data.put("value",on?"ON":"OFF");
+        p.setData(data);
+        c.sendRequest(p);
     }
 }

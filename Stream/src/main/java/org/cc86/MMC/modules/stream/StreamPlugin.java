@@ -37,7 +37,10 @@ public class StreamPlugin implements Plugin{
     @Override
     public void shutdown()
     {
-        h.stopStream();
+        if(h!=null)
+        {
+            h.stopStream();
+        }
     }
 
     @Override

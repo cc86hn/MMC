@@ -83,7 +83,7 @@ public class PluginManager {
                 } catch (PluginNotReadyException ex)
                 {
                     l.error("Plugin startup failed, shutting down");
-                    l.error(ex.getCause());
+                    l.error(ex.getMessage());
                     for (Plugin detectedPlugin : detectedPlugs)
                     {
                         detectedPlugin.shutdown();

@@ -8,6 +8,7 @@ package org.cc86.MMC.client;
 import de.nplusc.izc.tools.baseTools.Messagers;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cc86.MMC.client.API.Module;
 
 /**
  *
@@ -16,14 +17,13 @@ import org.apache.logging.log4j.Logger;
 public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 {
  private static final Logger l = LogManager.getLogger();
-    /**
-     * Creates new form DemoUI
-     */
+
     public DemoUI()
     {
         initComponents();
-        btnMinus.setVisible(false);
-        btnPlus.setVisible(false);
+        //btnMinus.setVisible(false);
+        //btnPlus.setVisible(false);
+        sourcesList.setVisible(false);
     }
 
     private static DemoUI m = new DemoUI();
@@ -64,6 +64,12 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
         btnPlus = new javax.swing.JButton();
         btnMinus = new javax.swing.JButton();
         lblEgg = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        outLabel = new javax.swing.JLabel();
+        speakersA = new javax.swing.JButton();
+        speakersAB = new javax.swing.JButton();
+        speakersB = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
 
         jLabel2.setText("jLabel2");
 
@@ -80,6 +86,13 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
         btnPower.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         btnPower.setText("Unbekannt");
+        btnPower.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnPowerActionPerformed(evt);
+            }
+        });
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -94,6 +107,13 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
             });
             sourcesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
             sourcesList.setEnabled(false);
+            sourcesList.addListSelectionListener(new javax.swing.event.ListSelectionListener()
+            {
+                public void valueChanged(javax.swing.event.ListSelectionEvent evt)
+                {
+                    sourcesListValueChanged(evt);
+                }
+            });
             jScrollPane1.setViewportView(sourcesList);
 
             jLabel1.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
@@ -107,6 +127,13 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
             btnPlus.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
             btnPlus.setText("+");
+            btnPlus.addActionListener(new java.awt.event.ActionListener()
+            {
+                public void actionPerformed(java.awt.event.ActionEvent evt)
+                {
+                    btnPlusActionPerformed(evt);
+                }
+            });
 
             btnMinus.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
             btnMinus.setText("-");
@@ -127,6 +154,36 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
                 }
             });
 
+            outLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            outLabel.setText("Gewählt: UNBEKANNT");
+
+            speakersA.setText("A1,A2");
+            speakersA.addActionListener(new java.awt.event.ActionListener()
+            {
+                public void actionPerformed(java.awt.event.ActionEvent evt)
+                {
+                    speakersAActionPerformed(evt);
+                }
+            });
+
+            speakersAB.setText("A1,B2");
+            speakersAB.addActionListener(new java.awt.event.ActionListener()
+            {
+                public void actionPerformed(java.awt.event.ActionEvent evt)
+                {
+                    speakersABActionPerformed(evt);
+                }
+            });
+
+            speakersB.setText("B1,B2");
+            speakersB.addActionListener(new java.awt.event.ActionListener()
+            {
+                public void actionPerformed(java.awt.event.ActionEvent evt)
+                {
+                    speakersBActionPerformed(evt);
+                }
+            });
+
             javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
             jPanel1.setLayout(jPanel1Layout);
             jPanel1Layout.setHorizontalGroup(
@@ -134,22 +191,30 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                            .addComponent(lblEgg, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(volumeSlider, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                    .addComponent(btnMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnPlus, javax.swing.GroupLayout.PREFERRED_SIZE, 181, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addContainerGap())
                         .addComponent(btnPower, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 764, Short.MAX_VALUE)
+                        .addComponent(outLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(volumeSlider, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(btnMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addComponent(speakersA, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addGap(83, 83, 83)
+                                            .addComponent(speakersAB, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(lblEgg, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(btnPlus, javax.swing.GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)
+                                        .addComponent(speakersB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addContainerGap())))
             );
             jPanel1Layout.setVerticalGroup(
                 jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -158,19 +223,30 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
                     .addComponent(jLabel4)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(btnPower, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGap(28, 28, 28)
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(18, 18, 18)
                     .addComponent(jLabel3)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addGap(18, 18, 18)
+                    .addComponent(outLabel)
+                    .addGap(18, 18, 18)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGap(18, 18, 18)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(18, 18, 18)
                     .addComponent(jLabel1)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                     .addComponent(volumeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(btnPlus, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnMinus, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnPlus, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGap(18, 18, 18)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(speakersB, javax.swing.GroupLayout.DEFAULT_SIZE, 80, Short.MAX_VALUE)
+                        .addComponent(speakersAB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(speakersA, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGap(111, 111, 111)
                     .addComponent(lblEgg))
             );
 
@@ -181,13 +257,46 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
     private void btnMinusActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnMinusActionPerformed
     {//GEN-HEADEREND:event_btnMinusActionPerformed
-        // TODO add your handling code here:
+        setVolume("DOWN");
     }//GEN-LAST:event_btnMinusActionPerformed
 
     private void lblEggMousePressed(java.awt.event.MouseEvent evt)//GEN-FIRST:event_lblEggMousePressed
     {//GEN-HEADEREND:event_lblEggMousePressed
         Messagers.SingleLineMsg("Kein Zugang", "Okay");
     }//GEN-LAST:event_lblEggMousePressed
+
+    private void sourcesListValueChanged(javax.swing.event.ListSelectionEvent evt)//GEN-FIRST:event_sourcesListValueChanged
+    {//GEN-HEADEREND:event_sourcesListValueChanged
+        Sources selsrc = Sources.values()[sourcesList.getSelectedIndex()];
+
+        
+    }//GEN-LAST:event_sourcesListValueChanged
+
+    private void speakersAActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_speakersAActionPerformed
+    {//GEN-HEADEREND:event_speakersAActionPerformed
+        setSpeakers("A1","A2");
+    }//GEN-LAST:event_speakersAActionPerformed
+
+    private void speakersABActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_speakersABActionPerformed
+    {//GEN-HEADEREND:event_speakersABActionPerformed
+        setSpeakers("A1","B2");
+    }//GEN-LAST:event_speakersABActionPerformed
+
+    private void speakersBActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_speakersBActionPerformed
+    {//GEN-HEADEREND:event_speakersBActionPerformed
+        setSpeakers("B1","B2");
+    }//GEN-LAST:event_speakersBActionPerformed
+
+    private void btnPlusActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnPlusActionPerformed
+    {//GEN-HEADEREND:event_btnPlusActionPerformed
+        setVolume("UP");
+    }//GEN-LAST:event_btnPlusActionPerformed
+
+    private void btnPowerActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnPowerActionPerformed
+    {//GEN-HEADEREND:event_btnPowerActionPerformed
+        changePowerState(btnPower.isSelected());
+        btnPower.setSelected(!btnPower.isSelected());
+    }//GEN-LAST:event_btnPowerActionPerformed
 
     /**
      * @param args the command line arguments
@@ -242,8 +351,14 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel lblEgg;
+    private javax.swing.JLabel outLabel;
     private javax.swing.JList sourcesList;
+    private javax.swing.JButton speakersA;
+    private javax.swing.JButton speakersAB;
+    private javax.swing.JButton speakersB;
     private javax.swing.JSlider volumeSlider;
     // End of variables declaration//GEN-END:variables
 
@@ -264,10 +379,19 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
         l.trace("SRC:"+s);
         java.awt.EventQueue.invokeLater(() ->
         {
-            sourcesList.setSelectedIndex(s.ordinal());
+            outLabel.setText("Gewählt: "+s);
         });
     }
-
+    public void changePowerState(boolean on)
+    {
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Stereo)
+            {
+                ((Mod_Stereo)m1).setPower(on);
+            }
+        }
+    }
     @Override
     public void setPowerState(boolean on)
     {
@@ -276,6 +400,47 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
         {
             btnPower.setText(on?"an":"aus");
             btnPower.setSelected(on);
+            btnMinus.setEnabled(on);
+            btnPlus.setEnabled(on);
+            speakersA.setEnabled(on);
+            speakersAB.setEnabled(on);
+            speakersB.setEnabled(on);
+            sourcesList.setEnabled(on);
         });
+    }
+    public void syncDevice()
+    {
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Stereo)
+            {
+                ((Mod_Stereo)m1).syncDevice();
+            }
+        }
+    }
+    public void setSpeakers(String... speakerIDs)
+    {
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Stereo)
+            {
+                ((Mod_Stereo)m1).speaker_select(speakerIDs);
+            }
+        }
+    }
+    public void setVolume(String target)
+    {
+        Module[] m = Main.getDispatcher().getModules();
+        for (Object m1 : m) {
+            if(m1 instanceof Mod_Stereo)
+            {
+                ((Mod_Stereo)m1).setVolume(target);
+            }
+        }
+    }
+    @Override
+    public void afterLoad()
+    {
+        syncDevice();
     }
 }

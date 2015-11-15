@@ -16,4 +16,6 @@ public interface StereoUIApi
     public void setSource(Sources s);
     
     public void setPowerState(boolean on);
+    
+    public void afterLoad();
 }

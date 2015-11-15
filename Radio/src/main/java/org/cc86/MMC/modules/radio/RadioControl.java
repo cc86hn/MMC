@@ -31,7 +31,10 @@ public class RadioControl implements Plugin{
     @Override
     public void shutdown()
     {
-        h.shitdown();
+        if(h!=null)
+        {
+            h.shitdown();
+        }
     }
 
     @Override

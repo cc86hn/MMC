@@ -23,10 +23,16 @@ Commands available
 ==Audio general==
 volume:
 	value: integer from 0 to 100 denoting the volume in %
+    on set UP and DOWN are also valid to denote going 1 step up or down 
 device_power:
 	value: OFF or ON; ==off 1=on;
 src_select:
 	value: One of the following values: TUNER PHONO EXT CD TAPE
+dev_sync:
+	set only, triggers a synchronize with the device
+speaker_select
+    set and get
+    speakers: list of speaker IDS in format XY (X letter, y digit)
 ==Music related==
 //partially implemented
 playback_control:

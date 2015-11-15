@@ -23,11 +23,11 @@ public class AudioPlugin implements Plugin{
 
     private AudioProcessor h;
     private StereoControl sc;
-     private static final Logger l = LogManager.getLogger();
+    private static final Logger l = LogManager.getLogger();
      
     @Override
     public void register() throws PluginNotReadyException {
-        if(!new File("/dev/pigpio").exists())
+        if(!API.getMockMode()&&!new File("/dev/pigpio").exists())
         {
             throw new PluginNotReadyException("Pigpio not started. please start it with \"sudo pigpiod\"!");
         }
@@ -40,6 +40,9 @@ public class AudioPlugin implements Plugin{
         API.getDispatcher().registerOnRequestType("playback_status", h); 
         API.getDispatcher().registerOnRequestType("playback_control", h); 
         API.getDispatcher().registerOnRequestType("volume", sc);
+        API.getDispatcher().registerOnRequestType("dev_sync", sc);
+        API.getDispatcher().registerOnRequestType("speaker_select", sc);
+        API.getDispatcher().registerOnRequestType("devince_power", sc);
     }
 
     @Override
@@ -50,7 +53,10 @@ public class AudioPlugin implements Plugin{
     @Override
     public void shutdown()
     {
-        h.shutdown();
+        if(h!=null)
+        {
+            h.shutdown();
+        }
     }
 
     @Override

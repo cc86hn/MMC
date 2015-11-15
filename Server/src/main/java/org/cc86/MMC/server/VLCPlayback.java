@@ -7,6 +7,7 @@ package org.cc86.MMC.server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.MediaPlayerControl;
 import org.cc86.MMC.API.StatusMode;
 import uk.co.caprica.vlcj.binding.internal.libvlc_media_t;
@@ -23,14 +24,17 @@ public class VLCPlayback implements MediaPlayerEventListener
     private static final Logger l = LogManager.getLogger();
     private final MediaPlayer mpaccess;
     private final MediaPlayerFactory f;
-
     public VLCPlayback()
     {
-
-
-        f = new MediaPlayerFactory("--no-video-title-show");
-        mpaccess = f.newHeadlessMediaPlayer();
-        mpaccess.addMediaPlayerEventListener(this);
+        if(!API.getMockMode())
+        {
+            f = new MediaPlayerFactory("--no-video-title-show");
+            mpaccess = f.newHeadlessMediaPlayer();
+            mpaccess.addMediaPlayerEventListener(this);
+        }
+        else{
+            f=null;mpaccess=null;
+        }
     }
 
     public void newFilePlz()
@@ -42,22 +46,37 @@ public class VLCPlayback implements MediaPlayerEventListener
     public void addTitle(String path)
     {
         l.trace("TrackSwitch://"+path);
-        mpaccess.stop();
-        mpaccess.playMedia(path);
+        if(mpaccess!=null)
+        {
+            mpaccess.stop();
+            mpaccess.playMedia(path);
+        }
     }
 
     public int getLengthInSeconds()
     {
+        if(mpaccess==null)
+        {
+            return 0;
+        }
         return (int) (Math.ceil(mpaccess.getLength() / 1000f));
     }
 
     public int getPosition()
     {
+        if(mpaccess==null)
+        {
+            return 0;
+        }
         return (int) (Math.ceil((mpaccess.getLength() / 1000f) * mpaccess.getPosition()));
     }
 
     public boolean isSeekable()
     {
+        if(mpaccess==null)
+        {
+            return false;
+        }
         return mpaccess.isSeekable();
     }
 
@@ -80,11 +99,19 @@ public class VLCPlayback implements MediaPlayerEventListener
 
     public void play()
     {
+        if(mpaccess==null)
+        {
+            return;
+        }
         mpaccess.play();
     }
 
     public void pause()
-    {
+    {       
+        if(mpaccess==null)
+        {
+            return;
+        }
         mpaccess.pause();
     }
 

@@ -62,4 +62,10 @@ public class StereoControl extends javax.swing.JPanel implements StereoUIApi
     {
     
     }
+
+    @Override
+    public void afterLoad()
+    {
+        
+    }
 }
