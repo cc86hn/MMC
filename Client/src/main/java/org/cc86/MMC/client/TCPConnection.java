@@ -55,11 +55,13 @@ public class TCPConnection implements Connection
                         }
                         if(ln==null)
                         {
-                            System.exit(9263);
+                            l.warn("Null-Read");
+                            System.exit(0);
                         }
                         
                     } catch (IOException ex) {
                         l.warn("NETZAP");
+                        System.exit(0);
                         break;
                     }
                     l.trace(request);

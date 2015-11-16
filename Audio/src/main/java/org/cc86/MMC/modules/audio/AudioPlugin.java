@@ -27,6 +27,7 @@ public class AudioPlugin implements Plugin{
      
     @Override
     public void register() throws PluginNotReadyException {
+        l.info("REGISTERING AudioPlugin");
         if(!API.getMockMode()&&!new File("/dev/pigpio").exists())
         {
             throw new PluginNotReadyException("Pigpio not started. please start it with \"sudo pigpiod\"!");

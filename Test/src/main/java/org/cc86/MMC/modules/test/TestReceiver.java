@@ -6,6 +6,8 @@
 
 package org.cc86.MMC.modules.test;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Plugin;
@@ -17,11 +19,12 @@ import org.cc86.MMC.API.Resources;
  */
 public class TestReceiver implements Plugin
 {
-
+    private static final Logger l = LogManager.getLogger();
     @Override
     public void register()
     {
-        System.out.println("REGISTERING");
+        
+        l.info("REGISTERING TestPlugin");
         API.getDispatcher().registerOnRequestType("Test", new TestProcessor());
     }
 

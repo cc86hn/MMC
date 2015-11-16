@@ -6,6 +6,8 @@
 package org.cc86.MMC.modules.stream;
 
 import java.util.HashMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Packet;
@@ -18,10 +20,11 @@ import org.cc86.MMC.API.Resources;
  */
 public class StreamPlugin implements Plugin{
     
-    StreamProcessor h;
-    
+    private StreamProcessor h;
+    private static final Logger l = LogManager.getLogger();
     @Override
     public void register() {
+        l.info("REGISTERING StreamPlugin");
         h = new StreamProcessor();
         API.getDispatcher().registerOnRequestType("vnc", h); 
         API.getDispatcher().registerOnRequestType("mp4", h);

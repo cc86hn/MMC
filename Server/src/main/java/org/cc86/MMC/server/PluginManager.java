@@ -94,6 +94,7 @@ public class PluginManager {
                 
             }
         }
+        l.info("Finished loading Plugins");
     }
 
     public void shitdown()

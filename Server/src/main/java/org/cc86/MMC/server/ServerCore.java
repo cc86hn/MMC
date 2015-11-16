@@ -25,9 +25,11 @@ public class ServerCore
     }
     public void bootUp()
     {
+        
         try 
         {
             ServerSocket serverSocket = new ServerSocket(port);
+            l.info("Ready and listening on port: "+port);
             while(true)
             {
                 Socket socket = serverSocket.accept();
@@ -40,7 +42,7 @@ public class ServerCore
             }
         } catch (IOException ex) 
         {
-            l.throwing(ex);
+            l.error(ex);
         }  
     }
 }

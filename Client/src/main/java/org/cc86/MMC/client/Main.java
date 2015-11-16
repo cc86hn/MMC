@@ -43,15 +43,18 @@ public class Main
     //private static RadioUI radio;
     private static final Dispatcher disp = new Dispatcher();
     private static Connection c;
-    
+    private static boolean devmode = false;
+
     private static String piIP;
+
     
     public static void main(String[] args)
     {
-        args=new String[]{"--demo"};
+        //args=new String[]{"--demo"};
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("d", "demo", false, "Demo UI modus für die H+E in Schuttgart");
+        options.addOption("x", "devmode", false, "Allows the Demo mode to be closed");
         try 
         {
             
@@ -130,6 +133,7 @@ public class Main
             {
                 l.error("Fehler beim Setzen des LookAndFeels");
             }
+            devmode = cl.hasOption("devmode");
             if(cl.hasOption("demo"))
             {
                 java.awt.EventQueue.invokeLater(()->
@@ -296,7 +300,10 @@ public class Main
         }
         cx.updateLoggers();
     }
-    
+    public static boolean isDevmode()
+    {
+        return devmode;
+    }
           
     
 }

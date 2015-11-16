@@ -32,7 +32,10 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
     {
         Main.getDispatcher().startUIs(true);
         m.setVisible(true);
-        
+        if(!Main.isDevmode())
+        {
+            m.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        }
         //l.trace("Ach LEgg mi doch am arsch");
         //m.pGeneral.add()
     }
@@ -154,6 +157,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
                 }
             });
 
+            outLabel.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
             outLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
             outLabel.setText("Gewählt: UNBEKANNT");
 
@@ -274,17 +278,17 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
     private void speakersAActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_speakersAActionPerformed
     {//GEN-HEADEREND:event_speakersAActionPerformed
-        setSpeakers("A1","A2");
+        setSpeakers("AL","AR");
     }//GEN-LAST:event_speakersAActionPerformed
 
     private void speakersABActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_speakersABActionPerformed
     {//GEN-HEADEREND:event_speakersABActionPerformed
-        setSpeakers("A1","B2");
+        setSpeakers("AL","BR");
     }//GEN-LAST:event_speakersABActionPerformed
 
     private void speakersBActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_speakersBActionPerformed
     {//GEN-HEADEREND:event_speakersBActionPerformed
-        setSpeakers("B1","B2");
+        setSpeakers("BL","BR");
     }//GEN-LAST:event_speakersBActionPerformed
 
     private void btnPlusActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnPlusActionPerformed

@@ -41,7 +41,7 @@ public class StereoControl implements Processor
     private static final String POWER_SET_COMMAND = "SET PWR %d\n";
     private static final String SPEAKER_SET_COMMAND = "SET SPK %s\n";
     private static final String POWER_GET_COMMAND = "GET PWR\n";
-    private static final String DEVSYNC_COMMAND = "SET SYNC\n";
+    private static final String DEVSYNC_COMMAND = "SYNC\n";
     private boolean pwr = false;
     private int volume=0;
     private String src = "";

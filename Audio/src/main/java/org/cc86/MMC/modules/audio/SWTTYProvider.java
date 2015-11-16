@@ -48,7 +48,9 @@ private static final Logger l = LogManager.getLogger();
 
         pigpiostream.println("M 10 W");
         pigpiostream.println("M 9 R");
+        pigpiostream.println("SLRC 9");
         pigpiostream.println("SLRO 9 2400 9");
+        writeSerialPacket("\n", pigpiostream); //Workaround für einen doofen PiGPIO-Bug
     }
 
 @Override
@@ -92,8 +94,8 @@ private static final Logger l = LogManager.getLogger();
                                 System.out.println(in);
                             }//*/
                                 //System.out.println("Incoming serial msg");
-                            if(false&&(!in.equals("0")))
-                               l.trace("DEBUG:"+in);
+                            /*if(false&&(!in.equals("0")))
+                               l.trace("DEBUG:"+in);*/
                             String[] insplit = in.split(" ");
 
                             if(insplit.length>1)
@@ -119,7 +121,8 @@ private static final Logger l = LogManager.getLogger();
                                     l.trace(String.format("%8s", Integer.toBinaryString(par)).replace(' ', '0'));
                                 }
                                 sb.append(val);
-                                sb2.append(String.format("%8s", Integer.toBinaryString(val)).replace(' ', '0')).append(" ");
+                                sb2.append(String.format("%8s", Integer.toBinaryString(val)).replace(' ', '0')).
+                                        append("(").append(val).append(")").append(" ");
                                 pl++;
                                 if(val=='\n')//||val=='\r'||pl>=10)
                                 {
