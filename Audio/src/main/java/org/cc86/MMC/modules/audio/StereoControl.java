@@ -177,7 +177,7 @@ public class StereoControl implements Processor
                 if(set)
                 {
                     try{
-                        String.format(DEVSYNC_COMMAND);
+                        sendViaUART(String.format(DEVSYNC_COMMAND));
                     }
                     catch(NumberFormatException ex)
                     {
