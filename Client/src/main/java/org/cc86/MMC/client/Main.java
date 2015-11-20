@@ -64,7 +64,7 @@ public class Main
 
             TimeoutManager m = new TimeoutManager(3, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
             m.start();
-            String srvr =serverDiscovery();
+            String srvr =serverDiscovery();//;//"10.110.12.183";//
             l.info(srvr);
             if(srvr.equals("0.0.0.0"))
             {

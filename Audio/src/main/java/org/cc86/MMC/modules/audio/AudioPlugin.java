@@ -43,7 +43,8 @@ public class AudioPlugin implements Plugin{
         API.getDispatcher().registerOnRequestType("volume", sc);
         API.getDispatcher().registerOnRequestType("dev_sync", sc);
         API.getDispatcher().registerOnRequestType("speaker_select", sc);
-        API.getDispatcher().registerOnRequestType("devince_power", sc);
+        API.getDispatcher().registerOnRequestType("device_power", sc);
+        API.getDispatcher().registerOnRequestType("src_select", sc);
     }
 
     @Override

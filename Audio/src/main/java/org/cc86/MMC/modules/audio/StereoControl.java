@@ -38,7 +38,8 @@ public class StereoControl implements Processor
     private static final String VOLUME_UP_COMMAND = "SET VOL UP\n";
     private static final String VOLUME_DOWN_COMMAND = "SET VOL DOWN\n";
     private static final String VOLUME_GET_COMMAND = "GET VOL\n";
-    private static final String POWER_SET_COMMAND = "SET PWR %d\n";
+    private static final String POWER_SET_COMMAND = "SET PWR %s\n";
+    private static final String SOURCE_SET_COMMAND = "SET SRC %s\n";
     private static final String SPEAKER_SET_COMMAND = "SET SPK %s\n";
     private static final String POWER_GET_COMMAND = "GET PWR\n";
     private static final String DEVSYNC_COMMAND = "SYNC\n";
@@ -77,7 +78,10 @@ public class StereoControl implements Processor
                         sendQueue.wait();
                         if(sendQueue.size()>0)
                         {
-                            serialControl.print(sendQueue.get(0));
+                            String sq = sendQueue.remove(0);
+                            l.trace(sq);
+                            serialControl.print(sq);
+                            
                         }
                     }
                     catch (InterruptedException ex)
@@ -162,7 +166,25 @@ public class StereoControl implements Processor
                         String pwr = ((String) r.getData().get("value"));
                         sendViaUART(String.format(POWER_SET_COMMAND, pwr));
                     }
-                    catch(NumberFormatException ex)
+                    catch(Exception ex)
+                    {
+                        ex.printStackTrace();
+                        //TODO ERROR_NOTIFY
+                    }
+                }
+                else
+                {
+                    //TODO
+                }
+            break;
+                case "src_select":
+                if(set)
+                {
+                    try{
+                        String src = ((String) r.getData().get("value"));
+                        sendViaUART(String.format(SOURCE_SET_COMMAND, src));
+                    }
+                    catch(Exception ex)
                     {
                         ex.printStackTrace();
                         //TODO ERROR_NOTIFY

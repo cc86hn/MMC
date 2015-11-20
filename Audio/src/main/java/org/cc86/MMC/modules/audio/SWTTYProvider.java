@@ -126,8 +126,9 @@ private static final Logger l = LogManager.getLogger();
                                 pl++;
                                 if(val=='\n')//||val=='\r'||pl>=10)
                                 {
-                                    out.accept((addPrefix?"Response:":"")+sb);
                                     l.trace("DEBUG:"+sb2);
+                                    out.accept((addPrefix?"Response:":"")+sb);
+                                    
                                     sb = new StringBuffer();
                                     sb2 = new StringBuffer();
                                     pl=0;
@@ -149,6 +150,7 @@ private static final Logger l = LogManager.getLogger();
                 {
                     String line = bs.readLine()+"\n";//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
                     //System.err.print("OUT:"+line);
+                    l.trace("PRESEND:"+line);
                     //ps.println(line);
                     writeSerialPacket(line, ps);
                     //Thread.sleep(1000);
@@ -204,8 +206,9 @@ private static final Logger l = LogManager.getLogger();
         
         String start = "WVCLR";
         String prepare = "WVCRE";
-        String send = "WVTX 0";
+        
         String msgcmd = "WVAS 10 2400 9 2 0 "+hexed.toString();
+        String send = "WVTX 0";
         l.trace("DEBUG:"+msgcmd);
         pigpio_out.println(start);
         pigpio_out.println(msgcmd);

@@ -108,8 +108,18 @@ public class Mod_Stereo implements Module
         Packet p = new Packet();
         HashMap<String,Object> data = new HashMap<>();
         data.put("type","set");
-        data.put("command","dev_sync");
+        data.put("command","device_power");
         data.put("value",on?"ON":"OFF");
+        p.setData(data);
+        c.sendRequest(p);
+    }
+    public void changeSrc(Sources s)
+    {
+        Packet p = new Packet();
+        HashMap<String,Object> data = new HashMap<>();
+        data.put("type","set");
+        data.put("command","src_select");
+        data.put("value",s+"");
         p.setData(data);
         c.sendRequest(p);
     }
