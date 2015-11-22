@@ -50,7 +50,7 @@ public class Main
     
     public static void main(String[] args)
     {
-        //args=new String[]{"--demo"};
+        //args=new String[]{"--demo","-x"};
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("d", "demo", false, "Demo UI modus für die H+E in Schuttgart");
@@ -62,7 +62,7 @@ public class Main
             //Main.setupLogging(cl.hasOption("verbose"));
             setupLogging(true);
 
-            TimeoutManager m = new TimeoutManager(3, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
+            TimeoutManager m = new TimeoutManager(30, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
             m.start();
             String srvr =serverDiscovery();//;//"10.110.12.183";//
             l.info(srvr);
