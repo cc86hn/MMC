@@ -18,6 +18,7 @@ import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.API.Processor;
+import org.cc86.MMC.modules.audio.drivers.technics.se540.ProtocolHandler;
 
 /**
  *
@@ -42,12 +43,13 @@ public class StereoControl implements Processor
     private static final String SOURCE_SET_COMMAND = "SET SRC %s\n";
     private static final String SPEAKER_SET_COMMAND = "SET SPK %s\n";
     private static final String POWER_GET_COMMAND = "GET PWR\n";
-    private static final String DEVSYNC_COMMAND = "SYNC\n";
+    private static final String DEVSYNC_COMMAND = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
     private boolean pwr = false;
     private int volume=0;
     private String src = "";
     private PrintStream serialControl;
-    private final List<String> sendQueue = new ArrayList<>();
+    private final List<byte[]> sendQueue = new ArrayList<>();
+    private ProtocolHandler se540 = new ProtocolHandler();
     public StereoControl()
     {
         new Thread(()->
@@ -78,45 +80,29 @@ public class StereoControl implements Processor
                         sendQueue.wait();
                         if(sendQueue.size()>0)
                         {
-                            String sq = sendQueue.remove(0);
-                            l.trace(sq);
+                            String sq = new String(sendQueue.remove(0));
+                            l.trace("SENDPREP:"+sq);
                             serialControl.print(sq);
-                            
+                            serialControl.flush();
                         }
                     }
                     catch (InterruptedException ex)
                     {
                         ex.printStackTrace();
                     }
-                    
                 }
             }
         }).start();
     }
     
-    public void processUARTLine(String line)
+    public void processUARTLine(int recvbyte)
     {
-        String[] response = line.split(" ");
-        if(response.length>=3&&response[0].equals(RESPONSE_HEADER))
+        if(recvbyte<0)
         {
-            String val = response[1];
-            String par = response[2].trim();
-            switch(val)
-            {
-                case VOLUME_RESPONSE:
-                    volume = Integer.valueOf(par);
-                    API.makeSimpleEvent("volume", "value", volume);
-                break;
-                case STATE_RESPONSE:
-                    pwr=val.equals("ON");
-                    API.makeSimpleEvent("device_power", "value", par);
-                break;
-                case SRCSEL_RESPONSE:
-                    src=par;
-                    API.makeSimpleEvent("src_select", "value", par);
-                break;
-            }
+            recvbyte+=128;
+            recvbyte&=0xff;
         }
+        se540.receiveByte((byte)recvbyte);
     }
     
     @Override
@@ -221,7 +207,6 @@ public class StereoControl implements Processor
                     spklist.deleteCharAt(0);
                     l.trace("spklist:"+spklist);
                     sendViaUART(String.format(SPEAKER_SET_COMMAND,spklist+""));
-
                 }
                 else
                 {
@@ -232,9 +217,13 @@ public class StereoControl implements Processor
     }
     private void sendViaUART(String line)
     {
+        //TODO KiLLme
+    }
+    private void sendViaUART(byte[] packet)
+    {
         synchronized(sendQueue)
         {
-            sendQueue.add(line);
+            sendQueue.add(packet);
             sendQueue.notify();
         }
     }

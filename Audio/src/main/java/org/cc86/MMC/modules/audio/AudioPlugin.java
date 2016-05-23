@@ -28,9 +28,9 @@ public class AudioPlugin implements Plugin{
     @Override
     public void register() throws PluginNotReadyException {
         l.info("REGISTERING AudioPlugin");
-        if(!API.getMockMode()&&!new File("/dev/pigpio").exists())
+        if(!API.getMockMode()&&!new File("/sys/class/softuart/softuart/data").exists())
         {
-            throw new PluginNotReadyException("Pigpio not started. please start it with \"sudo pigpiod\"!");
+            throw new PluginNotReadyException("Softuart driver required, somethind did not install correctly");
         }
         h = new AudioProcessor();
         sc = new StereoControl();

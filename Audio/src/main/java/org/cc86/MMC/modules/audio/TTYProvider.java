@@ -14,6 +14,6 @@ import java.util.function.Consumer;
  */
 public interface TTYProvider
 {
-     public void uartHandler(final Consumer<String> out, final InputStream ctrl, final boolean addPrefix);
+     public void uartHandler(final Consumer<Integer> out, final InputStream ctrl, final boolean addPrefix);
     
 }

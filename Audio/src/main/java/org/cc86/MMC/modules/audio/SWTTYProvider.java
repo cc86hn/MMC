@@ -5,8 +5,11 @@
  */
 package org.cc86.MMC.modules.audio;
 
+import de.nplusc.izc.tools.baseTools.Tools;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.io.IoBuilder;
 
 /**
  *
@@ -33,7 +37,7 @@ public class SWTTYProvider implements TTYProvider
     //M 9 R
 private static final Logger l = LogManager.getLogger();
     //cat auf /dev/pigout & /dev/pigerr
-    static String[] alphabet = "a#b#c#d#e#f#g#h#i#j#k#l#m#n#o#p#q#r#s#t#u#v#w#x#y#z".split("#");
+    //static String[] alphabet = "a#b#c#d#e#f#g#h#i#j#k#l#m#n#o#p#q#r#s#t#u#v#w#x#y#z".split("#");
 
     /**
      * @param args the command line arguments
@@ -43,98 +47,62 @@ private static final Logger l = LogManager.getLogger();
        new SWTTYProvider().uartHandler(System.out::println, System.in, true);
     }
 
-    private static void setup(PrintStream pigpiostream)
+    private static void setup()
     {
-
-        pigpiostream.println("M 10 W");
-        pigpiostream.println("M 9 R");
-        pigpiostream.println("SLRC 9");
-        pigpiostream.println("SLRO 9 2400 9");
-        writeSerialPacket("\n", pigpiostream); //Workaround für einen doofen PiGPIO-Bug
+        Tools.runCmdWithPassthru(IoBuilder.forLogger("External.sudoedChmod").buildPrintStream(),"sudo","chmod","777","/sys/class/softuart/softuart/data");
     }
-
-@Override
-    public void uartHandler(final Consumer<String> out, final InputStream ctrl, final boolean addPrefix)
+    @Override
+    public void uartHandler(final Consumer<Integer> out,final InputStream ctrl,final boolean addPrefix)
     {
-        new Thread(() ->
+        new Thread(()->
         {
+            InputStream fis = null;
             OutputStream fos = null;
 
             try
             {
                 //final Socket s = new Socket("127.0.0.1", 8888);
                 //fis = new FileInputStream();
-                if(!new File("/dev/pigpio").exists())
+                if(!new File("/sys/class/softuart/softuart/data").exists())
                 {
-                    l.error("no running pigpiod, shutting down");
+                    System.out.println("no running softuart driver, shutting down");
                     System.exit(0);
                 }
-                fos = new FileOutputStream("/dev/pigpio");
-                //fos = s.getOutputStream();/*new InputStreamReader(s.getInputStream()*/
 
+
+                setup();
+                fos = new FileOutputStream("/sys/class/softuart/softuart/data");
                 PrintStream ps = new PrintStream(fos);
-                setup(ps);
+                //fos = s.getOutputStream();/*new InputStreamReader(s.getInputStream()*/
 
                 new Thread(() ->
                 {
-                    StringBuffer sb = new StringBuffer();
-                    StringBuffer sb2 = new StringBuffer();
-                    List<Character> bfr  = new ArrayList<>();
-                    BufferedReader br;
+                    BufferedInputStream br;
                     try
                     {
-                       int pl = 0;
-                       br = new BufferedReader(new FileReader("/dev/pigout"));
+                       byte[] data = new byte[256000];
+                       br = new BufferedInputStream(new FileInputStream("/sys/class/softuart/softuart/data"));
+                       br.mark(4096);
                         while (true)
                         {
+                            int len = br.read(data);
+                            for(int i=0;i<len;i+=2)
+                            {
+                                int datapkg = ((data[i]&0xF0)>>4)|((data[i+1]&0xF8)<<1);
+                                boolean parity = numberOfSetBits(datapkg)%2==0;
+                                if(parity)
+                                {
+                                    out.accept(datapkg);
+                                }
+                            }
+                            br.reset();
                             
-                            String in = br.readLine();
-                            /*if(!in.startsWith("0"))
-                            {
-                                System.out.println(in);
-                            }//*/
-                                //System.out.println("Incoming serial msg");
-                            /*if(false&&(!in.equals("0")))
-                               l.trace("DEBUG:"+in);*/
-                            String[] insplit = in.split(" ");
-
-                            if(insplit.length>1)
-                            {
-                                for(int i=1;i<insplit.length;i++)
-                                {
-                                    char chr = (char)Integer.parseInt(insplit[i]);
-                                    bfr.add(chr);
-
-                                }
-                                //System.out.println();
-                            }
-                            while(bfr.size()>1) //2er-pärchen rausholen
-                            {
-                                char val = bfr.remove(0);
-                                char par = bfr.remove(0);
-                                //l.trace("RAW:("+val+"|"+par+")");
-                                int data = (val<<8)+par;
-                                if(numberOfSetBits(data)%2==1)
-                                {
-                                    l.warn("PARITY ERROR");
-                                    l.trace(String.format("%8s", Integer.toBinaryString(val)).replace(' ', '0'));
-                                    l.trace(String.format("%8s", Integer.toBinaryString(par)).replace(' ', '0'));
-                                }
-                                sb.append(val);
-                                sb2.append(String.format("%8s", Integer.toBinaryString(val)).replace(' ', '0')).
-                                        append("(").append(val).append(")").append(" ");
-                                pl++;
-                                if(val=='\n')//||val=='\r'||pl>=10)
-                                {
-                                    l.trace("DEBUG:"+sb2);
-                                    out.accept((addPrefix?"Response:":"")+sb);
-                                    
-                                    sb = new StringBuffer();
-                                    sb2 = new StringBuffer();
-                                    pl=0;
-                                }
-
-                            }
+                           try
+                           {
+                               Thread.sleep(100);
+                           } catch (InterruptedException ex)
+                           {
+                           }
                         }
                     } catch (FileNotFoundException ex)
                     {
@@ -144,15 +112,14 @@ private static final Logger l = LogManager.getLogger();
                         ex.printStackTrace();
                     }
                 }).start();//*/
-                 startReaderTickThread(ps);
                  BufferedReader bs = new BufferedReader(new InputStreamReader(ctrl));
                 while (true)
                 {
+                    l.warn("d'arvit");
                     String line = bs.readLine()+"\n";//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
-                    //System.err.print("OUT:"+line);
-                    l.trace("PRESEND:"+line);
-                    //ps.println(line);
-                    writeSerialPacket(line, ps);
+                    l.info("SENT_UART:"+line);
+                    ps.print(line);
+                    ps.flush();
                     //Thread.sleep(1000);
                 }
             } 
@@ -170,52 +137,10 @@ private static final Logger l = LogManager.getLogger();
                 {
                     ex.printStackTrace();
                 }
-            }
-        }).start();
+            }}
+        ).start();
     }
-
-    @SuppressWarnings("SleepWhileInLoop")
-    private static void startReaderTickThread(final PrintStream ps)
-    {
-        new Thread(() ->
-        {
-            while (true)
-            {
-                ps.println("SLR 9 20");
-                try
-                {
-                    Thread.sleep(10); //absicht
-                } catch (InterruptedException ex)
-                {
-                    ex.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-      
-    private static void writeSerialPacket(String msg, PrintStream pigpio_out)
-    {
-        final StringBuffer hexed = new StringBuffer();
-        msg.chars().forEach((i)->
-        {
-            int bits = numberOfSetBits(i);
-            
-            hexed.append("0x").append(Integer.toHexString(i)).append(" ").append("0x").append(Integer.toHexString(bits%2)).append(" ");
-        });
-        
-        String start = "WVCLR";
-        String prepare = "WVCRE";
-        
-        String msgcmd = "WVAS 10 2400 9 2 0 "+hexed.toString();
-        String send = "WVTX 0";
-        l.trace("DEBUG:"+msgcmd);
-        pigpio_out.println(start);
-        pigpio_out.println(msgcmd);
-        pigpio_out.println(prepare);
-        pigpio_out.println(send);
-        
-    }
+    
     private static int numberOfSetBits(int i)
     {
          // Java: use >>> instead of >>

@@ -67,9 +67,6 @@ repositories{
         maven {
                 url "https://repository.apache.org/content/repositories/snapshots"
         }
-        maven {
-                url "http://4thline.org/m2"
-        }
 
         maven { url "http://repo.gradle.org/gradle/libs-releases-local" }
 }

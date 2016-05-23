@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 public class MockSWTTYProvider implements TTYProvider
 {
      private static final Logger l = LogManager.getLogger();
-     public void uartHandler(final Consumer<String> out, final InputStream ctrl, final boolean addPrefix)
+     public void uartHandler(final Consumer<Integer> out, final InputStream ctrl, final boolean addPrefix)
     {
         new Thread(() ->
         {
@@ -29,7 +29,7 @@ public class MockSWTTYProvider implements TTYProvider
             {
                 try
                 {
-                    out.accept(br.readLine()+"\n");
+                    out.accept(br.read());
                 } catch (IOException ex)
                 {
                     ex.printStackTrace();
