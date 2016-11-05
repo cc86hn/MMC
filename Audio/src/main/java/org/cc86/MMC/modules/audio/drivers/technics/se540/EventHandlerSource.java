@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class EventHandlerSource
 {
-    public static  void handleEvent(List<Byte> packet)
+    public static  void handleEvent(List<Byte> packet,Integer cmd)
     {
         
     }

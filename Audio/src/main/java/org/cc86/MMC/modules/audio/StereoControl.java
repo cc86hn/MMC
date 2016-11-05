@@ -11,6 +11,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,7 +50,7 @@ public class StereoControl implements Processor
     private String src = "";
     private PrintStream serialControl;
     private final List<byte[]> sendQueue = new ArrayList<>();
-    private ProtocolHandler se540 = new ProtocolHandler();
+    private ProtocolHandler se540 = new ProtocolHandler(this);
     public StereoControl()
     {
         new Thread(()->
@@ -121,17 +122,17 @@ public class StereoControl implements Processor
                         {
                             if(par.equals("UP"))
                             {
-                                sendViaUART(String.format(VOLUME_UP_COMMAND));
+                                //sendViaUART(String.format(VOLUME_UP_COMMAND));
                             }
                             else
                             {
-                                sendViaUART(String.format(VOLUME_DOWN_COMMAND));
+                                //sendViaUART(String.format(VOLUME_DOWN_COMMAND));
                             }
                         }
                         else
                         {
                             int vol = Integer.parseInt(par,10);
-                            sendViaUART(String.format(VOLUME_SET_COMMAND, vol));
+                            //sendViaUART(String.format(VOLUME_SET_COMMAND, vol));
                         }
                     }
                     catch(NumberFormatException ex)
@@ -150,7 +151,7 @@ public class StereoControl implements Processor
                 {
                     try{
                         String pwr = ((String) r.getData().get("value"));
-                        sendViaUART(String.format(POWER_SET_COMMAND, pwr));
+                        //sendViaUART(String.format(POWER_SET_COMMAND, pwr));
                     }
                     catch(Exception ex)
                     {
@@ -168,7 +169,7 @@ public class StereoControl implements Processor
                 {
                     try{
                         String src = ((String) r.getData().get("value"));
-                        sendViaUART(String.format(SOURCE_SET_COMMAND, src));
+                        //sendViaUART(String.format(SOURCE_SET_COMMAND, src));
                     }
                     catch(Exception ex)
                     {
@@ -185,7 +186,7 @@ public class StereoControl implements Processor
                 if(set)
                 {
                     try{
-                        sendViaUART(String.format(DEVSYNC_COMMAND));
+                        //sendViaUART(String.format(DEVSYNC_COMMAND));
                     }
                     catch(NumberFormatException ex)
                     {
@@ -206,7 +207,7 @@ public class StereoControl implements Processor
                     speakers.forEach((s)->spklist.append(",").append(s));
                     spklist.deleteCharAt(0);
                     l.trace("spklist:"+spklist);
-                    sendViaUART(String.format(SPEAKER_SET_COMMAND,spklist+""));
+                    //sendViaUART(String.format(SPEAKER_SET_COMMAND,spklist+""));
                 }
                 else
                 {
@@ -215,15 +216,29 @@ public class StereoControl implements Processor
             break;
         }
     }
-    private void sendViaUART(String line)
+    
+    public static void volumeChanged(int newvolume)
     {
-        //TODO KiLLme
+        Packet evt = new Packet();
+        HashMap<String,Object> evtdata = new HashMap<>();
+        evtdata.put("command","volume");
+        evtdata.put("type","response");
+        evtdata.put("value",newvolume);
+        evt.setData(evtdata);
+        API.dispatchEvent(evt);
     }
-    private void sendViaUART(byte[] packet)
+    
+    public void sendViaUART(Byte[] packet)
     {
+        //workaround für java
+        byte[] realpkg = new byte[packet.length];
+        for (int i = 0; i < realpkg.length; i++)
+        {
+            realpkg[i]=packet[i];
+        }
         synchronized(sendQueue)
         {
-            sendQueue.add(packet);
+            sendQueue.add(realpkg);
             sendQueue.notify();
         }
     }

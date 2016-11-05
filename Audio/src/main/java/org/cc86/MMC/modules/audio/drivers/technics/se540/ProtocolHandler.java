@@ -8,9 +8,11 @@ package org.cc86.MMC.modules.audio.drivers.technics.se540;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.cc86.MMC.modules.audio.StereoControl;
 
 /**
  *
@@ -22,9 +24,9 @@ public class ProtocolHandler
       private static final Logger l = LogManager.getLogger();
       
     private ArrayList<Byte> receivebuffer = new ArrayList<>();
-    private final List<Consumer<List<Byte>>> listeners = new ArrayList<>(256);
+    private Consumer<List<Byte>> requestResponseListener = null;
     Thread handlingThread;
-    private static final int MAX_PACKET_SIZE=11;
+    private static final int MAX_PACKET_SIZE=9;
     private static final byte INVERTED_SIZE_MASK = 0x38;
     private static final int INVERTED_SIZE_OFFSET = 3;
     private static final byte CNT_MASK = (byte)0xC0;
@@ -63,34 +65,35 @@ public class ProtocolHandler
     public static final int SRV_EVT = 3;
     public static final int SRV_SYS = 4;
     
-    private static final int CMD_BYTE = 1;
-    private static final int CMD_MASK = 0xF8;
-    private static final int CMD_OFFSET = 3;
-    private static final int CMD_LENGTH = 5;
-    private static final int CMD_VERSION_VER = 1;
-    private static final int CMD_RESET_RST = 2;
-    private static final int CMD_BOOTLOADER_BOOT = 3;
-    private static final int CMD_EVENT_EVT = 4;
-    private static final int CMD_STATISTIC_STAT = 5;
-    private static final int CMD_POWER_PWR = 6;
-    private static final int CMD_VOLUME_VOL = 7;
-    private static final int CMD_VOLUME_VOLREL = 8;
-    private static final int CMD_VOLUME_MUTE = 9;
-    private static final int CMD_VOLUME_BALREL = 10;
-    private static final int CMD_VOLUME_BAL = 11;
-    private static final int CMD_SOURCE_SRC = 12;
-    private static final int CMD_SPEAKER_SPK = 13;
-    private static final int CMD_SPEAKER_SPK_CFG = 14;
-    private static final int CMD_TIME_TIME = 15;
+    public static final int CMD_BYTE = 1;
+    public static final int CMD_MASK = 0xF8;
+    public static final int CMD_OFFSET = 3;
+    public static final int CMD_LENGTH = 5;
+    public static final int CMD_VERSION_VER = 1;
+    public static final int CMD_RESET_RST = 2;
+    public static final int CMD_BOOTLOADER_BOOT = 3;
+    public static final int CMD_EVENT_EVT = 4;
+    public static final int CMD_STATISTIC_STAT = 5;
+    public static final int CMD_POWER_PWR = 6;
+    public static final int CMD_VOLUME_VOL = 7;
+    public static final int CMD_VOLUME_VOLREL = 8;
+    public static final int CMD_VOLUME_MUTE = 9;
+    public static final int CMD_VOLUME_BALREL = 10;
+    public static final int CMD_VOLUME_BAL = 11;
+    public static final int CMD_SOURCE_SRC = 12;
+    public static final int CMD_SPEAKER_SPK = 13;
+    public static final int CMD_SPEAKER_SPK_CFG = 14;
+    public static final int CMD_TIME_TIME = 15;
     
-    private static final List<Consumer<List<Byte>>> evtListeners = new ArrayList<>(2<<CMD_LENGTH);//initiale größe sollte die commands alle aufnehmen können
+    private static final List<BiConsumer<List<Byte>,Integer>> evtListeners = new ArrayList<>(2<<CMD_LENGTH);//initiale größe sollte die commands alle aufnehmen können
+    private static final int lastCmdStartTime=0;
     static
     {
         evtListeners.add(CMD_STATISTIC_STAT,null);
         
         evtListeners.add(CMD_POWER_PWR,null);
         
-        Consumer<List<Byte>> vollistener = EventHandlerVolume::handleEvent;
+        BiConsumer<List<Byte>,Integer> vollistener = EventHandlerVolume::handleEvent;
         evtListeners.add(CMD_VOLUME_VOL,vollistener);
         evtListeners.add(CMD_VOLUME_MUTE,vollistener);
         evtListeners.add(CMD_VOLUME_BAL,vollistener);
@@ -121,7 +124,7 @@ public class ProtocolHandler
     
     private static final byte NACK_BUSY = 1;
     
-    
+    private final StereoControl control;
     
     
     private static byte crc(int oldcrc,int in)
@@ -136,8 +139,9 @@ public class ProtocolHandler
         }
         return(byte) CRC8_TABLE[oldcrc^in];
     }
-    public ProtocolHandler()
+    public ProtocolHandler(StereoControl c)
     {
+        control=c;
         handlingThread = new Thread(()->
         {
             while(true)
@@ -192,12 +196,11 @@ public class ProtocolHandler
     }
     
     /**
-     * Removes the specified callback
-     * @param crc The crc of the sent request
+     * Removes the callback for the current running cmd
      */
-    public void unregister_callback(int crc)
+    private void unregister_callback()
     {
-        listeners.remove(crc);
+        requestResponseListener=null;
     }
     /**
      * Generates a packet for sending via the UART. CRC and frame is added by this method before send
@@ -245,8 +248,10 @@ public class ProtocolHandler
             crc = crc((byte)crc,raw_packet.get(i));
         }
         raw_packet.add(packetlength,(byte)crc);
+        control.sendViaUART(raw_packet.toArray(new Byte[0]));
+        //TODO start timeout countdown
         
-        listeners.add(crc, (packet)->
+        requestResponseListener=(packet)->
         {
             int statebyte = packet.get(RET_ST_BYTE);
             statebyte=(statebyte&RET_ST_MASK)>>RET_ST_OFFSET;
@@ -259,8 +264,8 @@ public class ProtocolHandler
             {
                 callback.accept(packet);
             }
-        });
-        
+        };
+//        SWTT
         //TODO consumer erstellen der auf Resend nötig prüft, dortrein dann den echten callback falls richtige antwort
     }
 
@@ -305,7 +310,7 @@ public class ProtocolHandler
             crc = crc((byte)crc,raw_packet.get(i));
         }
         raw_packet.add(packetlength,(byte)crc);
-        
+        control.sendViaUART(raw_packet.toArray(new Byte[0]));
         
         //TODO consumer erstellen der auf Resend nötig prüft, dortrein dann den echten callback falls richtige antwort
     }
@@ -318,7 +323,6 @@ public class ProtocolHandler
        
         int srv = packet.get(SRV_BYTE)&SRV_MASK>>SRV_OFFSET;
         //int ret_ST = (packet.get(RET_ST_BYTE)&RET_ST_MASK)>>RET_ST_OFFSET;
-        int req_crc = packet.get(REQ_CRC_BYTE);
         if(srv!=SRV_RET)
         {
             if(srv!=SRV_EVT)
@@ -328,25 +332,20 @@ public class ProtocolHandler
             handle_event(packet);
             return;
         }
-        if(req_crc<0)
+        if(requestResponseListener!=null)
         {
-            req_crc=(req_crc+128)&0xFF;
+            requestResponseListener.accept(packet);
         }
-        if(listeners.get(req_crc)!=null)
-        {
-            listeners.get(req_crc).accept(packet);
-        }
-        
     }
     private void handle_event(List<Byte> packet)
     {
         int cmd=packet.get(CMD_BYTE)&CMD_MASK>>CMD_OFFSET;
         int req_crc=packet.get(packet.size()-1);
         int cnt = packet.get(CNT_BYTE)&CNT_MASK>>CNT_OFFSET;
-        Consumer<List<Byte>> eventhandler = evtListeners.get(cmd);
+        BiConsumer<List<Byte>,Integer> eventhandler = evtListeners.get(cmd);
         if(eventhandler!=null)
         {
-            eventhandler.accept(packet);
+            eventhandler.accept(packet,cmd);
         }
         else
         {

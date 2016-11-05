@@ -6,6 +6,7 @@
 package org.cc86.MMC.modules.audio.drivers.technics.se540;
 
 import java.util.List;
+import org.cc86.MMC.modules.audio.StereoControl;
 
 /**
  *
@@ -13,8 +14,35 @@ import java.util.List;
  */
 public class EventHandlerVolume
 {
-    public static  void handleEvent(List<Byte> packet)
+    private static final int CMD_VOLUME_VOL = 7;
+    private static final int CMD_VOLUME_VOLREL = 8;
+    private static final int CMD_VOLUME_MUTE = 9;
+    private static final int CMD_VOLUME_BALREL = 10;
+    private static final int CMD_VOLUME_BAL = 11;
+    
+    
+    public static  void handleEvent(List<Byte> packet,Integer cmd)
     {
-        
+        switch(cmd)
+        {
+            
+            
+            case CMD_VOLUME_VOL:
+            {
+                int volume = (packet.get(3))&0x7F;
+                StereoControl.volumeChanged(volume);
+                break;
+            }
+            case CMD_VOLUME_BAL:
+            {
+             
+                break;
+            }
+            case CMD_VOLUME_MUTE:
+            {
+                break;
+            }
+                    
+        }
     }
 }
