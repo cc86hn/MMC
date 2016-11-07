@@ -11,14 +11,14 @@ import java.util.List;
  *
  * @author tgoerner
  */
-public class EventHandlerSource
+public class EventHandlerPower
 {
     public static void handleEvent(List<Byte> packet,Integer cmd)
     {
-        if(cmd==12)
+        if(cmd==6)
         {
-            int source = (packet.get(3))&0x03;
-            DriverSe540.getDriver().notifyCoreonSource(source);
+            boolean power = packet.get(3)!=0;
+            DriverSe540.getDriver().notifyCoreonPower(power);
         }
     }
 }

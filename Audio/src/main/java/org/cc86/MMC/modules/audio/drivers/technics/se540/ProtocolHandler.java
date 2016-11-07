@@ -86,21 +86,28 @@ public class ProtocolHandler
     public static final int CMD_TIME_TIME = 15;
     
     private static final List<BiConsumer<List<Byte>,Integer>> evtListeners = new ArrayList<>(2<<CMD_LENGTH);//initiale größe sollte die commands alle aufnehmen können
+    static{
+        for(int i=0;i<(2<<CMD_LENGTH);i++)
+        {
+            evtListeners.add(null);//priming list slots
+        }
+    }
+    
     private static final int lastCmdStartTime=0;
     static
     {
-        evtListeners.add(CMD_STATISTIC_STAT,null);
+        evtListeners.set(CMD_STATISTIC_STAT,null);
         
-        evtListeners.add(CMD_POWER_PWR,null);
+        evtListeners.set(CMD_POWER_PWR,null);
         
         BiConsumer<List<Byte>,Integer> vollistener = EventHandlerVolume::handleEvent;
-        evtListeners.add(CMD_VOLUME_VOL,vollistener);
-        evtListeners.add(CMD_VOLUME_MUTE,vollistener);
-        evtListeners.add(CMD_VOLUME_BAL,vollistener);
+        evtListeners.set(CMD_VOLUME_VOL,vollistener);
+        evtListeners.set(CMD_VOLUME_MUTE,vollistener);
+        evtListeners.set(CMD_VOLUME_BAL,vollistener);
         
-        evtListeners.add(CMD_SOURCE_SRC,EventHandlerSource::handleEvent);
+        evtListeners.set(CMD_SOURCE_SRC,EventHandlerSource::handleEvent);
         
-        evtListeners.add(CMD_SPEAKER_SPK,null);
+        evtListeners.set(CMD_SPEAKER_SPK,null);
     }
     
     
@@ -124,36 +131,39 @@ public class ProtocolHandler
     
     private static final byte NACK_BUSY = 1;
     
-    private final StereoControl control;
+    //private final StereoControl control;
     
     
     private static byte crc(int oldcrc,int in)
     {
         if(oldcrc<0)
         {
-            oldcrc=(oldcrc+128)&0xff;
+            oldcrc=(oldcrc+256)&0xff;
         }
         if(in<0)
         {
-            in=(in+128)&0xff;
+            in=(in+256)&0xff;
         }
-        return(byte) CRC8_TABLE[oldcrc^in];
+        return (byte)CRC8_TABLE[oldcrc^in];
     }
-    public ProtocolHandler(StereoControl c)
+    public ProtocolHandler(/*StereoControl c*/)
     {
-        control=c;
+        //control=c;
         handlingThread = new Thread(()->
         {
             while(true)
             {
                 
                 List<Byte> suspected_package = receivebuffer.subList(0, (MAX_PACKET_SIZE>receivebuffer.size()?receivebuffer.size():MAX_PACKET_SIZE));
-                
+                if(suspected_package.size()<1)
+                {
+                    continue;
+                }
                 byte hdr = suspected_package.get(0);
                 int size_first = ((hdr^0xff)&INVERTED_SIZE_MASK)>>INVERTED_SIZE_OFFSET;
                 int size_last = (hdr&BASE_SIZE_MASK);
                 
-                if(size_first==size_last&&size_first+3<suspected_package.size())
+                if(size_first==size_last&&size_first+3<=suspected_package.size())
                 {
                     int crc = CRC8_START;
                     int srv = suspected_package.get(SRV_BYTE)&SRV_MASK;
@@ -180,6 +190,13 @@ public class ProtocolHandler
                 else
                 {
                     receivebuffer.remove(0);
+                }
+                try
+                {
+                    Thread.sleep(1);
+                } catch (InterruptedException ex)
+                {
+                    ex.printStackTrace();
                 }
             }
         });
@@ -213,8 +230,14 @@ public class ProtocolHandler
      */
     public void send_packet(int cnt, int service,int command, List<Byte> userdata, Consumer<List<Byte>> callback) throws InvalidPacketException
     {
+        l.trace("Packet go!");
+        
         List<Byte> raw_packet = new ArrayList<>(MAX_PACKET_SIZE);
-        int udsize = userdata.size();
+        for(int i=0;i<MAX_PACKET_SIZE;i++)
+        {
+            raw_packet.add(i,(byte)0);
+        }
+        int udsize = userdata.size()+1;
         if(udsize>(1<<BASE_SIZE_LENGTH))
         {
             throw new InvalidPacketException("Userdata too long");
@@ -224,7 +247,7 @@ public class ProtocolHandler
             throw new InvalidPacketException("Counter too large");
         }
         int udsize_inv = udsize^((1<<BASE_SIZE_LENGTH)-1);
-        raw_packet.add(0, (byte)((cnt<<CNT_OFFSET)|(udsize_inv<<INVERTED_SIZE_OFFSET)|(udsize)));
+        raw_packet.set(0, (byte)((cnt<<CNT_OFFSET)|(udsize_inv<<INVERTED_SIZE_OFFSET)|(udsize)));
         if(command>(1<<CMD_LENGTH))
         {
             throw new InvalidPacketException("Command out of range");
@@ -233,22 +256,30 @@ public class ProtocolHandler
         {
             throw new InvalidPacketException("Service out of range");
         }
-        raw_packet.add(CMD_BYTE,(byte)0);
+        raw_packet.set(CMD_BYTE,(byte)0);
         if(CMD_BYTE!=SRV_BYTE)
         {
-            raw_packet.add(SRV_BYTE,(byte)0);
+            raw_packet.set(SRV_BYTE,(byte)0);
         }
-        raw_packet.add(CMD_BYTE,(byte)(raw_packet.get(CMD_BYTE)|(command<<CMD_OFFSET)));
-        raw_packet.add(SRV_BYTE,(byte)(raw_packet.get(SRV_BYTE)|(service<<SRV_OFFSET)));
-        int packetlength = USRDATA_REQ_START_BYTE+udsize;
+        raw_packet.set(CMD_BYTE,(byte)(raw_packet.get(CMD_BYTE)|(command<<CMD_OFFSET)));
+        raw_packet.set(SRV_BYTE,(byte)(raw_packet.get(SRV_BYTE)|(service<<SRV_OFFSET)));
+        int packetlength = USRDATA_REQ_START_BYTE+userdata.size();
         raw_packet.addAll(USRDATA_REQ_START_BYTE, userdata);
+        for(int i=0;i<userdata.size();i++)
+        {
+            raw_packet.set(i+USRDATA_REQ_START_BYTE, userdata.get(i));
+        }
         int crc = CRC8_START;
         for(int i=0;i<packetlength;i++)
         {
             crc = crc((byte)crc,raw_packet.get(i));
         }
-        raw_packet.add(packetlength,(byte)crc);
-        control.sendViaUART(raw_packet.toArray(new Byte[0]));
+        raw_packet.set(packetlength,(byte)crc);
+        while(raw_packet.size()>packetlength+1)
+        {
+            raw_packet.remove(packetlength+1);
+        }
+        DriverSe540.getDriver().sendDataViaUart(raw_packet.toArray(new Byte[0]));
         //TODO start timeout countdown
         
         requestResponseListener=(packet)->
@@ -279,6 +310,8 @@ public class ProtocolHandler
      */
     public void send_response(int cnt, int req_crc,int ret_st, List<Byte> userdata) throws InvalidPacketException
     {
+        if(true)
+            throw new UnsupportedOperationException("FIXME");
         List<Byte> raw_packet = new ArrayList<>(MAX_PACKET_SIZE);
         int udsize = userdata.size();
         if(udsize>(1<<BASE_SIZE_LENGTH))
@@ -302,7 +335,7 @@ public class ProtocolHandler
         }
         raw_packet.add(RET_ST_BYTE,(byte)(raw_packet.get(RET_ST_BYTE)|(ret_st<<RET_ST_OFFSET)));
         raw_packet.add(SRV_BYTE,(byte)(raw_packet.get(SRV_BYTE)|(SRV_RET<<SRV_OFFSET)));
-        int packetlength = USRDATA_RET_START_BYTE+udsize;
+        int packetlength = USRDATA_RET_START_BYTE+userdata.size();
         raw_packet.addAll(USRDATA_RET_START_BYTE, userdata);
         int crc = CRC8_START;
         for(int i=0;i<packetlength;i++)
@@ -310,7 +343,7 @@ public class ProtocolHandler
             crc = crc((byte)crc,raw_packet.get(i));
         }
         raw_packet.add(packetlength,(byte)crc);
-        control.sendViaUART(raw_packet.toArray(new Byte[0]));
+        DriverSe540.getDriver().sendDataViaUart(raw_packet.toArray(new Byte[0]));
         
         //TODO consumer erstellen der auf Resend nötig prüft, dortrein dann den echten callback falls richtige antwort
     }

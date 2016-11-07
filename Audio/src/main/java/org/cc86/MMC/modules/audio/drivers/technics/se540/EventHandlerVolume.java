@@ -6,7 +6,6 @@
 package org.cc86.MMC.modules.audio.drivers.technics.se540;
 
 import java.util.List;
-import org.cc86.MMC.modules.audio.StereoControl;
 
 /**
  *
@@ -30,7 +29,7 @@ public class EventHandlerVolume
             case CMD_VOLUME_VOL:
             {
                 int volume = (packet.get(3))&0x7F;
-                StereoControl.volumeChanged(volume);
+                DriverSe540.getDriver().notifyCoreonVolume(volume);
                 break;
             }
             case CMD_VOLUME_BAL:

@@ -12,19 +12,20 @@ import java.util.List;
  *
  * @author tgoerner
  */
-public class DataSenderVolume
+public class DataSenderPower
 {
     private ProtocolHandler handler;
     
-    public DataSenderVolume(ProtocolHandler h)
+    public DataSenderPower(ProtocolHandler h)
     {
         handler=h;
     }
     
-    public void changeVolume(int newVolume)
+    public void changePower(boolean power)
     {
         List<Byte> userdata = new ArrayList<>();
-        userdata.add(((byte)(((byte)newVolume)&((byte)0x7f))));
-        handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_VOLUME_VOL, userdata, null);
+        userdata.add(((byte)(power?1:0)));
+        handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_POWER_PWR, userdata, null);
     }
 }
+

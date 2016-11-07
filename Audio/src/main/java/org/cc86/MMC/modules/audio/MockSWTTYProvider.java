@@ -29,8 +29,19 @@ public class MockSWTTYProvider implements TTYProvider
             {
                 try
                 {
-                    out.accept(br.read());
-                } catch (IOException ex)
+                    try
+                    {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException ex)
+                    {
+                        ex.printStackTrace();
+                    }
+                    out.accept(42);
+                    out.accept(51);
+                    out.accept(1);
+                    out.accept(155);
+                    //out.accept(br.read());
+                } catch (Exception ex)
                 {
                     ex.printStackTrace();
                 }
@@ -45,7 +56,7 @@ public class MockSWTTYProvider implements TTYProvider
                 try
                 {
                     l.trace("waiting for line...");
-                    l.trace("UART_SEND:"+br.readLine());
+                    l.trace("UART_SEND:"+br.read());
                 } catch (IOException ex)
                 {
                     ex.printStackTrace();

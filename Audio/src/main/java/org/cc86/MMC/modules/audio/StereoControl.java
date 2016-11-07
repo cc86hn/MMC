@@ -19,7 +19,8 @@ import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Packet;
 import org.cc86.MMC.API.Processor;
-import org.cc86.MMC.modules.audio.drivers.technics.se540.ProtocolHandler;
+import org.cc86.MMC.modules.audio.drivers.technics.se540.DriverSe540;
+//import org.cc86.MMC.modules.audio.drivers.technics.se540.ProtocolHandler;
 
 /**
  *
@@ -50,9 +51,13 @@ public class StereoControl implements Processor
     private String src = "";
     private PrintStream serialControl;
     private final List<byte[]> sendQueue = new ArrayList<>();
-    private ProtocolHandler se540 = new ProtocolHandler(this);
+    private Driver se540 = DriverSe540.getDriver();
     public StereoControl()
     {
+        se540.addPowerCallback((power) -> this.powerChanged(power));
+        se540.addSourceCallback((source) -> this.sourceChanged(source));
+        se540.addVolumeCallback((volume) -> this.volumeChanged(volume));
+        se540.setUartSender((data) -> this.sendViaUART(data));
         new Thread(()->
         {
             PipedInputStream ttycontrolend = new PipedInputStream(8192);
@@ -103,7 +108,7 @@ public class StereoControl implements Processor
             recvbyte+=128;
             recvbyte&=0xff;
         }
-        se540.receiveByte((byte)recvbyte);
+        se540.receiveUartByte((byte)recvbyte);
     }
     
     @Override
@@ -132,7 +137,7 @@ public class StereoControl implements Processor
                         else
                         {
                             int vol = Integer.parseInt(par,10);
-                            //sendViaUART(String.format(VOLUME_SET_COMMAND, vol));
+                            se540.setVolume(vol);
                         }
                     }
                     catch(NumberFormatException ex)
@@ -151,7 +156,7 @@ public class StereoControl implements Processor
                 {
                     try{
                         String pwr = ((String) r.getData().get("value"));
-                        //sendViaUART(String.format(POWER_SET_COMMAND, pwr));
+                        se540.setPower(pwr.equals("ON"));
                     }
                     catch(Exception ex)
                     {
@@ -169,7 +174,18 @@ public class StereoControl implements Processor
                 {
                     try{
                         String src = ((String) r.getData().get("value"));
-                        //sendViaUART(String.format(SOURCE_SET_COMMAND, src));
+                        switch(src)
+                        {
+                            case "PHONO":
+                                se540.setSource(Source.PHONO);
+                                break;
+                            case "EXT":
+                                se540.setSource(Source.EXTERNAl);
+                                break;
+                            case "TUNER":
+                                se540.setSource(Source.TUNER);
+                                break;
+                        }
                     }
                     catch(Exception ex)
                     {
@@ -224,6 +240,43 @@ public class StereoControl implements Processor
         evtdata.put("command","volume");
         evtdata.put("type","response");
         evtdata.put("value",newvolume);
+        evt.setData(evtdata);
+        API.dispatchEvent(evt);
+    }
+    
+    public static void sourceChanged(Source newSource)
+    {
+        //TUNER PHONO EXT CD TAPE
+        String source = "";
+        switch(newSource)
+        {
+            case EXTERNAl:
+                source="EXT";
+                break;
+            case PHONO:
+                source="PHONO";
+                break;
+            case TUNER:
+                source="TUNER";
+                break;
+        }
+        
+        Packet evt = new Packet();
+        HashMap<String,Object> evtdata = new HashMap<>();
+        evtdata.put("command","volume");
+        evtdata.put("type","response");
+        //evtdata.put("value",newvolume);
+        evt.setData(evtdata);
+        API.dispatchEvent(evt);
+    }
+    
+    public static void powerChanged(boolean power)
+    {
+        Packet evt = new Packet();
+        HashMap<String,Object> evtdata = new HashMap<>();
+        evtdata.put("command","volume");
+        evtdata.put("type","response");
+        //evtdata.put("value",newvolume);
         evt.setData(evtdata);
         API.dispatchEvent(evt);
     }

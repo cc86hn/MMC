@@ -12,19 +12,19 @@ import java.util.List;
  *
  * @author tgoerner
  */
-public class DataSenderVolume
+public class DataSenderSource
 {
     private ProtocolHandler handler;
     
-    public DataSenderVolume(ProtocolHandler h)
+    public DataSenderSource(ProtocolHandler h)
     {
         handler=h;
     }
     
-    public void changeVolume(int newVolume)
+    public void changeSource(int newSource)
     {
         List<Byte> userdata = new ArrayList<>();
-        userdata.add(((byte)(((byte)newVolume)&((byte)0x7f))));
+        userdata.add(((byte)(((byte)newSource)&((byte)0x3))));
         handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_VOLUME_VOL, userdata, null);
     }
 }
