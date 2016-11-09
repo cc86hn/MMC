@@ -17,7 +17,7 @@ public class EventHandlerPower
     {
         if(cmd==6)
         {
-            boolean power = packet.get(3)!=0;
+            boolean power = packet.get(1)!=0;
             DriverSe540.getDriver().notifyCoreonPower(power);
         }
     }

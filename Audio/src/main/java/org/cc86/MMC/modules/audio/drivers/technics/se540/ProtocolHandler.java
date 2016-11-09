@@ -92,13 +92,12 @@ public class ProtocolHandler
             evtListeners.add(null);//priming list slots
         }
     }
-    
     private static final int lastCmdStartTime=0;
     static
     {
         evtListeners.set(CMD_STATISTIC_STAT,null);
         
-        evtListeners.set(CMD_POWER_PWR,null);
+        evtListeners.set(CMD_POWER_PWR,EventHandlerPower::handleEvent);
         
         BiConsumer<List<Byte>,Integer> vollistener = EventHandlerVolume::handleEvent;
         evtListeners.set(CMD_VOLUME_VOL,vollistener);
@@ -153,34 +152,51 @@ public class ProtocolHandler
         {
             while(true)
             {
-                
-                List<Byte> suspected_package = receivebuffer.subList(0, (MAX_PACKET_SIZE>receivebuffer.size()?receivebuffer.size():MAX_PACKET_SIZE));
-                if(suspected_package.size()<1)
+                 //suspected_package = ;
+                int listend = MAX_PACKET_SIZE>receivebuffer.size()?receivebuffer.size():MAX_PACKET_SIZE;
+                int ls = receivebuffer.size();
+                /*if(ls==0)
                 {
+                    continue;
+                }*/
+                List<Byte> suspected_package =null;
+                synchronized(receivebuffer)
+                {
+                    suspected_package = new ArrayList<Byte>(((ArrayList<Byte>)receivebuffer.clone()).subList(0, (listend)));
+                }
+                if(suspected_package.size()<1||suspected_package==null)
+                {
+                    if(suspected_package==null)
+                    {
+                        l.trace("this shouldnt happen");
+                    }
                     continue;
                 }
                 byte hdr = suspected_package.get(0);
-                int size_first = ((hdr^0xff)&INVERTED_SIZE_MASK)>>INVERTED_SIZE_OFFSET;
+                int size_first = ((hdr^0xff)&INVERTED_SIZE_MASK)>>>INVERTED_SIZE_OFFSET;
                 int size_last = (hdr&BASE_SIZE_MASK);
-                
-                if(size_first==size_last&&size_first+3<=suspected_package.size())
+                if(size_first!=size_last)
+                {
+                    receivebuffer.remove(0);
+                    continue;
+                }
+                if(suspected_package.size()>size_first+1)
                 {
                     int crc = CRC8_START;
-                    int srv = suspected_package.get(SRV_BYTE)&SRV_MASK;
-                    int extrabyte = srv==0?1:0;
-                    for(int i=0;i<size_first+2+extrabyte-1;i++)
+                    int realsize = size_first+2;
+                    for(int i=0;i<realsize;i++)
                     {
                         crc = crc((byte)crc,suspected_package.get(i));
                     }
-                    if(crc==suspected_package.get(suspected_package.size()-1))
+                    if(crc==0)//CRC mit gültigem CRC-wert soll immer auf 0 enden
                     {
-                        List<Byte> packet = new ArrayList<>(10);
-                        for(int i=0;i<size_first;i++)
+                        List<Byte> packet = new ArrayList<>(MAX_PACKET_SIZE);
+                        for(int i=1;i<realsize;i++)//header weg
                         {
                             packet.add(suspected_package.get(i));
                             receivebuffer.remove(0);
-                            packetReceived(packet);
                         }
+                        packetReceived(packet);
                     }
                     else
                     {
@@ -189,7 +205,7 @@ public class ProtocolHandler
                 }
                 else
                 {
-                    receivebuffer.remove(0);
+                    //receivebuffer.remove(0);
                 }
                 try
                 {
@@ -199,6 +215,7 @@ public class ProtocolHandler
                     ex.printStackTrace();
                 }
             }
+           
         });
         handlingThread.setName("ProtocolReceiverSE540");
     }
@@ -209,7 +226,11 @@ public class ProtocolHandler
     
     public void receiveByte(byte b)
     {
-        receivebuffer.add(b);
+        synchronized(receivebuffer)
+        {
+            receivebuffer.add(b);
+            l.trace(receivebuffer.size());
+        }
     }
     
     /**
@@ -285,7 +306,7 @@ public class ProtocolHandler
         requestResponseListener=(packet)->
         {
             int statebyte = packet.get(RET_ST_BYTE);
-            statebyte=(statebyte&RET_ST_MASK)>>RET_ST_OFFSET;
+            statebyte=(statebyte&RET_ST_MASK)>>>RET_ST_OFFSET;
             if(statebyte==RET_ST_PND)
             {
                 //TODO check timeout; error out if too late;
@@ -311,7 +332,8 @@ public class ProtocolHandler
     public void send_response(int cnt, int req_crc,int ret_st, List<Byte> userdata) throws InvalidPacketException
     {
         if(true)
-            throw new UnsupportedOperationException("FIXME");
+            return;
+        // throw new UnsupportedOperationException("FIXME");
         List<Byte> raw_packet = new ArrayList<>(MAX_PACKET_SIZE);
         int udsize = userdata.size();
         if(udsize>(1<<BASE_SIZE_LENGTH))
@@ -354,7 +376,7 @@ public class ProtocolHandler
     private void packetReceived(List<Byte> packet)
     {
        
-        int srv = packet.get(SRV_BYTE)&SRV_MASK>>SRV_OFFSET;
+        int srv = packet.get(SRV_BYTE-1)&SRV_MASK>>>SRV_OFFSET;
         //int ret_ST = (packet.get(RET_ST_BYTE)&RET_ST_MASK)>>RET_ST_OFFSET;
         if(srv!=SRV_RET)
         {
@@ -372,9 +394,11 @@ public class ProtocolHandler
     }
     private void handle_event(List<Byte> packet)
     {
-        int cmd=packet.get(CMD_BYTE)&CMD_MASK>>CMD_OFFSET;
+        int cmd=((int)packet.get(CMD_BYTE-1));
+        cmd=cmd&CMD_MASK;
+        cmd=cmd>>>CMD_OFFSET;
         int req_crc=packet.get(packet.size()-1);
-        int cnt = packet.get(CNT_BYTE)&CNT_MASK>>CNT_OFFSET;
+        //int cnt = packet.get(CNT_BYTE)&CNT_MASK>>CNT_OFFSET;
         BiConsumer<List<Byte>,Integer> eventhandler = evtListeners.get(cmd);
         if(eventhandler!=null)
         {
@@ -383,7 +407,7 @@ public class ProtocolHandler
         else
         {
             
-            this.send_response(cnt,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{NACK_UNKNOWN}));
+            this.send_response(0,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{NACK_UNKNOWN}));
             l.warn("Got unknown command ID {} in event response",cmd);
             
         }

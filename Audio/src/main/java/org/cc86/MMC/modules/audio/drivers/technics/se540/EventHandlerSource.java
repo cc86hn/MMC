@@ -17,7 +17,7 @@ public class EventHandlerSource
     {
         if(cmd==12)
         {
-            int source = (packet.get(3))&0x03;
+            int source = (packet.get(1))&0x03;
             DriverSe540.getDriver().notifyCoreonSource(source);
         }
     }

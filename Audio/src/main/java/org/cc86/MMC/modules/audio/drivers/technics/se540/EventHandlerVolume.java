@@ -28,7 +28,7 @@ public class EventHandlerVolume
             
             case CMD_VOLUME_VOL:
             {
-                int volume = (packet.get(3))&0x7F;
+                int volume = (packet.get(1))&0x7F;
                 DriverSe540.getDriver().notifyCoreonVolume(volume);
                 break;
             }

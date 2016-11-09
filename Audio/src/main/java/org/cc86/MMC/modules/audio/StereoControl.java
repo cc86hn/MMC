@@ -13,6 +13,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+//import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.API;
@@ -86,15 +87,17 @@ public class StereoControl implements Processor
                         sendQueue.wait();
                         if(sendQueue.size()>0)
                         {
-                            String sq = new String(sendQueue.remove(0));
-                            l.trace("SENDPREP:"+sq);
-                            serialControl.print(sq);
+                            //String sq = new String(sendQueue.remove(0));
+                            //l.trace("SENDPREP:"+sq);
+                            serialControl.write(sendQueue.remove(0));
                             serialControl.flush();
                         }
                     }
                     catch (InterruptedException ex)
                     {
                         ex.printStackTrace();
+                    } catch (IOException ex) {
+                        l.info("UART pipe internally broken");
                     }
                 }
             }
@@ -103,11 +106,13 @@ public class StereoControl implements Processor
     
     public void processUARTLine(int recvbyte)
     {
+        //byte recv = 
         if(recvbyte<0)
         {
-            recvbyte+=128;
+            recvbyte+=256;
             recvbyte&=0xff;
         }
+        l.trace("received "+recvbyte);
         se540.receiveUartByte((byte)recvbyte);
     }
     
@@ -274,9 +279,9 @@ public class StereoControl implements Processor
     {
         Packet evt = new Packet();
         HashMap<String,Object> evtdata = new HashMap<>();
-        evtdata.put("command","volume");
+        evtdata.put("command","device_power");
         evtdata.put("type","response");
-        //evtdata.put("value",newvolume);
+        evtdata.put("value",power?"ON":"OFF");
         evt.setData(evtdata);
         API.dispatchEvent(evt);
     }

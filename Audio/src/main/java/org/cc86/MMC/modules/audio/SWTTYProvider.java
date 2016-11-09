@@ -88,7 +88,7 @@ private static final Logger l = LogManager.getLogger();
                             int len = br.read(data);
                             for(int i=0;i<len;i+=2)
                             {
-                                int datapkg = ((data[i]&0xF0)>>4)|((data[i+1]&0xF8)<<1);
+                                int datapkg = ((data[i]&0xF0)>>>4)|((data[i+1]&0xF8)<<1);
                                 boolean parity = numberOfSetBits(datapkg)%2==0;
                                 if(parity)
                                 {
@@ -115,10 +115,10 @@ private static final Logger l = LogManager.getLogger();
                  BufferedReader bs = new BufferedReader(new InputStreamReader(ctrl));
                 while (true)
                 {
-                    l.warn("d'arvit");
-                    String line = bs.readLine()+"\n";//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
-                    l.info("SENT_UART:"+line);
-                    ps.print(line);
+                    //l.warn("d'arvit");
+                    byte thebyte = (byte) ctrl.read();//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
+                    l.trace("SENT_UART:"+thebyte);
+                    ps.write(new byte[]{thebyte});
                     ps.flush();
                     //Thread.sleep(1000);
                 }
