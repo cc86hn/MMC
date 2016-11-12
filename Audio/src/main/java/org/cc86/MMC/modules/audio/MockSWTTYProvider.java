@@ -36,10 +36,10 @@ public class MockSWTTYProvider implements TTYProvider
                     {
                         ex.printStackTrace();
                     }
-                    out.accept(42);
-                    out.accept(51);
-                    out.accept(1);
-                    out.accept(10);
+                   // out.accept(42);
+                    //out.accept(51);
+                   // out.accept(1);
+                   // out.accept(10);
                     
                     //out.accept(br.read());
                 } catch (Exception ex)

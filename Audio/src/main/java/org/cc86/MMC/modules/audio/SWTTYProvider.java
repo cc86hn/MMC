@@ -71,6 +71,7 @@ private static final Logger l = LogManager.getLogger();
 
 
                 setup();
+                //("/home/pi/codestuff/uartdmp");//
                 fos = new FileOutputStream("/sys/class/softuart/softuart/data");
                 PrintStream ps = new PrintStream(fos);
                 //fos = s.getOutputStream();/*new InputStreamReader(s.getInputStream()*/
@@ -80,22 +81,28 @@ private static final Logger l = LogManager.getLogger();
                     BufferedInputStream br;
                     try
                     {
-                       byte[] data = new byte[256000];
+                       byte[] data = new byte[3192];
                        br = new BufferedInputStream(new FileInputStream("/sys/class/softuart/softuart/data"));
-                       br.mark(4096);
+                       //br.mark(4096);
                         while (true)
                         {
                             int len = br.read(data);
+                            
+                            if(len<0)
+                            {
+                               continue;
+                            }
+                             l.info("data rcvd, len={}"+len);
                             for(int i=0;i<len;i+=2)
                             {
                                 int datapkg = ((data[i]&0xF0)>>>4)|((data[i+1]&0xF8)<<1);
                                 boolean parity = numberOfSetBits(datapkg)%2==0;
                                 if(parity)
                                 {
-                                    out.accept(datapkg);
+                                    out.accept(datapkg&0xff);
                                 }
                             }
-                            br.reset();
+                            //br.reset();
                             
                            try
                            {
@@ -118,8 +125,12 @@ private static final Logger l = LogManager.getLogger();
                     //l.warn("d'arvit");
                     byte thebyte = (byte) ctrl.read();//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
                     l.trace("SENT_UART:"+thebyte);
-                    ps.write(new byte[]{thebyte});
-                    ps.flush();
+                    String echo = "\\x"+String.format("%02X", thebyte);
+                    l.trace(echo);
+                    Tools.runCmdWithPassthru(System.out, "/bin/bash","-c","echo -ne '"+echo+"'>/sys/class/softuart/softuart/data");
+                    //ps.write(new byte[]{thebyte});
+                    //ps.flush();
+                    //fos.flush();
                     //Thread.sleep(1000);
                 }
             } 
