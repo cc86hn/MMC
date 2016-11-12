@@ -132,11 +132,11 @@ public class StereoControl implements Processor
                         {
                             if(par.equals("UP"))
                             {
-                                //sendViaUART(String.format(VOLUME_UP_COMMAND));
+                                se540.setVolumeRel((byte)10);
                             }
                             else
                             {
-                                //sendViaUART(String.format(VOLUME_DOWN_COMMAND));
+                                se540.setVolumeRel((byte)-10);
                             }
                         }
                         else
@@ -207,7 +207,7 @@ public class StereoControl implements Processor
                 if(set)
                 {
                     try{
-                        //sendViaUART(String.format(DEVSYNC_COMMAND));
+                        se540.sync();
                     }
                     catch(NumberFormatException ex)
                     {
@@ -224,11 +224,9 @@ public class StereoControl implements Processor
                 if(set)
                 {
                     List<Object> speakers = ((List<Object>) r.getData().get("speakers"));
-                    final StringBuilder spklist = new StringBuilder();
-                    speakers.forEach((s)->spklist.append(",").append(s));
-                    spklist.deleteCharAt(0);
-                    l.trace("spklist:"+spklist);
-                    //sendViaUART(String.format(SPEAKER_SET_COMMAND,spklist+""));
+                    final List<String> spk = new ArrayList<>();
+                    speakers.forEach((e)->{spk.add(e+"");});
+                    se540.setSpeker(spk.toArray(new String[]{}));
                 }
                 else
                 {
@@ -268,9 +266,9 @@ public class StereoControl implements Processor
         
         Packet evt = new Packet();
         HashMap<String,Object> evtdata = new HashMap<>();
-        evtdata.put("command","volume");
+        evtdata.put("command","src_select");
         evtdata.put("type","response");
-        //evtdata.put("value",newvolume);
+        evtdata.put("value",source);
         evt.setData(evtdata);
         API.dispatchEvent(evt);
     }

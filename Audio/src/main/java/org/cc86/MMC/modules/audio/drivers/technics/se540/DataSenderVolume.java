@@ -27,4 +27,10 @@ public class DataSenderVolume
         userdata.add(((byte)(((byte)newVolume)&((byte)0x7f))));
         handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_VOLUME_VOL, userdata, null);
     }
+    public void changeVolumeRel(byte newVolume)
+    {
+        List<Byte> userdata = new ArrayList<>();
+        userdata.add(newVolume);
+        handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_VOLUME_VOLREL, userdata, null);
+    }
 }

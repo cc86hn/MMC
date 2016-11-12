@@ -18,6 +18,12 @@ public interface Driver
      * @param volume Percentage value of the volume
      */
     public void setVolume(int volume);
+    public void setVolumeRel(byte volumeDelta);
+    
+    public void sync();
+    
+    
+    public void setSpeker(String[] spk);
     
     /**
      * Registers a callback for volume updates

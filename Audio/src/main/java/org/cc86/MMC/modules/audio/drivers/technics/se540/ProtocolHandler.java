@@ -383,4 +383,8 @@ public class ProtocolHandler
             
         }
     }
+    void sendPing()
+    {
+        DriverSe540.getDriver().sendDataViaUart(new Byte[]{0b00111000,CRC.crc8(CRC.CRC8_START,0b00111000)});
+    }
 }

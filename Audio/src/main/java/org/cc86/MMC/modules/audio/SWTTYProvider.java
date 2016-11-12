@@ -8,6 +8,7 @@ package org.cc86.MMC.modules.audio;
 import de.nplusc.izc.tools.baseTools.Tools;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,6 +22,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
@@ -78,27 +80,39 @@ private static final Logger l = LogManager.getLogger();
 
                 new Thread(() ->
                 {
-                    BufferedInputStream br;
+                    FileInputStream br;
                     try
                     {
                        byte[] data = new byte[3192];
-                       br = new BufferedInputStream(new FileInputStream("/sys/class/softuart/softuart/data"));
+                       //br = 
                        //br.mark(4096);
+                        ByteArrayOutputStream bs = new ByteArrayOutputStream();
                         while (true)
                         {
-                            int len = br.read(data);
+                            FileInputStream fi =  new FileInputStream("/sys/class/softuart/softuart/data");
+                            //Tools.runCmdWithPassthru(new PrintStream(bs), "cat","/sys/class/softuart/softuart/data");
                             
+                            int len=fi.read(data);
+                            //bs.reset();
+                            //int len=data.length;
                             if(len<0)
                             {
+                                try {
+                                    Thread.sleep(10);
+                                } catch (InterruptedException ex) {
+                                }
                                continue;
                             }
                              l.info("data rcvd, len={}"+len);
                             for(int i=0;i<len;i+=2)
                             {
-                                int datapkg = ((data[i]&0xF0)>>>4)|((data[i+1]&0xF8)<<1);
+                                int datapkg = ((data[i]&0xF0)>>>4)|((data[i+1]&0xF0));
+                                datapkg|=((data[i+1]&0x08)<<5);
                                 boolean parity = numberOfSetBits(datapkg)%2==0;
+                                l.trace(String.format("%03X",datapkg));
                                 if(parity)
                                 {
+                                    l.trace(datapkg);
                                     out.accept(datapkg&0xff);
                                 }
                             }
@@ -106,15 +120,15 @@ private static final Logger l = LogManager.getLogger();
                             
                            try
                            {
-                               Thread.sleep(100);
+                               Thread.sleep(10);
                            } catch (InterruptedException ex)
                            {
                            }
                         }
-                    } catch (FileNotFoundException ex)
+                    } /*catch (FileNotFoundException ex)
                     {
                         ex.printStackTrace();
-                    } catch (IOException ex)
+                    } */catch (IOException ex) //noop-catch killme
                     {
                         ex.printStackTrace();
                     }

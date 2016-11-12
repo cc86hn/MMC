@@ -25,6 +25,6 @@ public class DataSenderSource
     {
         List<Byte> userdata = new ArrayList<>();
         userdata.add(((byte)(((byte)newSource)&((byte)0x3))));
-        handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_VOLUME_VOL, userdata, null);
+        handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_SOURCE_SRC, userdata, null);
     }
 }

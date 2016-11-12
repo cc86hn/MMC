@@ -5,6 +5,7 @@
  */
 package org.cc86.MMC.modules.audio.drivers.technics.se540;
 
+import java.util.ArrayList;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +28,7 @@ public class DriverSe540 implements Driver
     private DataSenderVolume vs = new DataSenderVolume(h);
     private DataSenderPower ps = new DataSenderPower(h);
     private DataSenderSource ss = new DataSenderSource(h);
+    private DataSenderSpeaker ssp = new DataSenderSpeaker(h);
     
     private Consumer<Integer> volumeCallback;
     private Consumer<Source> sourceCallback;
@@ -139,6 +141,22 @@ public class DriverSe540 implements Driver
     public void setUartSender(Consumer<Byte[]> dataConsumer)
     {
         uartOut=dataConsumer;
+    }
+
+    @Override
+    public void sync() {
+       h.sendPing();
+    }
+
+    @Override
+    public void setVolumeRel(byte volumeDelta) {
+        vs.changeVolumeRel(volumeDelta);
+    }
+
+    @Override
+    public void setSpeker(String[] spk) {
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ssp.changeSpksel(spk);
     }
     
 }
