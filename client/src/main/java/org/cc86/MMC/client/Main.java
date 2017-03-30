@@ -21,6 +21,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Level;
@@ -50,21 +51,35 @@ public class Main
     
     public static void main(String[] args)
     {
-        args=new String[]{"--demo"};
+        //args=new String[]{"--demo"};
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption("d", "demo", false, "Demo UI modus für die H+E in Schuttgart");
         options.addOption("x", "devmode", false, "Allows the Demo mode to be closed");
+                options.addOption(OptionBuilder.withLongOpt("file")
+                .withDescription("ip")
+                .hasArg()
+                .withArgName("ADDR")
+                .create("i"));
         try 
         {
-            
+            String srvr="0.0.0.0";
+             TimeoutManager m =null;
             CommandLine cl = parser.parse(options, args);
-            //Main.setupLogging(cl.hasOption("verbose"));
             setupLogging(true);
+            if(cl.hasOption("i"))
+            {
+                srvr=cl.getOptionValue("i");
+            }
+            else
+            {
+                //Main.setupLogging(cl.hasOption("verbose"));
 
-            TimeoutManager m = new TimeoutManager(30, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
-            m.start();
-            String srvr =serverDiscovery();//;//"10.110.12.183";//
+
+               m = new TimeoutManager(2, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
+                m.start();
+                srvr =serverDiscovery();//;//"10.110.12.183";//
+            }
             l.info(srvr);
             if(srvr.equals("0.0.0.0"))
             {
@@ -87,7 +102,10 @@ public class Main
             piIP=srvr;
             disp.connect(c);
             Runtime.getRuntime().addShutdownHook(new Thread(disp::quit));
-            m.disarm();
+            if(m!=null)
+            {
+                m.disarm();
+            }
             
             /* Set the Nimbus look and feel */
             //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

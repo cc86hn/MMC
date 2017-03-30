@@ -13,12 +13,13 @@ import java.util.List;
  */
 public class EventHandlerSource
 {
-    public static void handleEvent(List<Byte> packet,Integer cmd)
+    public static int handleEvent(List<Byte> packet,Integer cmd)
     {
         if(cmd==12)
         {
             int source = (packet.get(1))&0x03;
             DriverSe540.getDriver().notifyCoreonSource(source);
         }
+        return -1;
     }
 }

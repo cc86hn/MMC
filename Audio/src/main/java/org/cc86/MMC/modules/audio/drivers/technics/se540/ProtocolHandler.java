@@ -8,12 +8,11 @@ package org.cc86.MMC.modules.audio.drivers.technics.se540;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.CRC;
-import org.cc86.MMC.modules.audio.StereoControl;
 
 /**
  *
@@ -22,11 +21,12 @@ import org.cc86.MMC.modules.audio.StereoControl;
  @SuppressWarnings("PointlessBitwiseExpression")
 public class ProtocolHandler
 {
-      private static final Logger l = LogManager.getLogger();
+    private static final Logger l = LogManager.getLogger();
       
     private ArrayList<Byte> receivebuffer = new ArrayList<>();
     private Consumer<List<Byte>> requestResponseListener = null;
-    Thread handlingThread;
+    private final Thread handlingThread;
+    
     private static final int MAX_PACKET_SIZE=9;
     private static final byte INVERTED_SIZE_MASK = 0x38;
     private static final int INVERTED_SIZE_OFFSET = 3;
@@ -51,37 +51,40 @@ public class ProtocolHandler
     public static final int CMD_MASK = 0xF8;
     public static final int CMD_OFFSET = 3;
     public static final int CMD_LENGTH = 5;
-    public static final int CMD_VERSION_VER = 1;
-    public static final int CMD_RESET_RST = 2;
-    public static final int CMD_BOOTLOADER_BOOT = 3;
-    public static final int CMD_EVENT_EVT = 4;
-    public static final int CMD_STATISTIC_STAT = 5;
-    public static final int CMD_POWER_PWR = 6;
-    public static final int CMD_VOLUME_VOL = 7;
-    public static final int CMD_VOLUME_VOLREL = 8;
-    public static final int CMD_VOLUME_MUTE = 9;
-    public static final int CMD_VOLUME_BALREL = 10;
-    public static final int CMD_VOLUME_BAL = 11;
-    public static final int CMD_SOURCE_SRC = 12;
-    public static final int CMD_SPEAKER_SPK = 13;
-    public static final int CMD_SPEAKER_SPK_CFG = 14;
-    public static final int CMD_TIME_TIME = 15;
     
-    private static final List<BiConsumer<List<Byte>,Integer>> evtListeners = new ArrayList<>(2<<CMD_LENGTH);//initiale größe sollte die commands alle aufnehmen können
+    
+    public static final int CMD_VERSION_VER = 0;
+    public static final int CMD_RESET_RST = 1;
+    public static final int CMD_BOOTLOADER_BOOT = 2;
+    public static final int CMD_EVENT_EVT = 3;
+    public static final int CMD_STATISTIC_STAT = 4;
+    public static final int CMD_POWER_PWR = 5;
+    public static final int CMD_VOLUME_VOL = 6;
+    public static final int CMD_VOLUME_VOLREL = 7;
+    public static final int CMD_VOLUME_MUTE = 8;
+    public static final int CMD_VOLUME_BALREL = 9;
+    public static final int CMD_VOLUME_BAL = 10;
+    public static final int CMD_SOURCE_SRC = 11;
+    public static final int CMD_SPEAKER_SPK = 12;
+    public static final int CMD_SPEAKER_SPK_CFG = 13;
+    public static final int CMD_TIME_TIME = 14;
+    
+    
+    private static final List<BiFunction<List<Byte>,Integer,Integer>> evtListeners = new ArrayList<>(2<<CMD_LENGTH);//initiale größe sollte die commands alle aufnehmen können
     static{
         for(int i=0;i<(2<<CMD_LENGTH);i++)
         {
             evtListeners.add(null);//priming list slots
         }
     }
-    private static final int lastCmdStartTime=0;
+    
     static
     {
         evtListeners.set(CMD_STATISTIC_STAT,null);
         
         evtListeners.set(CMD_POWER_PWR,EventHandlerPower::handleEvent);
         
-        BiConsumer<List<Byte>,Integer> vollistener = EventHandlerVolume::handleEvent;
+        BiFunction<List<Byte>,Integer,Integer> vollistener = EventHandlerVolume::handleEvent;
         evtListeners.set(CMD_VOLUME_VOL,vollistener);
         evtListeners.set(CMD_VOLUME_MUTE,vollistener);
         evtListeners.set(CMD_VOLUME_BAL,vollistener);
@@ -108,14 +111,17 @@ public class ProtocolHandler
     
     private static final byte NACK_UNKNOWN = 1;
     
-    private static final byte NACK_INVALID = 1;
+    public static final byte NACK_INVALID = 1;
     
-    private static final byte NACK_BUSY = 1;
+    public static final byte NACK_BUSY = 1;
     
     //private final StereoControl control;
     
-    
-   
+    // session handling logic
+    private int retries=0;
+    private long lastCmdStartTime=0;
+    private boolean acked=false;
+    boolean sent=false;
     public ProtocolHandler(/*StereoControl c*/)
     {
         //control=c;
@@ -125,7 +131,7 @@ public class ProtocolHandler
             {
                  //suspected_package = ;
                 int listend = MAX_PACKET_SIZE>receivebuffer.size()?receivebuffer.size():MAX_PACKET_SIZE;
-                int ls = receivebuffer.size();
+                //int ls = receivebuffer.size();
                 /*if(ls==0)
                 {
                     continue;
@@ -167,7 +173,7 @@ public class ProtocolHandler
                             packet.add(suspected_package.get(i));
                             receivebuffer.remove(0);
                         }
-                        packetReceived(packet);
+                        packetReceived(packet,hdr);
                     }
                     else
                     {
@@ -220,9 +226,11 @@ public class ProtocolHandler
      * @param callback Callback handler for responses to this packet;
      * @throws InvalidPacketException
      */
-    public void send_packet(int cnt, int service,int command, List<Byte> userdata, Consumer<List<Byte>> callback) throws InvalidPacketException
+    public synchronized void send_packet(int cnt, int service,int command, List<Byte> userdata, Consumer<List<Byte>> callback) throws InvalidPacketException
     {
+        acked=false;
         l.trace("Packet go!");
+        retries=0;
         
         List<Byte> raw_packet = new ArrayList<>(MAX_PACKET_SIZE);
         for(int i=0;i<MAX_PACKET_SIZE;i++)
@@ -271,18 +279,46 @@ public class ProtocolHandler
         {
             raw_packet.remove(packetlength+1);
         }
-        DriverSe540.getDriver().sendDataViaUart(raw_packet.toArray(new Byte[0]));
+        lastCmdStartTime = System.currentTimeMillis();
+        Byte[] rawpkg = raw_packet.toArray(new Byte[0]);
+        DriverSe540.getDriver().sendDataViaUart(rawpkg);
         //TODO start timeout countdown
-        
+        new Thread(()->{
+            try
+            {
+                              
+                while(retries<10)
+                {
+                    Thread.sleep(50);
+                    if(lastCmdStartTime+100>System.currentTimeMillis())
+                    {
+                        DriverSe540.getDriver().sendDataViaUart(rawpkg);
+                        retries++;
+                    }
+                    else
+                    {
+                        if(acked)
+                        {
+                            return;
+                        }
+                    }
+                }
+            } catch (InterruptedException ex)
+            {
+                ex.printStackTrace();
+            }
+        });
         requestResponseListener=(packet)->
         {
+            
             int statebyte = packet.get(RET_ST_BYTE);
             statebyte=(statebyte&RET_ST_MASK)>>>RET_ST_OFFSET;
             if(statebyte==RET_ST_PND)
             {
-                //TODO check timeout; error out if too late;
+                lastCmdStartTime = System.currentTimeMillis();
                 return;
             }
+            acked=true;
             if(callback!=null)
             {
                 callback.accept(packet);
@@ -302,8 +338,8 @@ public class ProtocolHandler
      */
     public void send_response(int cnt, int req_crc,int ret_st, List<Byte> userdata) throws InvalidPacketException
     {
-        if(true)
-            return;
+        //if(true)
+        //     return;
         // throw new UnsupportedOperationException("FIXME");
         List<Byte> raw_packet = new ArrayList<>(MAX_PACKET_SIZE);
         int udsize = userdata.size();
@@ -344,7 +380,7 @@ public class ProtocolHandler
     
     
     //Todo trigger resend bei PacketLoss via timeout
-    private void packetReceived(List<Byte> packet)
+    private void packetReceived(List<Byte> packet,int hdr)
     {
        
         int srv = packet.get(SRV_BYTE-1)&SRV_MASK>>>SRV_OFFSET;
@@ -355,34 +391,56 @@ public class ProtocolHandler
             {
                 return;
             }
-            handle_event(packet);
-            return;
+            
+            handle_event(packet,hdr);
         }
-        if(requestResponseListener!=null)
+        else
         {
-            requestResponseListener.accept(packet);
+            if(requestResponseListener!=null)
+            {
+                requestResponseListener.accept(packet);
+            }
         }
     }
-    private void handle_event(List<Byte> packet)
+    private void handle_event(List<Byte> packet,int hdr)
     {
         int cmd=((int)packet.get(CMD_BYTE-1));
         cmd=cmd&CMD_MASK;
         cmd=cmd>>>CMD_OFFSET;
         int req_crc=packet.get(packet.size()-1);
         //int cnt = packet.get(CNT_BYTE)&CNT_MASK>>CNT_OFFSET;
-        BiConsumer<List<Byte>,Integer> eventhandler = evtListeners.get(cmd);
+        BiFunction<List<Byte>,Integer,Integer> eventhandler = evtListeners.get(cmd);
         if(eventhandler!=null)
         {
-            eventhandler.accept(packet,cmd);
+            int cnt = (hdr&CNT_MASK)>>>CNT_OFFSET;
+            int crc = packet.get(packet.size()-1);
+            int stts = RET_ST_ACK;
+            
+            int retval = eventhandler.apply(packet,cmd);
+            
+            return;
+        }
+
+        send_response(0,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{NACK_UNKNOWN}));
+        l.warn("Got unknown command ID {} in event response",cmd);
+
+    }
+    
+    private void respond(int cnt, int crc, int stts)
+    {
+        List<Byte> pkg = new ArrayList<>();
+        if(stts<128)
+        {
+            stts=RET_ST_ACK;
         }
         else
         {
-            
-            this.send_response(0,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{NACK_UNKNOWN}));
-            l.warn("Got unknown command ID {} in event response",cmd);
-            
+            pkg.add((byte)stts);
         }
+        send_response(cnt, crc, stts, pkg);
     }
+    
+    
     void sendPing()
     {
         DriverSe540.getDriver().sendDataViaUart(new Byte[]{0b00111000,CRC.crc8(CRC.CRC8_START,0b00111000)});

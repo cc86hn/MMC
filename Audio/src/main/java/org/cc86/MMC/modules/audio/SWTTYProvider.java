@@ -20,7 +20,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
@@ -46,7 +49,7 @@ private static final Logger l = LogManager.getLogger();
      */
     public static void main(String[] args)
     {
-       new SWTTYProvider().uartHandler(System.out::println, System.in, true);
+       //new SWTTYProvider().uartHandler(System.out::println, System.in, true);
     }
 
     private static void setup()
@@ -54,7 +57,7 @@ private static final Logger l = LogManager.getLogger();
         Tools.runCmdWithPassthru(IoBuilder.forLogger("External.sudoedChmod").buildPrintStream(),"sudo","chmod","777","/sys/class/softuart/softuart/data");
     }
     @Override
-    public void uartHandler(final Consumer<Integer> out,final InputStream ctrl,final boolean addPrefix)
+    public void uartHandler(final Consumer<Integer> out,final BlockingQueue<byte[]> ctrl,final boolean addPrefix)
     {
         new Thread(()->
         {
@@ -133,13 +136,18 @@ private static final Logger l = LogManager.getLogger();
                         ex.printStackTrace();
                     }
                 }).start();//*/
-                 BufferedReader bs = new BufferedReader(new InputStreamReader(ctrl));
+                 //BufferedReader bs = new BufferedReader(new InputStreamReader(ctrl));
                 while (true)
                 {
                     //l.warn("d'arvit");
-                    byte thebyte = (byte) ctrl.read();//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
-                    l.trace("SENT_UART:"+thebyte);
-                    String echo = "\\x"+String.format("%02X", thebyte);
+                    byte[] thebyte = ctrl.take();//alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + alphabet[new Random().nextInt(26)] + "\r\n";
+                    l.trace("SENT_UART:"+Arrays.toString(thebyte));
+                    StringBuilder sb = new StringBuilder();
+                    for (Byte pkgbyte : thebyte)
+                    {
+                        sb.append("\\x").append(String.format("%02X", pkgbyte));
+                    }
+                    String echo = sb+"";
                     l.trace(echo);
                     Tools.runCmdWithPassthru(System.out, "/bin/bash","-c","echo -ne '"+echo+"'>/sys/class/softuart/softuart/data");
                     //ps.write(new byte[]{thebyte});

@@ -6,6 +6,8 @@
 package org.cc86.MMC.modules.audio;
 
 import java.io.InputStream;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 
 /**
@@ -14,6 +16,6 @@ import java.util.function.Consumer;
  */
 public interface TTYProvider
 {
-     public void uartHandler(final Consumer<Integer> out, final InputStream ctrl, final boolean addPrefix);
+     public void uartHandler(final Consumer<Integer> out, final BlockingQueue<byte[]> ctrl, final boolean addPrefix);
     
 }

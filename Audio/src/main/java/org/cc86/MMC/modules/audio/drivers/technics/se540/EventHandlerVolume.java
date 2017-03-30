@@ -20,13 +20,13 @@ public class EventHandlerVolume
     private static final int CMD_VOLUME_BAL = 11;
     
     
-    public static  void handleEvent(List<Byte> packet,Integer cmd)
+    public static  int handleEvent(List<Byte> packet,Integer cmd)
     {
         switch(cmd)
         {
             
             
-            case CMD_VOLUME_VOL:
+            case CMD_VOLUME_VOL: 
             {
                 int volume = (packet.get(1))&0x7F;
                 DriverSe540.getDriver().notifyCoreonVolume(volume);
@@ -40,8 +40,8 @@ public class EventHandlerVolume
             case CMD_VOLUME_MUTE:
             {
                 break;
-            }
-                    
+            }       
         }
+        return -1;
     }
 }

@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.MediaPlayerControl;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 import org.cc86.MMC.API.PlaybackListener;
 import org.cc86.MMC.API.PlaybackMode;
 import org.yaml.snakeyaml.Yaml;

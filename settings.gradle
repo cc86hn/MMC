@@ -1,1 +1,1 @@
-include 'Server', 'Test', 'Radio', 'Stream', 'Beamer', 'Audio','release','client'
+include 'Server', 'Test', 'Radio', 'Stream', 'Beamer', 'Audio','release','client','shared'

@@ -7,7 +7,7 @@ package org.cc86.MMC.server;
 
 import java.util.HashMap;
 import org.cc86.MMC.API.Handler;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 import org.cc86.MMC.API.Processor;
 
 /**

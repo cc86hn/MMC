@@ -5,6 +5,8 @@
  */
 package org.cc86.MMC.API;
 
+import org.cc86.MMC.Networking.Packet;
+
 
 /**
  *

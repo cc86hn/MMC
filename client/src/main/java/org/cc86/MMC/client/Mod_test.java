@@ -8,7 +8,7 @@ package org.cc86.MMC.client;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 import org.cc86.MMC.client.API.Connection;
 import org.cc86.MMC.client.API.Module;
 

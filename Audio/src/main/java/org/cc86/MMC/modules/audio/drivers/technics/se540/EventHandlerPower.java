@@ -13,12 +13,13 @@ import java.util.List;
  */
 public class EventHandlerPower
 {
-    public static void handleEvent(List<Byte> packet,Integer cmd)
+    public static int handleEvent(List<Byte> packet,Integer cmd)
     {
         if(cmd==6)
         {
             boolean power = packet.get(1)!=0;
             DriverSe540.getDriver().notifyCoreonPower(power);
         }
+        return -1;
     }
 }

@@ -9,7 +9,7 @@ package org.cc86.MMC.modules.test;
 import java.util.HashMap;
 import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.API.Processor;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 
 /**
  *

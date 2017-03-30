@@ -10,6 +10,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.Level;
@@ -37,6 +38,7 @@ public class Main {
         Options options = new Options();
         options.addOption("m", "mock", false, "Mock-Modus für verschiedenerlei Komponenten");
         options.addOption("v", "verbose", false, "Mock-Modus für verschiedenerlei Komponenten");
+
         try 
         {
             

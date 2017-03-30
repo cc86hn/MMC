@@ -13,7 +13,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 import org.cc86.MMC.client.API.Connection;
 import org.yaml.snakeyaml.Yaml;
 

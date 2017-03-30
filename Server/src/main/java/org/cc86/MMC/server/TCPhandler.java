@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 import org.yaml.snakeyaml.Yaml;
 
 

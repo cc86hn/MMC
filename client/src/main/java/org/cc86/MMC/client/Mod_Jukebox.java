@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 import org.cc86.MMC.client.API.Connection;
 import org.cc86.MMC.client.API.Module;
 import org.cc86.MMC.client.API.Utilities;

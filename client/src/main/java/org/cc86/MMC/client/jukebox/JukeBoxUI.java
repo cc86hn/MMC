@@ -13,7 +13,7 @@ import java.util.Set;
 import javax.swing.DefaultListModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 import org.cc86.MMC.client.Mod_Jukebox;
 
 /**

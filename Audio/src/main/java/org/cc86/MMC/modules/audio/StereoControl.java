@@ -13,12 +13,14 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 //import java.util.logging.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.API;
 import org.cc86.MMC.API.Handler;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 import org.cc86.MMC.API.Processor;
 import org.cc86.MMC.modules.audio.drivers.technics.se540.DriverSe540;
 //import org.cc86.MMC.modules.audio.drivers.technics.se540.ProtocolHandler;
@@ -34,25 +36,13 @@ public class StereoControl implements Processor
     //MODE: GET SET
     //response hat immer CHG
     private static final Logger l = LogManager.getLogger();
-    private static final String RESPONSE_HEADER = "CHG";
-    private static final String VOLUME_RESPONSE = "VOL";
-    private static final String STATE_RESPONSE = "PWR";
-    private static final String SRCSEL_RESPONSE = "SRC";
-    private static final String VOLUME_SET_COMMAND = "SET VOL %d\n";
-    private static final String VOLUME_UP_COMMAND = "SET VOL UP\n";
-    private static final String VOLUME_DOWN_COMMAND = "SET VOL DOWN\n";
-    private static final String VOLUME_GET_COMMAND = "GET VOL\n";
-    private static final String POWER_SET_COMMAND = "SET PWR %s\n";
-    private static final String SOURCE_SET_COMMAND = "SET SRC %s\n";
-    private static final String SPEAKER_SET_COMMAND = "SET SPK %s\n";
-    private static final String POWER_GET_COMMAND = "GET PWR\n";
-    private static final String DEVSYNC_COMMAND = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\n";
     private boolean pwr = false;
     private int volume=0;
     private String src = "";
-    private PrintStream serialControl;
+    //private PrintStream serialControl;
     private final List<byte[]> sendQueue = new ArrayList<>();
     private Driver se540 = DriverSe540.getDriver();
+    private BlockingQueue<byte[]> serialControl = new LinkedBlockingQueue<>();
     public StereoControl()
     {
         se540.addPowerCallback((power) -> this.powerChanged(power));
@@ -61,22 +51,15 @@ public class StereoControl implements Processor
         se540.setUartSender((data) -> this.sendViaUART(data));
         new Thread(()->
         {
-            PipedInputStream ttycontrolend = new PipedInputStream(8192);
-            try
+            serialControl.clear();
+            //serialControl = new PrintStream(new PipedOutputStream(ttycontrolend));
+            if(API.getMockMode())
             {
-                serialControl = new PrintStream(new PipedOutputStream(ttycontrolend));
-                if(API.getMockMode())
-                {
-                    new MockSWTTYProvider().uartHandler(this::processUARTLine, ttycontrolend, false);
-                }
-                else
-                {
-                    new SWTTYProvider().uartHandler(this::processUARTLine, ttycontrolend, false);
-                }
-
-            } catch (IOException ex)
+                new MockSWTTYProvider().uartHandler(this::processUARTLine, serialControl, false);
+            }
+            else
             {
-                ex.printStackTrace();
+                new SWTTYProvider().uartHandler(this::processUARTLine, serialControl, false);
             }
             while(true)
             {
@@ -89,15 +72,12 @@ public class StereoControl implements Processor
                         {
                             //String sq = new String(sendQueue.remove(0));
                             //l.trace("SENDPREP:"+sq);
-                            serialControl.write(sendQueue.remove(0));
-                            serialControl.flush();
+                            serialControl.add(sendQueue.remove(0));
                         }
                     }
                     catch (InterruptedException ex)
                     {
                         ex.printStackTrace();
-                    } catch (IOException ex) {
-                        l.info("UART pipe internally broken");
                     }
                 }
             }

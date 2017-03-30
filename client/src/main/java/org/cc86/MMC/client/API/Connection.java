@@ -6,7 +6,7 @@
 package org.cc86.MMC.client.API;
 
 import java.io.IOException;
-import org.cc86.MMC.API.Packet;
+import org.cc86.MMC.Networking.Packet;
 
 /**
  *
