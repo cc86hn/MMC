@@ -12,25 +12,28 @@ import java.util.List;
  *
  * @author tgoerner
  */
-public class DataSenderVolume
+public class DataHandlerVolumeVol extends DataHandler
 {
     private ProtocolHandler handler;
-    
-    public DataSenderVolume(ProtocolHandler h)
+    public static final DataHandlerVolumeVol instance = new DataHandlerVolumeVol(); 
+    private DataHandlerVolumeVol(){}
+    public static DataHandler linkHandler(ProtocolHandler h)
     {
-        handler=h;
+        instance.handler=h;
+        return instance;
     }
     
     public void changeVolume(int newVolume)
     {
         List<Byte> userdata = new ArrayList<>();
         userdata.add(((byte)(((byte)newVolume)&((byte)0x7f))));
-        handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_VOLUME_VOL, userdata, null);
+        handler.send_packet(0, ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
     }
-    public void changeVolumeRel(byte newVolume)
+    @Override
+    public int handleEvent(List<Byte> packet)
     {
-        List<Byte> userdata = new ArrayList<>();
-        userdata.add(newVolume);
-        handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_VOLUME_VOLREL, userdata, null);
+        int volume = (packet.get(1))&0x7F;
+        DriverSe540.getDriver().notifyCoreonVolume(volume);
+        return -1;
     }
 }

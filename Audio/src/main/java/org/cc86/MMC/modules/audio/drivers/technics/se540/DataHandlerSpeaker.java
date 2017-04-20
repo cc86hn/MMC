@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author LH
  */
-public class DataSenderSpeaker 
+public class DataHandlerSpeaker extends DataHandler
 {
     private final byte AR=0x1;
     private final byte AL=0x2;
@@ -20,9 +20,12 @@ public class DataSenderSpeaker
     private final byte BL=0x8;
     private ProtocolHandler handler;
     
-    public DataSenderSpeaker(ProtocolHandler h)
+    public static final DataHandlerSpeaker instance = new DataHandlerSpeaker(); 
+    private DataHandlerSpeaker(){}
+    public static DataHandler linkHandler(ProtocolHandler h)
     {
-        handler=h;
+        instance.handler=h;
+        return instance;
     }
     
     public void changeSpksel(String[] spksel)
@@ -48,6 +51,6 @@ public class DataSenderSpeaker
         }
         List<Byte> userdata = new ArrayList<>();
         userdata.add(spk);
-        handler.send_packet(0, ProtocolHandler.SRV_SET, ProtocolHandler.CMD_SPEAKER_SPK, userdata, null);
+        handler.send_packet(0, ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
     }
 }

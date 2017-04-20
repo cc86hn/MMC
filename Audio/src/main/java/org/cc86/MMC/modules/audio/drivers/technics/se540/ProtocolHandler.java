@@ -52,47 +52,27 @@ public class ProtocolHandler
     public static final int CMD_OFFSET = 3;
     public static final int CMD_LENGTH = 5;
     
+    /*public static final int CMD_VERSION_VER         = 0;
+    public static final int CMD_RESET_RST           = 1;
+    public static final int CMD_BOOTLOADER_BOOT     = 2;
+    public static final int CMD_EVENT_EVT           = 3;
+    public static final int CMD_EVENT_EVTALL        = 4;
+    public static final int CMD_STATISTIC_STAT      = 5;
+    public static final int CMD_POWER_PWR           = 6;
+    public static final int CMD_VOLUME_VOL          = 7;
+    public static final int CMD_VOLUME_VOLREL       = 8;
+    public static final int CMD_VOLUME_MUTE         = 9;
+    public static final int CMD_VOLUME_BALREL       = 10;
+    public static final int CMD_VOLUME_BAL          = 11;
+    public static final int CMD_SOURCE_SRC          = 12;
+    public static final int CMD_SPEAKER_SPK         = 13;
+    public static final int CMD_SPEAKER_SPKCFG      = 14;
+    public static final int CMD_TIME_TIME           = 15;*/
     
-    public static final int CMD_VERSION_VER = 0;
-    public static final int CMD_RESET_RST = 1;
-    public static final int CMD_BOOTLOADER_BOOT = 2;
-    public static final int CMD_EVENT_EVT = 3;
-    public static final int CMD_STATISTIC_STAT = 4;
-    public static final int CMD_POWER_PWR = 5;
-    public static final int CMD_VOLUME_VOL = 6;
-    public static final int CMD_VOLUME_VOLREL = 7;
-    public static final int CMD_VOLUME_MUTE = 8;
-    public static final int CMD_VOLUME_BALREL = 9;
-    public static final int CMD_VOLUME_BAL = 10;
-    public static final int CMD_SOURCE_SRC = 11;
-    public static final int CMD_SPEAKER_SPK = 12;
-    public static final int CMD_SPEAKER_SPK_CFG = 13;
-    public static final int CMD_TIME_TIME = 14;
+ 
+   
     
-    
-    private static final List<BiFunction<List<Byte>,Integer,Integer>> evtListeners = new ArrayList<>(2<<CMD_LENGTH);//initiale größe sollte die commands alle aufnehmen können
-    static{
-        for(int i=0;i<(2<<CMD_LENGTH);i++)
-        {
-            evtListeners.add(null);//priming list slots
-        }
-    }
-    
-    static
-    {
-        evtListeners.set(CMD_STATISTIC_STAT,null);
-        
-        evtListeners.set(CMD_POWER_PWR,EventHandlerPower::handleEvent);
-        
-        BiFunction<List<Byte>,Integer,Integer> vollistener = EventHandlerVolume::handleEvent;
-        evtListeners.set(CMD_VOLUME_VOL,vollistener);
-        evtListeners.set(CMD_VOLUME_MUTE,vollistener);
-        evtListeners.set(CMD_VOLUME_BAL,vollistener);
-        
-        evtListeners.set(CMD_SOURCE_SRC,EventHandlerSource::handleEvent);
-        
-        evtListeners.set(CMD_SPEAKER_SPK,null);
-    }
+    public final List<DataHandler> dataHandlers;
     
     
     private static final int USRDATA_REQ_START_BYTE=2;
@@ -109,21 +89,44 @@ public class ProtocolHandler
     private static final int RET_ST_NACK = 3;
     private static final int REQ_CRC_BYTE = 1;
     
-    private static final byte NACK_UNKNOWN = 1;
+    /*package*/ static final byte NACK_UNKNOWN = 1;
     
     public static final byte NACK_INVALID = 1;
     
     public static final byte NACK_BUSY = 1;
     
-    //private final StereoControl control;
     
     // session handling logic
     private int retries=0;
     private long lastCmdStartTime=0;
     private boolean acked=false;
     boolean sent=false;
+    @SuppressWarnings({"SleepWhileInLoop", "LeakingThisInConstructor"})
     public ProtocolHandler(/*StereoControl c*/)
     {
+        //setting up the listener lookup array
+        dataHandlers = Arrays.asList(
+            DataHandlerVersion.linkHandler(this),       //VERSION->VER;NO_EVT
+            null,                                       //RESET->RST;NO_EVT
+            null,                                       //BOOTLOADER->BOOT;NO_EVT
+            null,                                       //EVENT->EVT;NO_EVT
+            null,                                       //EVENT->EVTALL;NO_EVT
+            null,                                       //STATISTIC->STAT
+            DataHandlerPower.linkHandler(this),         //POWER->PWR
+            DataHandlerVolumeVol.linkHandler(this),     //VOLUME->VOL
+            DataHandlerVolumeVolrel.linkHandler(this),  //VOLUME->VOLREL;NO_EVT
+            DataHandlerVolumeMute.linkHandler(this),    //VOLUME->MUTE
+            DataHandlerVolumeBalrel.linkHandler(this),  //VOLUME->BALREL;NO_EVT
+            DataHandlerVolumeBal.linkHandler(this),     //VOLUME->BAL
+            DataHandlerSource.linkHandler(this),        //SOURCE->SRC
+            DataHandlerSpeaker.linkHandler(this),       //SPEAKER->SPK
+            null,                                       //SPEAKER->SPKCFG
+            null                                        //TIME->TIME
+        );
+        
+        
+        
+        
         //control=c;
         handlingThread = new Thread(()->
         {
@@ -407,22 +410,28 @@ public class ProtocolHandler
         int cmd=((int)packet.get(CMD_BYTE-1));
         cmd=cmd&CMD_MASK;
         cmd=cmd>>>CMD_OFFSET;
+        int cnt = (hdr&CNT_MASK)>>>CNT_OFFSET;
         int req_crc=packet.get(packet.size()-1);
         //int cnt = packet.get(CNT_BYTE)&CNT_MASK>>CNT_OFFSET;
-        BiFunction<List<Byte>,Integer,Integer> eventhandler = evtListeners.get(cmd);
-        if(eventhandler!=null)
+        boolean inRange=cmd<dataHandlers.size();
+        DataHandler eventhandler = dataHandlers.get(cmd);
+        if(inRange&&eventhandler!=null)
         {
-            int cnt = (hdr&CNT_MASK)>>>CNT_OFFSET;
-            int crc = packet.get(packet.size()-1);
-            int stts = RET_ST_ACK;
-            
-            int retval = eventhandler.apply(packet,cmd);
-            
-            return;
+            int retval = eventhandler.handleEvent(packet);
+            if(retval<0)
+            {
+                send_response(cnt,req_crc , RET_ST_ACK,new ArrayList<>());
+            }
+            else
+            {
+                send_response(cnt,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{((byte)(retval&0xFF))}));
+            }
         }
-
-        send_response(0,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{NACK_UNKNOWN}));
-        l.warn("Got unknown command ID {} in event response",cmd);
+        else
+        {
+            send_response(cnt,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{NACK_UNKNOWN}));
+            l.warn("Got unknown command ID {} in event response",cmd);
+        }
 
     }
     
@@ -439,7 +448,6 @@ public class ProtocolHandler
         }
         send_response(cnt, crc, stts, pkg);
     }
-    
     
     void sendPing()
     {
