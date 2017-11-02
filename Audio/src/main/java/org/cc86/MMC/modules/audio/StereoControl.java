@@ -186,14 +186,7 @@ public class StereoControl implements Processor
             case "dev_sync":
                 if(set)
                 {
-                    try{
-                        se540.sync();
-                    }
-                    catch(NumberFormatException ex)
-                    {
-                        ex.printStackTrace();
-                        //TODO ERROR_NOTIFY
-                    }
+                    se540.sync();
                 }
                 else
                 {
