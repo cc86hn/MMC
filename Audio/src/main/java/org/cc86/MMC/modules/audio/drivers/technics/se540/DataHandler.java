@@ -23,10 +23,8 @@ public class DataHandler
     
     public void sendGet()
     {
-        handler.send_packet(0, ProtocolHandler.SRV_GET, handler.dataHandlers.indexOf(this), null, null);
+        handler.send_packet(ProtocolHandler.SRV_GET, handler.dataHandlers.indexOf(this), null, null);
     }
-    
-    
     /**
      * Processes the Event packet for the given EventID
      * @param packet Packet of the associated Event

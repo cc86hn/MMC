@@ -43,6 +43,8 @@ public class ServerCore
         } catch (IOException ex) 
         {
             l.error(ex);
+            l.info("Shutting down Server since it could not boot correctly");
+            Main.m.shitdownHandler();
         }  
     }
 }

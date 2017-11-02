@@ -8,11 +8,11 @@ package org.cc86.MMC.modules.audio.drivers.technics.se540;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.API.CRC;
+import org.cc86.MMC.modules.audio.ReconnectionCallback;
 
 /**
  *
@@ -23,16 +23,20 @@ public class ProtocolHandler
 {
     private static final Logger l = LogManager.getLogger();
       
-    private ArrayList<Byte> receivebuffer = new ArrayList<>();
+    private final ArrayList<Byte> receivebuffer = new ArrayList<>();
     private Consumer<List<Byte>> requestResponseListener = null;
     private final Thread handlingThread;
     
     private static final int MAX_PACKET_SIZE=9;
     private static final byte INVERTED_SIZE_MASK = 0x38;
     private static final int INVERTED_SIZE_OFFSET = 3;
-    private static final byte CNT_MASK = (byte)0xC0;
+    private static final byte CNT_MASK = (byte)0x40;
     private static final int CNT_OFFSET = 6;
-    private static final int CNT_LENGTH = 2;
+    private static final int CNT_LENGTH = 1;
+    private static final int DIR_OFFSET = 7;
+    private static final int DIR_LENGTH = 1;
+    private static final byte DIR_MASK = (byte)0x80;
+    private static final int DIR_VALUE = 0;
     private static final int CNT_BYTE = 0;
     private static final byte BASE_SIZE_MASK = 0x07;
     private static final int BASE_SIZE_LENGTH = 3;
@@ -52,42 +56,23 @@ public class ProtocolHandler
     public static final int CMD_OFFSET = 3;
     public static final int CMD_LENGTH = 5;
     
-    /*public static final int CMD_VERSION_VER         = 0;
-    public static final int CMD_RESET_RST           = 1;
-    public static final int CMD_BOOTLOADER_BOOT     = 2;
-    public static final int CMD_EVENT_EVT           = 3;
-    public static final int CMD_EVENT_EVTALL        = 4;
-    public static final int CMD_STATISTIC_STAT      = 5;
-    public static final int CMD_POWER_PWR           = 6;
-    public static final int CMD_VOLUME_VOL          = 7;
-    public static final int CMD_VOLUME_VOLREL       = 8;
-    public static final int CMD_VOLUME_MUTE         = 9;
-    public static final int CMD_VOLUME_BALREL       = 10;
-    public static final int CMD_VOLUME_BAL          = 11;
-    public static final int CMD_SOURCE_SRC          = 12;
-    public static final int CMD_SPEAKER_SPK         = 13;
-    public static final int CMD_SPEAKER_SPKCFG      = 14;
-    public static final int CMD_TIME_TIME           = 15;*/
-    
- 
-   
-    
     public final List<DataHandler> dataHandlers;
+    
+    private final InternalPacket[] packets;
     
     
     private static final int USRDATA_REQ_START_BYTE=2;
-    
     
     private static final int USRDATA_RET_START_BYTE=3;
     private static final int RET_ST_BYTE = 1;
     private static final int RET_ST_MASK = 0x18;
     private static final int RET_ST_OFFSET = 3;
     private static final int RET_ST_LENGTH = 2;
-    private static final int RET_ST_ACK = 1;
+    private static final int RET_ST_ACK = 0;
     
-    private static final int RET_ST_PND = 2;
-    private static final int RET_ST_NACK = 3;
-    private static final int REQ_CRC_BYTE = 1;
+    private static final int RET_ST_PND = 1;
+    private static final int RET_ST_NACK = 2;
+    private static final int REQ_CRC_BYTE = 2;
     
     /*package*/ static final byte NACK_UNKNOWN = 1;
     
@@ -95,12 +80,25 @@ public class ProtocolHandler
     
     public static final byte NACK_BUSY = 1;
     
+    private byte cnt=0;
     
+    private final Object pingsync = new Object();
+    private boolean connectionExists=false;
     // session handling logic
     private int retries=0;
     private long lastCmdStartTime=0;
     private boolean acked=false;
     boolean sent=false;
+    private byte lastPingCRC=0x00;
+    private ReconnectionCallback cbk; 
+    
+    private int lastSentCrc=-1;
+    private int lastSentCrcResponse=-1;
+    //Debug variables
+    private int packetsLost=0,completeConnectionsLost=0,
+            packetsReceived=0,packetsSent=0;
+    
+    
     @SuppressWarnings({"SleepWhileInLoop", "LeakingThisInConstructor"})
     public ProtocolHandler(/*StereoControl c*/)
     {
@@ -110,7 +108,7 @@ public class ProtocolHandler
             null,                                       //RESET->RST;NO_EVT
             null,                                       //BOOTLOADER->BOOT;NO_EVT
             null,                                       //EVENT->EVT;NO_EVT
-            null,                                       //EVENT->EVTALL;NO_EVT
+            DataHandlerEventAll.linkHandler(this),                                       //EVENT->EVTALL;NO_EVT
             null,                                       //STATISTIC->STAT
             DataHandlerPower.linkHandler(this),         //POWER->PWR
             DataHandlerVolumeVol.linkHandler(this),     //VOLUME->VOL
@@ -122,10 +120,9 @@ public class ProtocolHandler
             DataHandlerSpeaker.linkHandler(this),       //SPEAKER->SPK
             null,                                       //SPEAKER->SPKCFG
             null                                        //TIME->TIME
-        );
+        ); 
         
-        
-        
+        packets = new InternalPacket[dataHandlers.size()];
         
         //control=c;
         handlingThread = new Thread(()->
@@ -139,17 +136,13 @@ public class ProtocolHandler
                 {
                     continue;
                 }*/
-                List<Byte> suspected_package =null;
+                List<Byte> suspected_package;
                 synchronized(receivebuffer)
                 {
-                    suspected_package = new ArrayList<Byte>(((ArrayList<Byte>)receivebuffer.clone()).subList(0, (listend)));
+                    suspected_package = new ArrayList<>(((ArrayList<Byte>)receivebuffer.clone()).subList(0, (listend)));
                 }
-                if(suspected_package.size()<1||suspected_package==null)
+                if(suspected_package.size()<1)
                 {
-                    if(suspected_package==null)
-                    {
-                        l.trace("this shouldnt happen");
-                    }
                     continue;
                 }
                 byte hdr = suspected_package.get(0);
@@ -160,6 +153,15 @@ public class ProtocolHandler
                     receivebuffer.remove(0);
                     continue;
                 }
+                //l.info("Header correct");
+                int direction = ((hdr&DIR_MASK)>>DIR_OFFSET);
+                //l.trace("direction{}",direction);
+                if(direction==DIR_VALUE)
+                {
+                    receivebuffer.remove(0);
+                    continue;
+                }
+                
                 if(suspected_package.size()>size_first+1)
                 {
                     int crc = CRC.CRC8_START;
@@ -170,12 +172,17 @@ public class ProtocolHandler
                     }
                     if(crc==0)//CRC mit gültigem CRC-wert soll immer auf 0 enden
                     {
+                        l.info("Packet received via UART,Size{},Header{}",realsize,String.format("%03X",suspected_package.get(0)));
                         List<Byte> packet = new ArrayList<>(MAX_PACKET_SIZE);
-                        for(int i=1;i<realsize;i++)//header weg
+                        String pkg = String.format("%03X",suspected_package.get(0))+"|";
+                        for(int i=1;i<realsize;i++)
                         {
+                            pkg+=String.format("%03X",suspected_package.get(i))+"|";
                             packet.add(suspected_package.get(i));
                             receivebuffer.remove(0);
                         }
+                        l.trace(pkg);
+                        packetsReceived++;
                         packetReceived(packet,hdr);
                     }
                     else
@@ -189,7 +196,7 @@ public class ProtocolHandler
                 }
                 try
                 {
-                    Thread.sleep(1);
+                    Thread.sleep(10);
                 } catch (InterruptedException ex)
                 {
                     ex.printStackTrace();
@@ -199,9 +206,33 @@ public class ProtocolHandler
         });
         handlingThread.setName("ProtocolReceiverSE540");
     }
-    public void startReceive()
+    public void connect(ReconnectionCallback c)
     {
+        cbk=c;
+        l.info("Connected");
         handlingThread.start();
+        
+        packetDispatchStart();
+        pingHandlerStart();
+        
+        new Thread(()->{
+            while(!DriverSe540.getDriver().isReady())
+            {
+                try
+                {
+                    Thread.sleep(50);
+                } catch (InterruptedException ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+            DataHandlerEventAll.instance.registerEvents();
+            synchronized(pingsync)
+            {
+                connectionExists=false;
+                pingsync.notify();
+            }
+        }).start();
     }
     
     public void receiveByte(byte b)
@@ -222,14 +253,120 @@ public class ProtocolHandler
     }
     /**
      * Generates a packet for sending via the UART. CRC and frame is added by this method before send
-     * @param cnt 2-bit counter that should change when sending new packet
      * @param service integer ID of the selected service
      * @param command integer ID of the command type, see SRV_* constants
      * @param userdata Userdata bytes of the packet
      * @param callback Callback handler for responses to this packet;
      * @throws InvalidPacketException
      */
-    public synchronized void send_packet(int cnt, int service,int command, List<Byte> userdata, Consumer<List<Byte>> callback) throws InvalidPacketException
+    public void send_packet(int service, int command, List<Byte> userdata, Consumer<List<Byte>> callback) throws InvalidPacketException
+    {
+        if(command>=dataHandlers.size())
+        {
+            throw new InvalidPacketException("The command is not registered so far");
+        }
+        int udsize = userdata.size()+1;
+        if(udsize>(1<<BASE_SIZE_LENGTH))
+        {
+            throw new InvalidPacketException("Userdata too long");
+        }
+        if(cnt>(1<<CNT_LENGTH))
+        {
+            throw new InvalidPacketException("Counter too large");
+        }
+        if(command>(1<<CMD_LENGTH))
+        {
+            throw new InvalidPacketException("Command out of range");
+        }
+        if(service>(1<<SRV_LENGTH))
+        {
+            throw new InvalidPacketException("Service out of range");
+        }
+        InternalPacket p = new InternalPacket();
+        p.callback=callback;
+        p.command=command;
+        p.service=service;
+        p.userdata=userdata;
+        packets[command]=p;
+        synchronized(packets)
+        {
+            l.trace("Triggering packet rack");
+            packets.notifyAll();
+        }
+    }
+    
+    private void pingHandlerStart()
+    {
+        Thread t = new Thread(()->{
+            while(true)
+            {
+                synchronized(pingsync)
+                {
+                    try
+                    {
+                        pingsync.wait();
+                        while(!connectionExists)
+                        {
+                            l.trace("Ping triggered");
+                            sendPing();
+                            Thread.sleep(1000);
+                        }
+                    } catch (InterruptedException ex)
+                    {
+                        l.warn("Should not happen;Ping loop interrupt");
+                        ex.printStackTrace();
+                    }
+                    
+                }
+            }
+        });
+        t.setName("PackageSendDispatcher");
+        t.start();
+    }
+
+    private void packetDispatchStart()
+    {
+        Thread t = new Thread(()->{
+            synchronized(packets)
+            {
+                while(true)
+                {
+                    try
+                    {
+                        l.trace("PKG cycle");
+                        packets.wait();
+                        l.trace("Packets got notified");
+                        for (int i=0;i<packets.length;i++)
+                        {
+                            if (packets[i] != null)
+                            {
+                                InternalPacket p = packets[i];
+                                l.trace("Send packet started");
+                                send_packet_core(p.service, p.command, p.userdata, p.callback);
+                                packets.wait();
+                                if(connectionExists)
+                                {
+                                    packets[i]=null;
+                                }
+                            }
+                            /*if(!connectionExists)
+                            {
+                                break;
+                            }*/
+                        }
+                    } catch (InterruptedException ex)
+                    {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+        t.setName("PackageSendDispatcher");
+        t.start();
+    }
+    
+    @SuppressWarnings("SleepWhileInLoop")
+    private void send_packet_core(int service, int command, List<Byte> userdata, Consumer<List<Byte>> callback) throws InvalidPacketException
     {
         acked=false;
         l.trace("Packet go!");
@@ -241,24 +378,8 @@ public class ProtocolHandler
             raw_packet.add(i,(byte)0);
         }
         int udsize = userdata.size()+1;
-        if(udsize>(1<<BASE_SIZE_LENGTH))
-        {
-            throw new InvalidPacketException("Userdata too long");
-        }
-        if(cnt>(1<<CNT_LENGTH))
-        {
-            throw new InvalidPacketException("Counter too large");
-        }
         int udsize_inv = udsize^((1<<BASE_SIZE_LENGTH)-1);
-        raw_packet.set(0, (byte)((cnt<<CNT_OFFSET)|(udsize_inv<<INVERTED_SIZE_OFFSET)|(udsize)));
-        if(command>(1<<CMD_LENGTH))
-        {
-            throw new InvalidPacketException("Command out of range");
-        }
-        if(service>(1<<SRV_LENGTH))
-        {
-            throw new InvalidPacketException("Service out of range");
-        }
+        raw_packet.set(0, (byte)((cnt<<CNT_OFFSET)|(DIR_VALUE<<DIR_OFFSET)|(udsize_inv<<INVERTED_SIZE_OFFSET)|(udsize)));
         raw_packet.set(CMD_BYTE,(byte)0);
         if(CMD_BYTE!=SRV_BYTE)
         {
@@ -285,6 +406,8 @@ public class ProtocolHandler
         lastCmdStartTime = System.currentTimeMillis();
         Byte[] rawpkg = raw_packet.toArray(new Byte[0]);
         DriverSe540.getDriver().sendDataViaUart(rawpkg);
+        lastSentCrc=crc;
+        packetsSent++;
         //TODO start timeout countdown
         new Thread(()->{
             try
@@ -292,7 +415,7 @@ public class ProtocolHandler
                               
                 while(retries<10)
                 {
-                    Thread.sleep(50);
+                    Thread.sleep(200);
                     if(lastCmdStartTime+100>System.currentTimeMillis())
                     {
                         DriverSe540.getDriver().sendDataViaUart(rawpkg);
@@ -302,15 +425,30 @@ public class ProtocolHandler
                     {
                         if(acked)
                         {
+                            packetsLost++;
+                            synchronized(packets)
+                            {
+                                packets.notify();
+                            }
                             return;
                         }
+                    }
+                }
+                if(retries>=10)
+                {
+                    synchronized(pingsync)
+                    {
+                        packetsLost++;
+                        completeConnectionsLost++;
+                        connectionExists=false;
+                        pingsync.notify();
                     }
                 }
             } catch (InterruptedException ex)
             {
                 ex.printStackTrace();
             }
-        });
+        }).start();
         requestResponseListener=(packet)->
         {
             
@@ -327,10 +465,17 @@ public class ProtocolHandler
                 callback.accept(packet);
             }
         };
-//        SWTT
-        //TODO consumer erstellen der auf Resend nötig prüft, dortrein dann den echten callback falls richtige antwort
+        cnt++;
+        cnt=(byte) (cnt%(1<<CNT_LENGTH));
     }
-
+    
+    public void send_response(int cnt,int req_crc,int ret_st, List<Byte> userdata) throws InvalidPacketException
+    {
+        send_response(cnt, req_crc, ret_st, userdata, false);
+    }
+    
+    
+    
     /**
      * Sends a response packet
      * @param cnt Continue value of the source packet
@@ -339,18 +484,28 @@ public class ProtocolHandler
      * @param userdata payload packets
      * @throws InvalidPacketException 
      */
-    public void send_response(int cnt, int req_crc,int ret_st, List<Byte> userdata) throws InvalidPacketException
+    public void send_response(int cnt,int req_crc,int ret_st, List<Byte> userdata,boolean forceSend) throws InvalidPacketException
     {
+        if(userdata==null)
+        {
+            userdata = new ArrayList<>();
+        }
+
         //if(true)
         //     return;
         // throw new UnsupportedOperationException("FIXME");
         List<Byte> raw_packet = new ArrayList<>(MAX_PACKET_SIZE);
-        int udsize = userdata.size();
+        for(int i=0;i<3;i++)
+        {
+            raw_packet.add((byte)0);
+        }
+        
+        int udsize = userdata.size()+2;
         if(udsize>(1<<BASE_SIZE_LENGTH))
         {
             throw new InvalidPacketException("Userdata too long");
         }
-        if(cnt>(1<<CNT_LENGTH))
+        if(cnt>=(1<<CNT_LENGTH))
         {
             throw new InvalidPacketException("Counter too large");
         }
@@ -359,14 +514,13 @@ public class ProtocolHandler
             throw new InvalidPacketException("Response-Status too large");
         }
         int udsize_inv = udsize^((1<<BASE_SIZE_LENGTH)-1);
-        raw_packet.add(0, (byte)((cnt<<CNT_OFFSET)|(udsize_inv<<INVERTED_SIZE_OFFSET)|(udsize)));
-        raw_packet.add(CMD_BYTE,(byte)0);
-        if(RET_ST_BYTE!=SRV_BYTE)
-        {
-            raw_packet.add(RET_ST_BYTE,(byte)0);
-        }
-        raw_packet.add(RET_ST_BYTE,(byte)(raw_packet.get(RET_ST_BYTE)|(ret_st<<RET_ST_OFFSET)));
-        raw_packet.add(SRV_BYTE,(byte)(raw_packet.get(SRV_BYTE)|(SRV_RET<<SRV_OFFSET)));
+        l.trace("UDSIZE_INV=={}",String.format("%03X",udsize_inv));
+        l.trace("REQCRC=={}",String.format("%03X",req_crc));
+        raw_packet.set(0, (byte)((cnt<<CNT_OFFSET)|(DIR_VALUE<<DIR_OFFSET)|(udsize_inv<<INVERTED_SIZE_OFFSET)|(udsize)));
+        raw_packet.set(RET_ST_BYTE,(byte)(raw_packet.get(RET_ST_BYTE)|(ret_st<<RET_ST_OFFSET)));
+        raw_packet.set(SRV_BYTE,(byte)(raw_packet.get(SRV_BYTE)|(SRV_RET<<SRV_OFFSET)));
+        raw_packet.set(REQ_CRC_BYTE,(byte)(req_crc&0xFF));
+        
         int packetlength = USRDATA_RET_START_BYTE+userdata.size();
         raw_packet.addAll(USRDATA_RET_START_BYTE, userdata);
         int crc = CRC.CRC8_START;
@@ -375,18 +529,30 @@ public class ProtocolHandler
             crc = CRC.crc8((byte)crc,raw_packet.get(i));
         }
         raw_packet.add(packetlength,(byte)crc);
-        DriverSe540.getDriver().sendDataViaUart(raw_packet.toArray(new Byte[0]));
+        if(forceSend||lastSentCrcResponse!=crc)
+        {
+           DriverSe540.getDriver().sendDataViaUart(raw_packet.toArray(new Byte[0])); 
+           if(!forceSend)
+           {
+               lastSentCrcResponse=crc;
+           }
+        }
         
-        //TODO consumer erstellen der auf Resend nötig prüft, dortrein dann den echten callback falls richtige antwort
     }
     
     
     
-    //Todo trigger resend bei PacketLoss via timeout
     private void packetReceived(List<Byte> packet,int hdr)
     {
-       
-        int srv = packet.get(SRV_BYTE-1)&SRV_MASK>>>SRV_OFFSET;
+        if((hdr&BASE_SIZE_MASK)==0)
+        {
+            l.info("PING RECEIVED");
+            int req_cnt = (hdr&CNT_MASK)>>CNT_OFFSET;
+            l.trace(req_cnt);
+            send_response(req_cnt, packet.get(0), RET_ST_ACK, null,true);
+            return;
+        }
+        int srv = (packet.get(SRV_BYTE-1)&SRV_MASK)>>>SRV_OFFSET;
         //int ret_ST = (packet.get(RET_ST_BYTE)&RET_ST_MASK)>>RET_ST_OFFSET;
         if(srv!=SRV_RET)
         {
@@ -399,9 +565,29 @@ public class ProtocolHandler
         }
         else
         {
-            if(requestResponseListener!=null)
+            if(connectionExists)
             {
-                requestResponseListener.accept(packet);
+                if(requestResponseListener!=null)
+                {
+                    l.info("Request Response gotten");
+                    requestResponseListener.accept(packet);
+                }
+            }
+            else
+            {
+                l.info("Ping ACK'd");
+                l.trace(packet.size());
+                l.trace("PINGDATA:{}{}",String.format("%03X",packet.get(REQ_CRC_BYTE-1)),String.format("%03X",lastPingCRC));
+                if(packet.size()==3&&(packet.get(REQ_CRC_BYTE-1)+(byte)0)==lastPingCRC)
+                {
+                    l.info("ACK valid");
+                    connectionExists=true;
+                    cbk.connectionReestablished();
+                    synchronized(packets)
+                    {
+                        packets.notify();
+                    }
+                }
             }
         }
     }
@@ -410,7 +596,7 @@ public class ProtocolHandler
         int cmd=((int)packet.get(CMD_BYTE-1));
         cmd=cmd&CMD_MASK;
         cmd=cmd>>>CMD_OFFSET;
-        int cnt = (hdr&CNT_MASK)>>>CNT_OFFSET;
+        int req_cnt = (hdr&CNT_MASK)>>>CNT_OFFSET;
         int req_crc=packet.get(packet.size()-1);
         //int cnt = packet.get(CNT_BYTE)&CNT_MASK>>CNT_OFFSET;
         boolean inRange=cmd<dataHandlers.size();
@@ -420,37 +606,43 @@ public class ProtocolHandler
             int retval = eventhandler.handleEvent(packet);
             if(retval<0)
             {
-                send_response(cnt,req_crc , RET_ST_ACK,new ArrayList<>());
+                send_response(req_cnt,req_crc , RET_ST_ACK,new ArrayList<>());
             }
             else
             {
-                send_response(cnt,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{((byte)(retval&0xFF))}));
+                send_response(req_cnt,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{((byte)(retval&0xFF))}));
             }
         }
         else
         {
-            send_response(cnt,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{NACK_UNKNOWN}));
+            send_response(req_cnt,req_crc , RET_ST_NACK,Arrays.asList(new Byte[]{NACK_UNKNOWN}));
             l.warn("Got unknown command ID {} in event response",cmd);
         }
 
     }
     
-    private void respond(int cnt, int crc, int stts)
-    {
-        List<Byte> pkg = new ArrayList<>();
-        if(stts<128)
-        {
-            stts=RET_ST_ACK;
-        }
-        else
-        {
-            pkg.add((byte)stts);
-        }
-        send_response(cnt, crc, stts, pkg);
-    }
-    
     void sendPing()
     {
-        DriverSe540.getDriver().sendDataViaUart(new Byte[]{0b00111000,CRC.crc8(CRC.CRC8_START,0b00111000)});
+        packetsSent++;
+        l.trace("cnt>>{}",cnt);
+        byte pingHdr = (byte)(0b00111000|((cnt<<CNT_OFFSET)&CNT_MASK)|(DIR_VALUE<<DIR_OFFSET));
+        lastPingCRC = CRC.crc8(CRC.CRC8_START,pingHdr);
+        DriverSe540.getDriver().sendDataViaUart(new Byte[]{pingHdr,lastPingCRC});
+    }
+    
+    void resyncData()
+    {
+        dataHandlers.forEach((DataHandler dh)->{dh.sendGet();});
+    }
+    
+    
+    
+    /*Sorta a struct*/
+    private class InternalPacket{
+        public int service;
+        public int command; 
+        public List<Byte> userdata; 
+        public Consumer<List<Byte>> callback;
     }
 }
+

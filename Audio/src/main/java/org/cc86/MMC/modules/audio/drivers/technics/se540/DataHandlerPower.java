@@ -7,6 +7,8 @@ package org.cc86.MMC.modules.audio.drivers.technics.se540;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -14,7 +16,7 @@ import java.util.List;
  */
 public class DataHandlerPower extends DataHandler
 {
-    
+    private static final Logger l = LogManager.getLogger();
     public static final DataHandlerPower instance = new DataHandlerPower(); 
     private DataHandlerPower(){};
     
@@ -28,9 +30,10 @@ public class DataHandlerPower extends DataHandler
     {
         List<Byte> userdata = new ArrayList<>();
         userdata.add(((byte)(power?1:0)));
-        handler.send_packet(0, ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
+        int cmdid = handler.dataHandlers.indexOf(this);
+        l.trace("prepared PowerPKG, cmdid={}",cmdid);
+        handler.send_packet(ProtocolHandler.SRV_SET,cmdid , userdata, null);
     }
-    
     
     @Override
     public int handleEvent(List<Byte> packet)

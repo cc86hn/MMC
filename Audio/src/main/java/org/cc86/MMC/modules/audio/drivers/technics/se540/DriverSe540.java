@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.modules.audio.Driver;
+import org.cc86.MMC.modules.audio.ReconnectionCallback;
 import org.cc86.MMC.modules.audio.Source;
 
 /**
@@ -34,14 +35,24 @@ public class DriverSe540 implements Driver
     private Consumer<Source> sourceCallback;
     private Consumer<Boolean> powerCallback;
     
+    private ReconnectionCallback handler = null;
+    
     private DriverSe540()
     {
-        h.startReceive();
+        /*()->{handler.connectionReestablished();}*/
+        //TODO FIX
+        h.connect(()->{});
     }
     
     public static DriverSe540 getDriver()
     {
         return instance;
+    }
+
+    @Override
+    public void setHandler(ReconnectionCallback handler)
+    {
+        this.handler = handler;
     }
     
     
@@ -57,6 +68,14 @@ public class DriverSe540 implements Driver
        volumeCallback=volumeHandler;
     }
 
+    @Override
+    public boolean isReady()
+    {
+        return uartOut!=null;
+    }
+
+    
+        
     @Override
     public void setSource(Source source)
     {
@@ -142,10 +161,12 @@ public class DriverSe540 implements Driver
     {
         uartOut=dataConsumer;
     }
-
+    
+    
+    
     @Override
     public void sync() {
-       h.sendPing();
+       //Proto
     }
 
     @Override

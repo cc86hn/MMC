@@ -23,6 +23,8 @@ public interface Driver
     public void sync();
     
     
+    boolean isReady();
+    
     public void setSpeker(String[] spk);
     
     /**
@@ -66,5 +68,11 @@ public interface Driver
      * @param data Byte-array of the data
      */
     public void setUartSender(Consumer<Byte[]> data);
+    
+    /**
+     * Registers a callback to reconfigure target incase the connection was lost
+     * @param cbk Listener that reconfigures the Stereo
+     */
+    public void setHandler(ReconnectionCallback cbk);
     
 }

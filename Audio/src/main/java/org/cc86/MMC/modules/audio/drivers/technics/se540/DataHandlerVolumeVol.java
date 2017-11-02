@@ -27,7 +27,7 @@ public class DataHandlerVolumeVol extends DataHandler
     {
         List<Byte> userdata = new ArrayList<>();
         userdata.add(((byte)(((byte)newVolume)&((byte)0x7f))));
-        handler.send_packet(0, ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
+        handler.send_packet(ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
     }
     @Override
     public int handleEvent(List<Byte> packet)

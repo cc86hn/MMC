@@ -29,7 +29,7 @@ public class DataHandlerSource extends DataHandler
     {
         List<Byte> userdata = new ArrayList<>();
         userdata.add(((byte)(((byte)newSource)&((byte)0x3))));
-        handler.send_packet(0, ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
+        handler.send_packet(ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
     }
     @Override
     public int handleEvent(List<Byte> packet)

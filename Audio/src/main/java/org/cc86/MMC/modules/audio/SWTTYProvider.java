@@ -6,26 +6,18 @@
 package org.cc86.MMC.modules.audio;
 
 import de.nplusc.izc.tools.baseTools.Tools;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
-import java.util.logging.Level;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
@@ -44,6 +36,9 @@ private static final Logger l = LogManager.getLogger();
     //cat auf /dev/pigout & /dev/pigerr
     //static String[] alphabet = "a#b#c#d#e#f#g#h#i#j#k#l#m#n#o#p#q#r#s#t#u#v#w#x#y#z".split("#");
 
+    private int bytesReceived;
+    private int bytesErrored;
+
     /**
      * @param args the command line arguments
      */
@@ -55,6 +50,7 @@ private static final Logger l = LogManager.getLogger();
     private static void setup()
     {
         Tools.runCmdWithPassthru(IoBuilder.forLogger("External.sudoedChmod").buildPrintStream(),"sudo","chmod","777","/sys/class/softuart/softuart/data");
+        Tools.runCmdWithPassthru(new PrintStream(new NullOutputStream()),"cat","/sys/class/softuart/softuart/data");
     }
     @Override
     public void uartHandler(final Consumer<Integer> out,final BlockingQueue<byte[]> ctrl,final boolean addPrefix)
@@ -106,17 +102,23 @@ private static final Logger l = LogManager.getLogger();
                                 }
                                continue;
                             }
-                             l.info("data rcvd, len={}"+len);
+                            l.trace("data rcvd, len={}"+len);
                             for(int i=0;i<len;i+=2)
                             {
                                 int datapkg = ((data[i]&0xF0)>>>4)|((data[i+1]&0xF0));
                                 datapkg|=((data[i+1]&0x08)<<5);
                                 boolean parity = numberOfSetBits(datapkg)%2==0;
                                 l.trace(String.format("%03X",datapkg));
+                                bytesReceived++;
                                 if(parity)
                                 {
                                     l.trace(datapkg);
                                     out.accept(datapkg&0xff);
+                                    
+                                }
+                                else
+                                {
+                                    bytesErrored++;
                                 }
                             }
                             //br.reset();
