@@ -18,13 +18,11 @@ public class DataHandlerSpeaker extends DataHandler
     private final byte AL=0x2;
     private final byte BR=0x4;
     private final byte BL=0x8;
-    private ProtocolHandler handler;
     
     public static final DataHandlerSpeaker instance = new DataHandlerSpeaker(); 
     private DataHandlerSpeaker(){}
-    public static DataHandler linkHandler(ProtocolHandler h)
+    public static DataHandler getInstance()
     {
-        instance.handler=h;
         return instance;
     }
     
@@ -51,6 +49,7 @@ public class DataHandlerSpeaker extends DataHandler
         }
         List<Byte> userdata = new ArrayList<>();
         userdata.add(spk);
-        handler.send_packet(ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
+        int cmdid = ApplicationLayer.dataHandlers.indexOf(this);
+        ApplicationLayer.sendPacket(ServiceType.SRV_SET,cmdid , userdata);
     }
 }

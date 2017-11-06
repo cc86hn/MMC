@@ -20,9 +20,8 @@ public class DataHandlerPower extends DataHandler
     public static final DataHandlerPower instance = new DataHandlerPower(); 
     private DataHandlerPower(){};
     
-    public static DataHandler linkHandler(ProtocolHandler h)
+    public static DataHandler getInstance()
     {
-        instance.handler=h;
         return instance;
     }
     
@@ -30,15 +29,15 @@ public class DataHandlerPower extends DataHandler
     {
         List<Byte> userdata = new ArrayList<>();
         userdata.add(((byte)(power?1:0)));
-        int cmdid = handler.dataHandlers.indexOf(this);
+        int cmdid = ApplicationLayer.dataHandlers.indexOf(this);
         l.trace("prepared PowerPKG, cmdid={}",cmdid);
-        handler.send_packet(ProtocolHandler.SRV_SET,cmdid , userdata, null);
+         ApplicationLayer.sendPacket(ServiceType.SRV_SET,cmdid , userdata);
     }
     
     @Override
-    public int handleEvent(List<Byte> packet)
+    public int handleEvent(List<Byte> userdata)
     {
-        boolean power = packet.get(1)!=0;
+        boolean power = userdata.get(0)!=0;
         DriverSe540.getDriver().notifyCoreonPower(power);
         return -1;
     }

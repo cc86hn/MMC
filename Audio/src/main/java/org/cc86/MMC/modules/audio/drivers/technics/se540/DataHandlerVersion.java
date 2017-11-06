@@ -20,12 +20,10 @@ public class DataHandlerVersion extends DataHandler
     private static final int VERSION_SUB_MASK=0x0F;
     private static final int VERSION_TEST_OFFSET=7;
     private static final int VERSION_TEST_MASK=0x01;
-    private ProtocolHandler handler;
     public static final DataHandlerVersion instance = new DataHandlerVersion(); 
     private DataHandlerVersion(){}
-    public static DataHandler linkHandler(ProtocolHandler h)
+    public static DataHandler getInstance()
     {
-        instance.handler=h;
         return instance;
     }
         
@@ -33,8 +31,8 @@ public class DataHandlerVersion extends DataHandler
     @Override
     public int handleEvent(List<Byte> packet)
     {
-        int communication_version = packet.get(1);
-        int program_version = packet.get(2);
+        int communication_version = packet.get(0);
+        int program_version = packet.get(1);
         
         int main_version = ((program_version^0xff)&VERSION_MAIN_MASK)>>>VERSION_MAIN_OFFSET;
         int sub_version = ((program_version^0xff)&VERSION_MAIN_MASK)>>>VERSION_SUB_OFFSET;

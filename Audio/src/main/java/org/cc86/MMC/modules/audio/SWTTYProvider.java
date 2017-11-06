@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.function.Consumer;
 import org.apache.commons.io.output.NullOutputStream;
@@ -53,7 +55,7 @@ private static final Logger l = LogManager.getLogger();
         Tools.runCmdWithPassthru(new PrintStream(new NullOutputStream()),"cat","/sys/class/softuart/softuart/data");
     }
     @Override
-    public void uartHandler(final Consumer<Integer> out,final BlockingQueue<byte[]> ctrl,final boolean addPrefix)
+    public void uartHandler(final Consumer<Byte[]> out,final BlockingQueue<byte[]> ctrl,final boolean addPrefix)
     {
         new Thread(()->
         {
@@ -88,6 +90,7 @@ private static final Logger l = LogManager.getLogger();
                         ByteArrayOutputStream bs = new ByteArrayOutputStream();
                         while (true)
                         {
+                            List<Byte> bfr = new ArrayList<Byte>();
                             FileInputStream fi =  new FileInputStream("/sys/class/softuart/softuart/data");
                             //Tools.runCmdWithPassthru(new PrintStream(bs), "cat","/sys/class/softuart/softuart/data");
                             
@@ -113,7 +116,7 @@ private static final Logger l = LogManager.getLogger();
                                 if(parity)
                                 {
                                     l.trace(datapkg);
-                                    out.accept(datapkg&0xff);
+                                    bfr.add((byte)(datapkg&0xff));
                                     
                                 }
                                 else
@@ -121,7 +124,7 @@ private static final Logger l = LogManager.getLogger();
                                     bytesErrored++;
                                 }
                             }
-                            //br.reset();
+                            out.accept(bfr.toArray(new Byte[0]));
                             
                            try
                            {

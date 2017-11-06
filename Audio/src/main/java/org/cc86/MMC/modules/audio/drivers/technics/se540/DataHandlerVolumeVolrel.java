@@ -7,6 +7,7 @@ package org.cc86.MMC.modules.audio.drivers.technics.se540;
 
 import java.util.ArrayList;
 import java.util.List;
+import static org.cc86.MMC.modules.audio.drivers.technics.se540.DataHandlerEventAll.instance;
 
 /**
  *
@@ -14,12 +15,10 @@ import java.util.List;
  */
 public class DataHandlerVolumeVolrel extends DataHandler
 {
-    private ProtocolHandler handler;
     public static final DataHandlerVolumeVolrel instance = new DataHandlerVolumeVolrel(); 
     private DataHandlerVolumeVolrel(){}
-    public static DataHandler linkHandler(ProtocolHandler h)
+    public static DataHandler getInstance()
     {
-        instance.handler=h;
         return instance;
     }
     
@@ -27,6 +26,7 @@ public class DataHandlerVolumeVolrel extends DataHandler
     {
         List<Byte> userdata = new ArrayList<>();
         userdata.add(newVolume);
-        handler.send_packet(ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
+        int cmdid = ApplicationLayer.dataHandlers.indexOf(this);
+        ApplicationLayer.sendPacket(ServiceType.SRV_SET,cmdid , userdata);
     }
 }

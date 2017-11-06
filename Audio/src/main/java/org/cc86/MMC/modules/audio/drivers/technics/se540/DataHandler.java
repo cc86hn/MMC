@@ -17,21 +17,30 @@ public class DataHandler
     /**
      * 
      */
-    protected ProtocolHandler handler;
+    protected ApplicationLayer handler;
     
     protected DataHandler(){};
     
     public void sendGet()
     {
-        handler.send_packet(ProtocolHandler.SRV_GET, handler.dataHandlers.indexOf(this), null, null);
+        ApplicationLayer.sendPacket(ServiceType.SRV_GET, ApplicationLayer.dataHandlers.indexOf(this), null);
     }
+    
+    
+    
     /**
      * Processes the Event packet for the given EventID
-     * @param packet Packet of the associated Event
+     * @param userdata Packet of the associated Event
      * @return NACK_RSN or -1 for ACK-ing packet
      */
-    public int handleEvent(List<Byte> packet)
+    public int handleEvent(List<Byte> userdata)
     {
-        return ProtocolHandler.NACK_UNKNOWN;
+        return TransportLayer.NACK_UNKNOWN;
+    }
+    
+    
+    public void handleResponse(List<Byte> userdata)
+    {
+        
     }
 }

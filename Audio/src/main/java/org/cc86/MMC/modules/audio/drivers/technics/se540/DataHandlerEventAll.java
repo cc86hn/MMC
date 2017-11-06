@@ -20,9 +20,8 @@ public class DataHandlerEventAll extends DataHandler
     public static final DataHandlerEventAll instance = new DataHandlerEventAll(); 
     private DataHandlerEventAll(){};
     
-    public static DataHandler linkHandler(ProtocolHandler h)
+    public static DataHandler getInstance()
     {
-        instance.handler=h;
         return instance;
     }
     
@@ -33,9 +32,9 @@ public class DataHandlerEventAll extends DataHandler
         userdata.add((byte)0xff);
         userdata.add((byte)0xff);
         userdata.add((byte)0xff);
-        int cmdid = handler.dataHandlers.indexOf(this);
+        int cmdid = ApplicationLayer.dataHandlers.indexOf(this);
         l.trace("prepared EvtAll, cmdid={}",cmdid);
-        handler.send_packet(ProtocolHandler.SRV_SET,cmdid , userdata, null);
+        ApplicationLayer.sendPacket(ServiceType.SRV_SET,cmdid , userdata);
     }
 }
 

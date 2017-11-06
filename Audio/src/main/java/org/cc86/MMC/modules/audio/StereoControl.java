@@ -84,16 +84,9 @@ public class StereoControl implements Processor
         }).start();
     }
     
-    public void processUARTLine(int recvbyte)
+    public void processUARTLine(Byte[] recvbyte)
     {
-        //byte recv = 
-        if(recvbyte<0)
-        {
-            recvbyte+=256;
-            recvbyte&=0xff;
-        }
-        l.trace("received "+recvbyte);
-        se540.receiveUartByte((byte)recvbyte);
+        se540.receiveUartBytes(recvbyte);
     }
     
     @Override

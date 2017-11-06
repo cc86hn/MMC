@@ -14,14 +14,12 @@ import java.util.List;
  */
 public class DataHandlerSource extends DataHandler
 {
-    private ProtocolHandler handler;
     
     public static final DataHandlerSource instance = new DataHandlerSource(); 
     private DataHandlerSource(){};
     
-    public static DataHandler linkHandler(ProtocolHandler h)
+    public static DataHandler getInstance()
     {
-        instance.handler=h;
         return instance;
     }
     
@@ -29,12 +27,13 @@ public class DataHandlerSource extends DataHandler
     {
         List<Byte> userdata = new ArrayList<>();
         userdata.add(((byte)(((byte)newSource)&((byte)0x3))));
-        handler.send_packet(ProtocolHandler.SRV_SET, handler.dataHandlers.indexOf(this), userdata, null);
+       int cmdid = ApplicationLayer.dataHandlers.indexOf(this);
+        ApplicationLayer.sendPacket(ServiceType.SRV_SET,cmdid , userdata);
     }
     @Override
     public int handleEvent(List<Byte> packet)
     {
-        int source = (packet.get(1))&0x03;
+        int source = (packet.get(0))&0x03;
         DriverSe540.getDriver().notifyCoreonSource(source);
         return -1;
     }

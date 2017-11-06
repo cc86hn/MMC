@@ -59,9 +59,9 @@ public interface Driver
     
     /**
      * Handler to connect the Uart control stream to the driver
-     * @param b Byte to receive
+     * @param b Bytes to receive
      */
-    public void receiveUartByte(byte b);
+    public void receiveUartBytes(Byte[] b);
     
     /**
      * Handler to allow tzhe driver to send Data via uart

@@ -21,7 +21,6 @@ public class DriverSe540 implements Driver
     private static final Logger l = LogManager.getLogger();
     
     private static DriverSe540 instance = new DriverSe540();
-    private ProtocolHandler h = new ProtocolHandler();
     
     private Consumer<Byte[]> uartOut;
     
@@ -39,9 +38,7 @@ public class DriverSe540 implements Driver
     
     private DriverSe540()
     {
-        /*()->{handler.connectionReestablished();}*/
-        //TODO FIX
-        h.connect(()->{});
+        
     }
     
     public static DriverSe540 getDriver()
@@ -151,9 +148,9 @@ public class DriverSe540 implements Driver
     
     
     @Override
-    public void receiveUartByte(byte b)
+    public void receiveUartBytes(Byte[] b)
     {
-        h.receiveByte(b);
+        TransportLayer.receiveBytes(b);
     }
 
     @Override

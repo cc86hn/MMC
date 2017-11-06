@@ -24,7 +24,7 @@ public class MockSWTTYProvider implements TTYProvider
 {
      private static final Logger l = LogManager.getLogger();
      @Override
-     public void uartHandler(final Consumer<Integer> out, final BlockingQueue<byte[]> ctrl, final boolean addPrefix)
+     public void uartHandler(final Consumer<Byte[]> out, final BlockingQueue<byte[]> ctrl, final boolean addPrefix)
     {
         new Thread(() ->
         {
