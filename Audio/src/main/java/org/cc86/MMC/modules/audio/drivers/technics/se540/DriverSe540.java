@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.cc86.MMC.modules.audio.Driver;
 import org.cc86.MMC.modules.audio.ReconnectionCallback;
 import org.cc86.MMC.modules.audio.Source;
+import org.cc86.MMC.modules.audio.StereoControl;
 
 /**
  *
@@ -21,6 +22,9 @@ public class DriverSe540 implements Driver
     private static final Logger l = LogManager.getLogger();
     
     private static DriverSe540 instance = new DriverSe540();
+    private StereoControl c;
+
+
     
     private Consumer<Byte[]> uartOut;
     
@@ -46,6 +50,8 @@ public class DriverSe540 implements Driver
         return instance;
     }
 
+    
+    
     @Override
     public void setHandler(ReconnectionCallback handler)
     {
@@ -175,6 +181,20 @@ public class DriverSe540 implements Driver
     public void setSpeker(String[] spk) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         sps.changeSpksel(spk);
+    }
+    
+    
+    
+    @Override
+    public StereoControl getStereoControl()
+    {
+        return c;
+    }
+
+    @Override
+    public void setStereoControl(StereoControl c)
+    {
+        this.c = c;
     }
     
 }

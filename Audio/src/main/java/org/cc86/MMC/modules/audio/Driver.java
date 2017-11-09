@@ -75,4 +75,9 @@ public interface Driver
      */
     public void setHandler(ReconnectionCallback cbk);
     
+    
+    public StereoControl getStereoControl();
+
+    public void setStereoControl(StereoControl c);
+    
 }

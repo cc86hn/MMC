@@ -80,8 +80,8 @@ public class TransportLayer
     private static boolean acked=false;
     private static int requestCRC=0;
     
-   
-    
+    private static int pingCRC=0;
+    private static boolean ping_acked=false;
     
     
     private static final ArrayList<Byte> receivebuffer = new ArrayList<>();
@@ -90,6 +90,43 @@ public class TransportLayer
             packetsReceived=0,packetsSent=0;
     
     
+    public static void handleData()
+    {
+
+        new Thread(()->{
+            while(!DriverSe540.getDriver().isReady())
+            {
+                try
+                {
+                    Thread.sleep(10);
+                } catch (InterruptedException ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+            do_ping();
+        }).start();
+    }
+    
+    
+    static void do_ping()
+    {
+        while(!ping_acked)
+        {
+            byte hdr=(byte)((DIR_VALUE<<DIR_OFFSET)|(cnt<<CNT_OFFSET)|0b111000);
+            byte crc=CRC.crc8(CRC.CRC8_START, hdr);
+            pingCRC=crc;
+            DriverSe540.getDriver().sendDataViaUart(new Byte[]{hdr,crc});
+            try
+            {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+        DataHandlerEventAll.instance.registerEvents();
+    }
     
     @SuppressWarnings("SleepWhileInLoop")
     static void send_request(ServiceType service, int command, List<Byte> userdata) throws InvalidPacketException
@@ -145,7 +182,7 @@ public class TransportLayer
             DriverSe540.getDriver().sendDataViaUart(rawpkg);
             try
             {
-                Thread.sleep(50);
+                Thread.sleep(500); //HACK!
             }
             catch (InterruptedException ex)
             {
@@ -188,10 +225,12 @@ public class TransportLayer
         int udsize_inv = udsize^((1<<BASE_SIZE_LENGTH)-1);
         l.trace("UDSIZE_INV=={}",String.format("%03X",udsize_inv));
         l.trace("REQCRC=={}",String.format("%03X",req_crc));
-        raw_packet.set(0, (byte)((cnt<<CNT_OFFSET)|(DIR_VALUE<<DIR_OFFSET)|(udsize_inv<<INVERTED_SIZE_OFFSET)|(udsize)));
+        raw_packet.set(0, (byte)((req_cnt<<CNT_OFFSET)|(DIR_VALUE<<DIR_OFFSET)|(udsize_inv<<INVERTED_SIZE_OFFSET)|(udsize)));
         
         raw_packet.set(RET_ST_BYTE,(byte)(raw_packet.get(RET_ST_BYTE)|(ReturnStatus.RET_ST_ACK.ordinal()<<RET_ST_OFFSET)));
         raw_packet.set(SRV_BYTE,(byte)(raw_packet.get(SRV_BYTE)|(ServiceType.SRV_RET.ordinal()<<SRV_OFFSET)));
+        
+        raw_packet.set(REQ_CRC_BYTE,req_crc);
         
         int crc = CRC.CRC8_START;
         for(int i=0;i<3;i++)
@@ -202,6 +241,7 @@ public class TransportLayer
         raw_packet.add((byte)crc);
         DriverSe540.getDriver().sendDataViaUart(raw_packet.toArray(new Byte[0])); 
         packetsSent++;
+        l.trace("SEND_RETURN");
     }
     
     
@@ -241,6 +281,7 @@ public class TransportLayer
          //suspected_package = ;
         while(true)
         {
+            l.trace("parsershift");
             int listend = MAX_PACKET_SIZE>receivebuffer.size()?receivebuffer.size():MAX_PACKET_SIZE;
             //int ls = receivebuffer.size();
             /*if(ls==0)
@@ -254,7 +295,7 @@ public class TransportLayer
             }
             if(suspected_package.size()<1)
             {
-                continue;
+                break;
             }
             byte hdr = suspected_package.get(0);
             int size_first = ((hdr^0xff)&INVERTED_SIZE_MASK)>>>INVERTED_SIZE_OFFSET;
@@ -316,7 +357,10 @@ public class TransportLayer
         {
             l.info("SYNC RECEIVED");
             
-            sendAck(req_cnt,packet.get(REQ_CRC_BYTE));
+            sendAck(req_cnt,packet.get(packet.size()-1));
+            //HACK!
+            new Thread(()->DataHandlerEventAll.instance.registerEvents()).start();
+            
             //send_response(req_cnt, packet.get(0), RET_ST_ACK, null,true);
             return;
         }
@@ -331,7 +375,28 @@ public class TransportLayer
             {
                 sendNack(req_cnt, packet.get(REQ_CRC_BYTE), NACK_UNKNOWN);
             }
-            
+            else
+            {
+                
+                int cmd = ((packet.get(CMD_BYTE)&CMD_MASK)>>>CMD_OFFSET);
+                if(ApplicationLayer.dataHandlers.size()>cmd)
+                {
+                    DataHandler h = ApplicationLayer.dataHandlers.get(cmd);
+                    if(h!=null)
+                    {
+                        sendAck(req_cnt,packet.get(packet.size()-1));
+                        h.handleEvent(packet.subList(2, packet.size()-1));
+                    }
+                    else
+                    {
+                        sendNack(req_cnt, packet.get(packet.size()-1), NACK_INVALID);
+                    }
+                }
+                else
+                {
+                    sendNack(req_cnt, packet.get(packet.size()-1), NACK_UNKNOWN);
+                }
+            }
             //handle_event(packet,hdr);//TO
         }
         else
@@ -344,26 +409,11 @@ public class TransportLayer
                     acked=true;
                 }
             }
-            /*
-            if(connectionExists)
+            
+            if(resp_crc==pingCRC)
             {
-                if(requestResponseListener!=null)
-                {
-                    l.info("Request Response gotten");
-                    requestResponseListener.accept(packet);
-                }
+                ping_acked=true;
             }
-            else
-            {
-                l.info("Ping ACK'd");
-                l.trace(packet.size());
-                l.trace("PINGDATA:{}{}",String.format("%03X",packet.get(REQ_CRC_BYTE-1)),String.format("%03X",lastPingCRC));
-                if(packet.size()==3&&(packet.get(REQ_CRC_BYTE-1)+(byte)0)==lastPingCRC)
-                {
-                    l.info("ACK valid");
-                    //TODO
-                }
-            }*/
         }
     }
     

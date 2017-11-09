@@ -79,18 +79,44 @@ public class Mod_Stereo implements Module
     }
     public void syncDevice()
     {
+        /*Single round of Getters*/
         Packet p = new Packet();
         HashMap<String,Object> data = new HashMap<>();
-        data.put("type","set");
-        data.put("command","dev_sync");
+        data.put("type","get");
+        data.put("command","device_power");
 
         p.setData(data);
         c.sendRequest(p);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            //java.util.logging.Logger.getLogger(Mod_Stereo.class.getName()).log(Level.SEVERE, null, ex);
-        }c.sendRequest(p);
+        try
+        {
+            Thread.sleep(500);
+        } catch (InterruptedException ex)
+        {
+            ex.printStackTrace();
+        }
+        
+        p = new Packet();
+        data = new HashMap<>();
+        data.put("type","get");
+        data.put("command","src_select");
+
+        try
+        {
+            Thread.sleep(500);
+        } catch (InterruptedException ex)
+        {
+            ex.printStackTrace();
+        }
+        p.setData(data);
+        c.sendRequest(p);
+        
+         p = new Packet();
+        data = new HashMap<>();
+        data.put("type","get");
+        data.put("command","volume");
+
+        p.setData(data);
+        c.sendRequest(p);
         
     }
     

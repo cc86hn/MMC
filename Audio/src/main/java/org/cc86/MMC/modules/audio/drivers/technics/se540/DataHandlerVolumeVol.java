@@ -32,7 +32,7 @@ public class DataHandlerVolumeVol extends DataHandler
     @Override
     public int handleEvent(List<Byte> packet)
     {
-        int volume = (packet.get(1))&0x7F;
+        int volume = (packet.get(0))&0x7F;
         DriverSe540.getDriver().notifyCoreonVolume(volume);
         return -1;
     }

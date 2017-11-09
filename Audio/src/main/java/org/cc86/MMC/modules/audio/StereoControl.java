@@ -23,6 +23,7 @@ import org.cc86.MMC.API.Handler;
 import org.cc86.MMC.Networking.Packet;
 import org.cc86.MMC.API.Processor;
 import org.cc86.MMC.modules.audio.drivers.technics.se540.DriverSe540;
+import org.cc86.MMC.modules.audio.drivers.technics.se540.TransportLayer;
 //import org.cc86.MMC.modules.audio.drivers.technics.se540.ProtocolHandler;
 
 /**
@@ -38,17 +39,34 @@ public class StereoControl implements Processor
     private static final Logger l = LogManager.getLogger();
     private boolean pwr = false;
     private int volume=0;
-    private String src = "";
+    private Source source;
+
+
+    
+    
+    
+    
     //private PrintStream serialControl;
     private final List<byte[]> sendQueue = new ArrayList<>();
     private Driver se540 = DriverSe540.getDriver();
     private BlockingQueue<byte[]> serialControl = new LinkedBlockingQueue<>();
     public StereoControl()
     {
-        se540.addPowerCallback((power) -> this.powerChanged(power));
-        se540.addSourceCallback((source) -> this.sourceChanged(source));
-        se540.addVolumeCallback((volume) -> this.volumeChanged(volume));
+        se540.addPowerCallback((power) -> {
+            this.powerChanged(power);
+            this.pwr=power;
+                    
+                });
+        se540.addSourceCallback((source) -> {
+            this.sourceChanged(source);
+            this.source=source;
+                });
+        se540.addVolumeCallback((volume) ->{
+            this.volumeChanged(volume);
+            this.volume=volume;
+                });
         se540.setUartSender((data) -> this.sendViaUART(data));
+        se540.setStereoControl(this);
         new Thread(()->
         {
             serialControl.clear();
@@ -61,6 +79,9 @@ public class StereoControl implements Processor
             {
                 new SWTTYProvider().uartHandler(this::processUARTLine, serialControl, false);
             }
+            
+            TransportLayer.handleData();
+            
             while(true)
             {
                 synchronized(sendQueue)
@@ -126,7 +147,13 @@ public class StereoControl implements Processor
                 }
                 else
                 {
-                    //TODO
+                    Packet rsp = new Packet();
+                    HashMap<String,Object> rspns= new HashMap<>();
+                    rspns.put("value",volume);
+                    rspns.put("command","volume");
+                    rspns.put("type","response");
+                    rsp.setData(rspns);
+                    h.respondToLinkedClient(rsp);
                 }
             break;
             case "device_power":
@@ -144,7 +171,13 @@ public class StereoControl implements Processor
                 }
                 else
                 {
-                    //TODO
+                    Packet rsp = new Packet();
+                    HashMap<String,Object> rspns= new HashMap<>();
+                    rspns.put("value",pwr?"ON":"OFF");
+                    rspns.put("command","device_power");
+                    rspns.put("type","response");
+                    rsp.setData(rspns);
+                    h.respondToLinkedClient(rsp);
                 }
             break;
                 case "src_select":
@@ -173,7 +206,26 @@ public class StereoControl implements Processor
                 }
                 else
                 {
-                    //TODO
+                        String source = "";
+                        switch(this.source)
+                        {
+                            case EXTERNAl:
+                                source="EXT";
+                                break;
+                            case PHONO:
+                                source="PHONO";
+                                break;
+                            case TUNER:
+                                source="TUNER";
+                                break;
+                        }
+                    Packet rsp = new Packet();
+                    HashMap<String,Object> rspns= new HashMap<>();
+                    rspns.put("value",source);
+                    rspns.put("command","src_select");
+                    rspns.put("type","response");
+                    rsp.setData(rspns);
+                    h.respondToLinkedClient(rsp);
                 }
             break;
             case "dev_sync":
@@ -264,4 +316,21 @@ public class StereoControl implements Processor
             sendQueue.notify();
         }
     }
+    
+        public void setPwr(boolean pwr)
+    {
+        this.pwr = pwr;
+    }
+
+    public void setVolume(int volume)
+    {
+        this.volume = volume;
+    }
+
+    public void setSource(Source source)
+    {
+        this.source = source;
+    }
+    
+    
 }

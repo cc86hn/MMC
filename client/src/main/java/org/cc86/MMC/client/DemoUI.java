@@ -61,7 +61,8 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jLabel2 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox();
@@ -97,8 +98,10 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
         btnPower.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         btnPower.setText("Unbekannt");
-        btnPower.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnPower.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnPowerActionPerformed(evt);
             }
         });
@@ -118,24 +121,30 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
         btnPlus.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         btnPlus.setText("+");
-        btnPlus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnPlus.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnPlusActionPerformed(evt);
             }
         });
 
         btnMinus.setFont(new java.awt.Font("Tahoma", 0, 48)); // NOI18N
         btnMinus.setText("-");
-        btnMinus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnMinus.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnMinusActionPerformed(evt);
             }
         });
 
         lblEgg.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
         lblEgg.setText("π");
-        lblEgg.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
+        lblEgg.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mousePressed(java.awt.event.MouseEvent evt)
+            {
                 lblEggMousePressed(evt);
             }
         });
@@ -145,29 +154,37 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
         outLabel.setText("Gewählt: UNBEKANNT");
 
         speakersA.setText("Raum A");
-        speakersA.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        speakersA.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 speakersAActionPerformed(evt);
             }
         });
 
         speakersAB.setText("Raum A& B");
-        speakersAB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        speakersAB.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 speakersABActionPerformed(evt);
             }
         });
 
         speakersB.setText("Raum B");
-        speakersB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        speakersB.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 speakersBActionPerformed(evt);
             }
         });
 
         cbxSourceSel.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Tuner", "CD", "Tape", "Phono","Ext" }));
-        cbxSourceSel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        cbxSourceSel.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 cbxSourceSelActionPerformed(evt);
             }
         });
