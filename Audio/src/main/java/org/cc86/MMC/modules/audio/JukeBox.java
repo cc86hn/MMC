@@ -27,6 +27,9 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class JukeBox implements PlaybackListener
 {
+   
+    
+    private StereoControl ctrl;
     
     private boolean isPlaying=false;
     private static final Logger l = LogManager.getLogger();
@@ -39,7 +42,22 @@ public class JukeBox implements PlaybackListener
         MediaPlayerControl.registerListener(this);
     }
 
-
+    
+    void setStereoControl(StereoControl c)
+    {
+        ctrl=c;
+    }
+    
+    private static final HashMap<String,String> demoPlaybackIDs = new HashMap<>();
+    
+    static{
+        demoPlaybackIDs.put("SUGARRUSH", "/home/pi/demomedia/sugarrush.mp3");
+        demoPlaybackIDs.put("HIGHWAYTOHELL", "/home/pi/demomedia/highwaytohell.mp3");
+        demoPlaybackIDs.put("SHUTUPANDDRIVE", "/home/pi/demomedia/shutupanddrive.mp3");
+        //TODO more titles
+        demoPlaybackIDs.put("SUGARRUSH", "/home/pi/demomedia/sugarrush.mp3");
+        demoPlaybackIDs.put("SUGARRUSH", "/home/pi/demomedia/sugarrush.mp3");
+    }
     
     
     
@@ -64,8 +82,13 @@ public class JukeBox implements PlaybackListener
     }
     
     
+    
+    
+    
     public void start_playback(Packet p, Handler h)
     {
+        
+        ctrl.powerOn(); 
         try
         {
             l.info("Playback enqueue");
@@ -73,6 +96,29 @@ public class JukeBox implements PlaybackListener
             HashMap<String,Object> data = p.getData();
             String trkid = (String) data.get("path");
             String[] fp = trkid.split("/");
+            if(fp[0].equals("FREQGEN"))
+            {
+                //TODO
+                return;
+            }
+            if(fp[0].equals("DEMO"))
+            {
+                l.trace("Demo Track={}",trkid);
+                
+                if(fp.length>=2&&demoPlaybackIDs.containsKey(fp[1]))
+                {
+                    MediaPlayerControl.playURL(demoPlaybackIDs.get(fp[1]));
+                    MediaPlayerControl.control(PlaybackMode.PLAY);
+                }
+                else
+                {
+                    MediaPlayerControl.control(PlaybackMode.STOP);
+                }
+                return;
+            }
+            
+            
+            
             boolean enqueue = (boolean) data.get("scheduled");
             l.info("scheduled="+enqueue);
             String streamurl = "http://"+fp[0]+":9265/"+URLEncoder.encode(fp[1], "UTF-8");;

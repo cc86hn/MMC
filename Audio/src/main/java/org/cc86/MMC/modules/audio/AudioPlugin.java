@@ -34,6 +34,7 @@ public class AudioPlugin implements Plugin{
         }
         h = new AudioProcessor();
         sc = new StereoControl();
+        h.linkStereoControl(sc);
         API.getDispatcher().registerOnRequestType("playback_dlna", h);
         API.getDispatcher().registerOnRequestType("playback_jukebox", h);
         API.getDispatcher().registerOnRequestType("playback_pool", h);

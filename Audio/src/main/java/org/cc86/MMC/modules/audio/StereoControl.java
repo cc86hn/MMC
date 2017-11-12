@@ -317,7 +317,7 @@ public class StereoControl implements Processor
         }
     }
     
-        public void setPwr(boolean pwr)
+    public void setPwr(boolean pwr)
     {
         this.pwr = pwr;
     }
@@ -331,6 +331,27 @@ public class StereoControl implements Processor
     {
         this.source = source;
     }
+
+    public boolean isPwr()
+    {
+        return pwr;
+    }
+
+    public int getVolume()
+    {
+        return volume;
+    }
+
+    public Source getSource()
+    {
+        return source;
+    }
     
-    
+    public void powerOn()
+    {
+        if(!pwr)
+        {
+            se540.setPower(true);
+        }
+    }
 }

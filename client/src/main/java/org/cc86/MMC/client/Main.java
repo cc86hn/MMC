@@ -56,7 +56,7 @@ public class Main
         Options options = new Options();
         options.addOption("d", "demo", false, "Demo UI modus für die H+E in Schuttgart");
         options.addOption("x", "devmode", false, "Allows the Demo mode to be closed");
-                options.addOption(OptionBuilder.withLongOpt("file")
+        options.addOption(OptionBuilder.withLongOpt("ip")
                 .withDescription("ip")
                 .hasArg()
                 .withArgName("ADDR")
@@ -64,7 +64,7 @@ public class Main
         try 
         {
             String srvr="0.0.0.0";
-             TimeoutManager m =null;
+            TimeoutManager m =null;
             CommandLine cl = parser.parse(options, args);
             setupLogging(true);
             if(cl.hasOption("i"))
@@ -76,7 +76,7 @@ public class Main
                 //Main.setupLogging(cl.hasOption("verbose"));
 
 
-               m = new TimeoutManager(2, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
+                m = new TimeoutManager(2, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
                 m.start();
                 //srvr =serverDiscovery();//;//"10.110.12.183";//
                 srvr="192.168.10.41";

@@ -17,6 +17,11 @@ public class AudioProcessor implements Processor
 {
     private JukeBox jbx = new JukeBox();
     
+    void linkStereoControl(StereoControl c)
+    {
+        jbx.setStereoControl(c);
+    }
+    
     
     @Override
     public void process(Packet r, Handler h)
