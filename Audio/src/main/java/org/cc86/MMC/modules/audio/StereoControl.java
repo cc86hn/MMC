@@ -354,4 +354,12 @@ public class StereoControl implements Processor
             se540.setPower(true);
         }
     }
+    
+    public void gotoExt()
+    {
+        if(source!=Source.EXTERNAl)
+        {
+            se540.setSource(Source.EXTERNAl);
+        }
+    }
 }

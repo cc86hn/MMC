@@ -11,10 +11,18 @@ import de.nplusc.izc.tools.baseTools.TimeoutManager;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.cli.CommandLine;
@@ -73,13 +81,15 @@ public class Main
             }
             else
             {
+                serverDiscoveryHack(args);
+                return;
                 //Main.setupLogging(cl.hasOption("verbose"));
 
 
-                m = new TimeoutManager(2, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
-                m.start();
+                //m = new TimeoutManager(2, ()->Messagers.SingleLineMsg("Serversuche fehlgeschlagen", "OK"));
+                //m.start();
                 //srvr =serverDiscovery();//;//"10.110.12.183";//
-                srvr="192.168.10.41";
+                //srvr="192.168.10.41";
             }
             l.info(srvr);
             if(srvr.equals("0.0.0.0"))
@@ -172,7 +182,6 @@ public class Main
                     Menu.bootUI();
                 });
             }
-            
         }
         catch (ParseException ex)
         {
@@ -208,8 +217,82 @@ public class Main
     {
         return piIP;
     }
-    
-    
+    //HACKHACKHACKHACKHACK
+    public static void serverDiscoveryHack(String[] args)
+    {
+        try
+        {
+
+            final boolean[] foundSomething = {false};
+            List<InetAddress> addrList = new ArrayList<InetAddress>();
+            Enumeration interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements())
+            {
+                try
+                {
+                    NetworkInterface ifc = (NetworkInterface) interfaces.nextElement();
+
+                    if(ifc.isUp()) 
+                    {
+                        Enumeration addresses = ifc.getInetAddresses();
+                        while (addresses.hasMoreElements())
+                        {
+                            InetAddress addr = (InetAddress)addresses.nextElement();
+                            if(addr instanceof Inet6Address)
+                            {
+                                continue;
+                            }
+                            byte[] addrraw = addr.getAddress();
+                            for(int i=1;i<254;i++)
+                            {
+                                try
+                                {
+                                    final InetAddress calculated = InetAddress.getByAddress(new byte[]{addrraw[0],addrraw[1],addrraw[2],(byte)i});
+                                    new Thread(()->{
+                                        //c=new TCPConnection(calculated.getHostAddress(), 0xCC86);
+                                        try
+                                        {
+                                            Socket client=new Socket();   
+                                            client.connect(new InetSocketAddress(calculated.getHostAddress(),0xcc87),2000); 
+                                            synchronized(foundSomething)
+                                            {
+                                                if(!foundSomething[0])
+                                                {
+                                                    foundSomething[0]=true;
+                                                    ArrayList<String> lst = new ArrayList(Arrays.asList(args));
+                                                    lst.add("-i");
+                                                    lst.add(calculated.getHostAddress());
+                                                    main(lst.toArray(args));
+                                                }
+                                            }
+                                        }
+                                        catch (IOException ex)
+                                        {
+                                            //System.out.println(ex.m);
+                                            l.trace("Dead host");
+                                            //System.exit(0);
+                                        }
+                                    }).start();
+                                } catch (UnknownHostException ex)
+                                {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (SocketException ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+
+        }
+        catch(SocketException ex)
+        {
+            ex.printStackTrace();
+        }
+    }
     
     public static String serverDiscovery()
     {

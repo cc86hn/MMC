@@ -46,6 +46,8 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
         {
             m.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         }
+        m.track4.setVisible(false);
+        m.track5.setVisible(false);
         //l.trace("Ach LEgg mi doch am arsch");
         //m.pGeneral.add()
     }
@@ -200,7 +202,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
         jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
-        jLabel5.setText("Musik-Wahl");
+        jLabel5.setText("Ton-Wahl");
 
         stopPlayback.setText("STOP");
         stopPlayback.addActionListener(new java.awt.event.ActionListener()
@@ -211,7 +213,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
             }
         });
 
-        highwayToHellPlayback.setText("Highway To Hell");
+        highwayToHellPlayback.setText("Sinus 1KHz");
         highwayToHellPlayback.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -220,7 +222,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
             }
         });
 
-        shutUpAndDrivePlayback.setText("Shut up and Drive");
+        shutUpAndDrivePlayback.setText("Sinus 8KHz");
         shutUpAndDrivePlayback.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -229,7 +231,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
             }
         });
 
-        sugarRushPlayback.setText("Sugar Rush");
+        sugarRushPlayback.setText("Weißes Rauschen");
         sugarRushPlayback.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -318,21 +320,6 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(24, 24, 24)
-                        .addComponent(highwayToHellPlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(shutUpAndDrivePlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(sugarRushPlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(track4, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(track5, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(126, 126, 126)
-                        .addComponent(stopPlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addGap(18, 18, 18)
                         .addComponent(btnPower)
@@ -358,11 +345,26 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
                             .addComponent(speakersA, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(speakersAB, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(speakersB, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                         .addComponent(lblEgg))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jSeparator3)
-                        .addContainerGap())))
+                        .addContainerGap())
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(24, 24, 24)
+                        .addComponent(highwayToHellPlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(shutUpAndDrivePlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sugarRushPlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(track4, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(track5, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(stopPlayback, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(34, 34, 34))))
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -413,19 +415,19 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
     private void highwayToHellPlaybackActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_highwayToHellPlaybackActionPerformed
     {//GEN-HEADEREND:event_highwayToHellPlaybackActionPerformed
-        playTrack("DEMO/HIGHWAYTOHELL");
+        playTrack("DEMO/SINE1K");
 
     }//GEN-LAST:event_highwayToHellPlaybackActionPerformed
 
     private void shutUpAndDrivePlaybackActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_shutUpAndDrivePlaybackActionPerformed
     {//GEN-HEADEREND:event_shutUpAndDrivePlaybackActionPerformed
-        playTrack("DEMO/SHUTUPANDDRIVE");
+        playTrack("DEMO/SINE8K");
         
     }//GEN-LAST:event_shutUpAndDrivePlaybackActionPerformed
 
     private void sugarRushPlaybackActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_sugarRushPlaybackActionPerformed
     {//GEN-HEADEREND:event_sugarRushPlaybackActionPerformed
-        playTrack("DEMO/SUGARRUSH");
+        playTrack("DEMO/WHITENOISE");
     }//GEN-LAST:event_sugarRushPlaybackActionPerformed
 
     private void track4ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_track4ActionPerformed

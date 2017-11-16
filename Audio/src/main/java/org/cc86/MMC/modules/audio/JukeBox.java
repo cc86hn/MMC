@@ -51,12 +51,12 @@ public class JukeBox implements PlaybackListener
     private static final HashMap<String,String> demoPlaybackIDs = new HashMap<>();
     
     static{
-        demoPlaybackIDs.put("SUGARRUSH", "/home/pi/demomedia/sugarrush.mp3");
-        demoPlaybackIDs.put("HIGHWAYTOHELL", "/home/pi/demomedia/highwaytohell.mp3");
-        demoPlaybackIDs.put("SHUTUPANDDRIVE", "/home/pi/demomedia/shutupanddrive.mp3");
+        demoPlaybackIDs.put("SINE1K", "/home/pi/demomedia/sine1k.mp3");
+        demoPlaybackIDs.put("SINE8K", "/home/pi/demomedia/sine8k.mp3");
+        demoPlaybackIDs.put("WHITENOISE", "/home/pi/demomedia/whitenoise.mp3");
         //TODO more titles
-        demoPlaybackIDs.put("SUGARRUSH", "/home/pi/demomedia/sugarrush.mp3");
-        demoPlaybackIDs.put("SUGARRUSH", "/home/pi/demomedia/sugarrush.mp3");
+        /*demoPlaybackIDs.put("SUGARRUSH", "/home/pi/demomedia/sugarrush.mp3");
+        demoPlaybackIDs.put("SUGARRUSH", "/home/pi/demomedia/sugarrush.mp3");*/
     }
     
     
@@ -89,6 +89,7 @@ public class JukeBox implements PlaybackListener
     {
         
         ctrl.powerOn(); 
+        ctrl.gotoExt();
         try
         {
             l.info("Playback enqueue");
