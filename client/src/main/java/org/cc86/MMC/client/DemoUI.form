@@ -164,7 +164,7 @@
                               <Component id="speakersAB" alignment="3" min="-2" pref="50" max="-2" attributes="0"/>
                               <Component id="speakersB" alignment="3" min="-2" pref="45" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="8" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                           <Component id="lblEgg" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
@@ -358,7 +358,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="sugarRushPlayback">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Wei&#xdf;es Rauschen"/>
+            <Property name="text" type="java.lang.String" value="Lied 1"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="sugarRushPlaybackActionPerformed"/>
@@ -366,7 +366,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="track4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;RESERVED&gt;"/>
+            <Property name="text" type="java.lang.String" value="Lied 2"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="track4ActionPerformed"/>
@@ -374,7 +374,7 @@
         </Component>
         <Component class="javax.swing.JButton" name="track5">
           <Properties>
-            <Property name="text" type="java.lang.String" value="&lt;RESERVED&gt;"/>
+            <Property name="text" type="java.lang.String" value="Lied 3"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="track5ActionPerformed"/>

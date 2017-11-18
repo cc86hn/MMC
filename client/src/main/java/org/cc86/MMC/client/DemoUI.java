@@ -46,8 +46,8 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
         {
             m.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         }
-        m.track4.setVisible(false);
-        m.track5.setVisible(false);
+        //m.track4.setVisible(false);
+        //m.track5.setVisible(false);
         //l.trace("Ach LEgg mi doch am arsch");
         //m.pGeneral.add()
     }
@@ -231,7 +231,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
             }
         });
 
-        sugarRushPlayback.setText("Weißes Rauschen");
+        sugarRushPlayback.setText("Lied 1");
         sugarRushPlayback.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -240,7 +240,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
             }
         });
 
-        track4.setText("<RESERVED>");
+        track4.setText("Lied 2");
         track4.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -249,7 +249,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
             }
         });
 
-        track5.setText("<RESERVED>");
+        track5.setText("Lied 3");
         track5.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
@@ -345,7 +345,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
                             .addComponent(speakersA, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(speakersAB, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(speakersB, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(lblEgg))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jSeparator3)
@@ -427,7 +427,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
     private void sugarRushPlaybackActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_sugarRushPlaybackActionPerformed
     {//GEN-HEADEREND:event_sugarRushPlaybackActionPerformed
-        playTrack("DEMO/WHITENOISE");
+        playTrack("DEMO/SHUTUPANDDRIVE");
     }//GEN-LAST:event_sugarRushPlaybackActionPerformed
 
     private void track4ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_track4ActionPerformed
@@ -437,7 +437,7 @@ public class DemoUI extends javax.swing.JFrame implements StereoUIApi
 
     private void track5ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_track5ActionPerformed
     {//GEN-HEADEREND:event_track5ActionPerformed
-        playTrack("DEMO/SUGARRUSH");
+        playTrack("DEMO/HIGHWAYTOHELL");
     }//GEN-LAST:event_track5ActionPerformed
 
     private void stopPlaybackActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_stopPlaybackActionPerformed
